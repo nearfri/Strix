@@ -1,0 +1,430 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		7556A2A21E7AE4B70094EF39 /* Strix.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7556A2981E7AE4B70094EF39 /* Strix.framework */; };
+		7556A2D71E7AE6A00094EF39 /* CharacterStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7556A2D61E7AE6A00094EF39 /* CharacterStream.swift */; };
+		7556A2D91E7AE7030094EF39 /* CharacterStreamTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7556A2D81E7AE7030094EF39 /* CharacterStreamTests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		7556A2A31E7AE4B70094EF39 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 7556A28F1E7AE4B70094EF39 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 7556A2971E7AE4B70094EF39;
+			remoteInfo = Strix;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		7556A2981E7AE4B70094EF39 /* Strix.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Strix.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		7556A29C1E7AE4B70094EF39 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		7556A2A11E7AE4B70094EF39 /* StrixTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = StrixTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		7556A2A81E7AE4B70094EF39 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		7556A2D61E7AE6A00094EF39 /* CharacterStream.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CharacterStream.swift; sourceTree = "<group>"; };
+		7556A2D81E7AE7030094EF39 /* CharacterStreamTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CharacterStreamTests.swift; sourceTree = "<group>"; };
+		7556A35B1E7AEB8B0094EF39 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = SOURCE_ROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		7556A2941E7AE4B70094EF39 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7556A29E1E7AE4B70094EF39 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7556A2A21E7AE4B70094EF39 /* Strix.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		7556A28E1E7AE4B70094EF39 = {
+			isa = PBXGroup;
+			children = (
+				7556A29A1E7AE4B70094EF39 /* Strix */,
+				7556A2A51E7AE4B70094EF39 /* StrixTests */,
+				7556A2991E7AE4B70094EF39 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		7556A2991E7AE4B70094EF39 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				7556A2981E7AE4B70094EF39 /* Strix.framework */,
+				7556A2A11E7AE4B70094EF39 /* StrixTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		7556A29A1E7AE4B70094EF39 /* Strix */ = {
+			isa = PBXGroup;
+			children = (
+				7556A2D61E7AE6A00094EF39 /* CharacterStream.swift */,
+				7556A3561E7AEA710094EF39 /* Supporting Files */,
+			);
+			path = Strix;
+			sourceTree = "<group>";
+		};
+		7556A2A51E7AE4B70094EF39 /* StrixTests */ = {
+			isa = PBXGroup;
+			children = (
+				7556A2D81E7AE7030094EF39 /* CharacterStreamTests.swift */,
+				7556A2A81E7AE4B70094EF39 /* Info.plist */,
+			);
+			path = StrixTests;
+			sourceTree = "<group>";
+		};
+		7556A3561E7AEA710094EF39 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				7556A29C1E7AE4B70094EF39 /* Info.plist */,
+				7556A35B1E7AEB8B0094EF39 /* README.md */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		7556A2951E7AE4B70094EF39 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		7556A2971E7AE4B70094EF39 /* Strix */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7556A2AC1E7AE4B70094EF39 /* Build configuration list for PBXNativeTarget "Strix" */;
+			buildPhases = (
+				7556A2931E7AE4B70094EF39 /* Sources */,
+				7556A2941E7AE4B70094EF39 /* Frameworks */,
+				7556A2951E7AE4B70094EF39 /* Headers */,
+				7556A2961E7AE4B70094EF39 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Strix;
+			productName = Strix;
+			productReference = 7556A2981E7AE4B70094EF39 /* Strix.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		7556A2A01E7AE4B70094EF39 /* StrixTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7556A2AF1E7AE4B70094EF39 /* Build configuration list for PBXNativeTarget "StrixTests" */;
+			buildPhases = (
+				7556A29D1E7AE4B70094EF39 /* Sources */,
+				7556A29E1E7AE4B70094EF39 /* Frameworks */,
+				7556A29F1E7AE4B70094EF39 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				7556A2A41E7AE4B70094EF39 /* PBXTargetDependency */,
+			);
+			name = StrixTests;
+			productName = StrixTests;
+			productReference = 7556A2A11E7AE4B70094EF39 /* StrixTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		7556A28F1E7AE4B70094EF39 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 0820;
+				LastUpgradeCheck = 0820;
+				ORGANIZATIONNAME = nearfri;
+				TargetAttributes = {
+					7556A2971E7AE4B70094EF39 = {
+						CreatedOnToolsVersion = 8.2.1;
+						LastSwiftMigration = 0820;
+						ProvisioningStyle = Automatic;
+					};
+					7556A2A01E7AE4B70094EF39 = {
+						CreatedOnToolsVersion = 8.2.1;
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 7556A2921E7AE4B70094EF39 /* Build configuration list for PBXProject "Strix" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 7556A28E1E7AE4B70094EF39;
+			productRefGroup = 7556A2991E7AE4B70094EF39 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				7556A2971E7AE4B70094EF39 /* Strix */,
+				7556A2A01E7AE4B70094EF39 /* StrixTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		7556A2961E7AE4B70094EF39 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7556A29F1E7AE4B70094EF39 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		7556A2931E7AE4B70094EF39 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7556A2D71E7AE6A00094EF39 /* CharacterStream.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7556A29D1E7AE4B70094EF39 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7556A2D91E7AE7030094EF39 /* CharacterStreamTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		7556A2A41E7AE4B70094EF39 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 7556A2971E7AE4B70094EF39 /* Strix */;
+			targetProxy = 7556A2A31E7AE4B70094EF39 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		7556A2AA1E7AE4B70094EF39 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		7556A2AB1E7AE4B70094EF39 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		7556A2AD1E7AE4B70094EF39 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "";
+				COMBINE_HIDPI_IMAGES = YES;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_VERSION = A;
+				INFOPLIST_FILE = Strix/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.nearfri.Strix;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 3.0;
+			};
+			name = Debug;
+		};
+		7556A2AE1E7AE4B70094EF39 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "";
+				COMBINE_HIDPI_IMAGES = YES;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_VERSION = A;
+				INFOPLIST_FILE = Strix/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.nearfri.Strix;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 3.0;
+			};
+			name = Release;
+		};
+		7556A2B01E7AE4B70094EF39 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = StrixTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.nearfri.StrixTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
+			};
+			name = Debug;
+		};
+		7556A2B11E7AE4B70094EF39 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = StrixTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.nearfri.StrixTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		7556A2921E7AE4B70094EF39 /* Build configuration list for PBXProject "Strix" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7556A2AA1E7AE4B70094EF39 /* Debug */,
+				7556A2AB1E7AE4B70094EF39 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		7556A2AC1E7AE4B70094EF39 /* Build configuration list for PBXNativeTarget "Strix" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7556A2AD1E7AE4B70094EF39 /* Debug */,
+				7556A2AE1E7AE4B70094EF39 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		7556A2AF1E7AE4B70094EF39 /* Build configuration list for PBXNativeTarget "StrixTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7556A2B01E7AE4B70094EF39 /* Debug */,
+				7556A2B11E7AE4B70094EF39 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 7556A28F1E7AE4B70094EF39 /* Project object */;
+}
