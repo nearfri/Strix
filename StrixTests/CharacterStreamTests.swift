@@ -13,17 +13,26 @@ class CharacterStreamTests: XCTestCase {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
         super.tearDown()
     }
-
-    func testExample() {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
+    
+    func test_init_whenGivenBounds_setsIndexes() {
+        let string = "Foo"
+        let bounds = string.startIndex..<string.index(before: string.endIndex)
+        let stream = CharacterStream(string: string, bounds: bounds)
+        XCTAssertEqual(stream.string, string)
+        XCTAssertEqual(stream.startIndex, bounds.lowerBound)
+        XCTAssertEqual(stream.endIndex, bounds.upperBound)
+        XCTAssertEqual(stream.nextIndex, bounds.lowerBound)
     }
-
-    func testPerformanceExample() {
-        // This is an example of a performance test case.
-        self.measure {
-            // Put the code you want to measure the time of here.
-        }
+    
+    func test_init_whenNotGivenBounds_setsIndexes() {
+        let string = "Foo"
+        let stream = CharacterStream(string: string)
+        XCTAssertEqual(stream.string, string)
+        XCTAssertEqual(stream.startIndex, string.startIndex)
+        XCTAssertEqual(stream.endIndex, string.endIndex)
+        XCTAssertEqual(stream.nextIndex, string.startIndex)
     }
-
 }
+
+
+
