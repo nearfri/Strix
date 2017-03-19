@@ -30,6 +30,7 @@
 		7556A2D61E7AE6A00094EF39 /* CharacterStream.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CharacterStream.swift; sourceTree = "<group>"; };
 		7556A2D81E7AE7030094EF39 /* CharacterStreamTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CharacterStreamTests.swift; sourceTree = "<group>"; };
 		7556A35B1E7AEB8B0094EF39 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = SOURCE_ROOT; };
+		7556A3621E7D80640094EF39 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -92,6 +93,7 @@
 			children = (
 				7556A29C1E7AE4B70094EF39 /* Info.plist */,
 				7556A35B1E7AEB8B0094EF39 /* README.md */,
+				7556A3621E7D80640094EF39 /* LICENSE */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";

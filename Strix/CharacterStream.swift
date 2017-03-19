@@ -28,5 +28,28 @@ open class CharacterStream {
     }
 }
 
+extension CharacterStream {
+    open var isAtStart: Bool { return nextIndex == startIndex }
+    open var isAtEnd: Bool { return nextIndex == endIndex }
+    
+    open func seek(to index: String.Index) {
+        precondition(index >= startIndex, "index is less than startIndex")
+        precondition(index <= endIndex, "index is greater than endIndex")
+        nextIndex = index
+    }
+    
+    open func peek() -> Character? {
+        return isAtEnd ? nil : string[nextIndex]
+    }
+    
+    open func peek(offset: String.IndexDistance) -> Character? {
+        let limit = offset < 0 ? startIndex : endIndex
+        if let i = string.index(nextIndex, offsetBy: offset, limitedBy: limit), i != endIndex {
+            return string[i]
+        }
+        return nil
+    }
+}
+
 
 
