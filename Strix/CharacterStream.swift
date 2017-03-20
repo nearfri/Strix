@@ -52,11 +52,15 @@ extension CharacterStream {
     }
     
     open func peek(offset: String.IndexDistance) -> Character? {
-        let limit = offset < 0 ? startIndex : endIndex
-        if let i = string.index(nextIndex, offsetBy: offset, limitedBy: limit), i != endIndex {
+        if let i = index(nextIndex, offsetBy: offset), i != endIndex {
             return string[i]
         }
         return nil
+    }
+    
+    fileprivate func index(_ i: String.Index, offsetBy n: String.IndexDistance) -> String.Index? {
+        let limit = n < 0 ? startIndex : endIndex
+        return string.index(i, offsetBy: n, limitedBy: limit)
     }
     
     open func matches(_ c: Character) -> Bool {
