@@ -1,4 +1,11 @@
 
+import Foundation
+
+public enum StringSensitivity {
+    case sensitive
+    case insensitive
+}
+
 open class CharacterStream {
     public typealias UserInfo = [String: Any]
     
@@ -37,7 +44,9 @@ extension CharacterStream {
         precondition(index <= endIndex, "index is greater than endIndex")
         nextIndex = index
     }
-    
+}
+
+extension CharacterStream {
     open func peek() -> Character? {
         return isAtEnd ? nil : string[nextIndex]
     }
@@ -48,6 +57,50 @@ extension CharacterStream {
             return string[i]
         }
         return nil
+    }
+    
+    open func matches(_ c: Character) -> Bool {
+        return matches({ $0 == c })
+    }
+    
+    open func matches(_ predicate: (Character) -> Bool) -> Bool {
+        return !isAtEnd && predicate(string[nextIndex])
+    }
+    
+    open func matches(_ str: String, case caseSensitivity: StringSensitivity) -> Bool {
+        return index(afterMatch: str, from: nextIndex, case: caseSensitivity) != nil
+    }
+    
+    fileprivate func index(afterMatch str: String, from start: String.Index,
+                           case caseSensitivity: StringSensitivity) -> String.Index? {
+        assert(start >= startIndex, "start is less than startIndex")
+        guard let end = string.index(start, offsetBy: str.characters.count, limitedBy: endIndex)
+            else { return nil }
+        
+        let options: String.CompareOptions
+        switch caseSensitivity {
+        case .sensitive:    options = []
+        case .insensitive:  options = .caseInsensitive
+        }
+        
+        if string.compare(str, options: options, range: start..<end) == .orderedSame {
+            return end
+        }
+        return nil
+    }
+    
+    open func matches(_ regex: NSRegularExpression) -> NSTextCheckingResult? {
+        func utf16IntRange(in str: String, from: String.Index, to: String.Index) -> Range<Int> {
+            let utf16View = str.utf16
+            let utf16From = from.samePosition(in: utf16View)
+            let utf16To = to.samePosition(in: utf16View)
+            let start = utf16View.distance(from: utf16View.startIndex, to: utf16From)
+            let count = utf16View.distance(from: utf16From, to: utf16To)
+            return start..<(start+count)
+        }
+        
+        let range = NSRange(utf16IntRange(in: string, from: nextIndex, to: endIndex))
+        return regex.firstMatch(in: string, options: [], range: range)
     }
 }
 
