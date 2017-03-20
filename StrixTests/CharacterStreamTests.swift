@@ -33,6 +33,22 @@ class CharacterStreamTests: XCTestCase {
         XCTAssertEqual(stream.nextIndex, string.startIndex)
     }
     
+    func test_whenSetProperties_incrementsStateTag() {
+        let string = "Bar"
+        let stream = CharacterStream(string: string)
+        
+        XCTAssertEqual(stream.stateTag, 0)
+        
+        stream.userInfo["info1"] = 10
+        XCTAssertEqual(stream.stateTag, 1)
+        
+        stream.userInfo = ["info2": 20]
+        XCTAssertEqual(stream.stateTag, 2)
+        
+        stream.name = "StreamName"
+        XCTAssertEqual(stream.stateTag, 3)
+    }
+    
     func test_seek() {
         let string = "Foo"
         let stream = CharacterStream(string: string)
