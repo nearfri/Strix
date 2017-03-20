@@ -6,6 +6,18 @@ public enum StringSensitivity {
     case insensitive
 }
 
+extension String {
+    public func compare(_ aString: String, case caseSensitivity: StringSensitivity,
+                        range: Range<String.Index>, locale: Locale? = nil) -> ComparisonResult {
+        let options: String.CompareOptions
+        switch caseSensitivity {
+        case .sensitive:    options = []
+        case .insensitive:  options = .caseInsensitive
+        }
+        return compare(aString, options: options, range: range, locale: locale)
+    }
+}
+
 open class CharacterStream {
     public typealias UserInfo = [String: Any]
     
@@ -52,15 +64,15 @@ extension CharacterStream {
     }
     
     open func peek(offset: String.IndexDistance) -> Character? {
-        if let i = index(nextIndex, offsetBy: offset), i != endIndex {
+        if let i = index(from: nextIndex, offset: offset), i != endIndex {
             return string[i]
         }
         return nil
     }
     
-    fileprivate func index(_ i: String.Index, offsetBy n: String.IndexDistance) -> String.Index? {
-        let limit = n < 0 ? startIndex : endIndex
-        return string.index(i, offsetBy: n, limitedBy: limit)
+    fileprivate func index(from i: String.Index, offset: String.IndexDistance) -> String.Index? {
+        let limit = offset < 0 ? startIndex : endIndex
+        return string.index(i, offsetBy: offset, limitedBy: limit)
     }
     
     open func matches(_ c: Character) -> Bool {
@@ -72,25 +84,10 @@ extension CharacterStream {
     }
     
     open func matches(_ str: String, case caseSensitivity: StringSensitivity) -> Bool {
-        return index(afterMatch: str, from: nextIndex, case: caseSensitivity) != nil
-    }
-    
-    fileprivate func index(afterMatch str: String, from start: String.Index,
-                           case caseSensitivity: StringSensitivity) -> String.Index? {
-        assert(start >= startIndex, "start is less than startIndex")
-        guard let end = string.index(start, offsetBy: str.characters.count, limitedBy: endIndex)
-            else { return nil }
-        
-        let options: String.CompareOptions
-        switch caseSensitivity {
-        case .sensitive:    options = []
-        case .insensitive:  options = .caseInsensitive
+        guard let end = index(from: nextIndex, offset: str.characters.count) else {
+            return false
         }
-        
-        if string.compare(str, options: options, range: start..<end) == .orderedSame {
-            return end
-        }
-        return nil
+        return string.compare(str, case: caseSensitivity, range: nextIndex..<end) == .orderedSame
     }
     
     open func matches(_ regex: NSRegularExpression) -> NSTextCheckingResult? {
@@ -112,6 +109,30 @@ extension CharacterStream {
     open func skip() {
         if isAtEnd { return }
         nextIndex = string.index(after: nextIndex)
+    }
+    
+    @discardableResult
+    open func skip(_ c: Character) -> Bool {
+        return skip({ $0 == c })
+    }
+    
+    @discardableResult
+    open func skip(_ predicate: (Character) -> Bool) -> Bool {
+        guard matches(predicate) else { return false }
+        nextIndex = string.index(after: nextIndex)
+        return true
+    }
+    
+    @discardableResult
+    open func skip(_ str: String, case caseSensitivity: StringSensitivity) -> Bool {
+        guard let end = index(from: nextIndex, offset: str.characters.count) else {
+            return false
+        }
+        if string.compare(str, case: caseSensitivity, range: nextIndex..<end) != .orderedSame {
+            return false
+        }
+        nextIndex = end
+        return true
     }
 }
 

@@ -101,7 +101,7 @@ class CharacterStreamTests: XCTestCase {
         XCTAssertNil(stream.peek(offset: 1))
     }
     
-    func test_matchesChar() {
+    func test_matchesCharacter() {
         let string = "Bar"
         let stream = CharacterStream(string: string)
         
@@ -118,7 +118,7 @@ class CharacterStreamTests: XCTestCase {
         XCTAssertFalse(stream.matches("r"))
     }
     
-    func test_matchesCharPredicate() {
+    func test_matchesCharacterPredicate() {
         let string = "Bar"
         let stream = CharacterStream(string: string)
         
@@ -224,8 +224,87 @@ class CharacterStreamTests: XCTestCase {
         stream.skip()
         XCTAssertEqual(stream.peek(), "r")
         
+        XCTAssertNotEqual(stream.nextIndex, stream.endIndex)
         stream.skip()
         XCTAssertNil(stream.peek())
+        
+        XCTAssertEqual(stream.nextIndex, stream.endIndex)
+        stream.skip()
+        XCTAssertEqual(stream.nextIndex, stream.endIndex)
+        XCTAssertNil(stream.peek())
+    }
+    
+    func test_skipCharacter() {
+        let string = "Bar"
+        let stream = CharacterStream(string: string)
+        XCTAssertTrue(stream.skip("B"))
+        XCTAssertFalse(stream.skip("B"))
+        XCTAssertTrue(stream.skip("a"))
+        XCTAssertTrue(stream.skip("r"))
+        XCTAssertTrue(stream.isAtEnd)
+    }
+    
+    func test_skipCharacterPredicate() {
+        let string = "Bar"
+        let stream = CharacterStream(string: string)
+        XCTAssertTrue(stream.skip({ $0 == "B" }))
+        XCTAssertFalse(stream.skip({ $0 == "B" }))
+        XCTAssertTrue(stream.skip({ $0 == "a" }))
+        XCTAssertTrue(stream.skip({ $0 == "r" }))
+        XCTAssertTrue(stream.isAtEnd)
+    }
+    
+    func test_skipString_caseSensitive() {
+        let string = "Bar"
+        let stream = CharacterStream(string: string)
+        
+        XCTAssertFalse(stream.skip("bar", case: .sensitive))
+        XCTAssertFalse(stream.skip("BaR", case: .sensitive))
+        XCTAssertTrue(stream.skip("Bar", case: .sensitive))
+        XCTAssertFalse(stream.skip("Bar", case: .sensitive))
+        XCTAssertTrue(stream.isAtEnd)
+        XCTAssertTrue(stream.skip("", case: .sensitive))
+        
+        stream.seek(to: stream.startIndex)
+        XCTAssertTrue(stream.skip("Ba", case: .sensitive))
+        XCTAssertTrue(stream.skip("r", case: .sensitive))
+        XCTAssertTrue(stream.isAtEnd)
+        
+        stream.seek(to: string.index(after: string.startIndex))
+        XCTAssertFalse(stream.skip("Ar", case: .sensitive))
+        XCTAssertFalse(stream.skip("A", case: .sensitive))
+        XCTAssertTrue(stream.skip("ar", case: .sensitive))
+        XCTAssertTrue(stream.isAtEnd)
+        XCTAssertTrue(stream.skip("", case: .sensitive))
+
+        stream.seek(to: stream.endIndex)
+        XCTAssertTrue(stream.skip("", case: .sensitive))
+        XCTAssertFalse(stream.skip("r", case: .sensitive))
+        XCTAssertFalse(stream.skip(" ", case: .sensitive))
+        XCTAssertFalse(stream.skip("\0", case: .sensitive))
+    }
+    
+    func test_skipString_caseInsensitive() {
+        let string = "Bar"
+        let stream = CharacterStream(string: string)
+        
+        XCTAssertTrue(stream.skip("baR", case: .insensitive))
+        XCTAssertTrue(stream.isAtEnd)
+        
+        stream.seek(to: stream.startIndex)
+        XCTAssertTrue(stream.skip("bA", case: .insensitive))
+        XCTAssertTrue(stream.skip("R", case: .insensitive))
+        XCTAssertTrue(stream.isAtEnd)
+        
+        stream.seek(to: string.index(after: string.startIndex))
+        XCTAssertTrue(stream.skip("Ar", case: .insensitive))
+        XCTAssertTrue(stream.isAtEnd)
+        
+        stream.seek(to: stream.endIndex)
+        XCTAssertTrue(stream.skip("", case: .insensitive))
+        XCTAssertFalse(stream.skip("r", case: .insensitive))
+        XCTAssertFalse(stream.skip(" ", case: .insensitive))
+        XCTAssertFalse(stream.skip("\0", case: .insensitive))
     }
 }
 
