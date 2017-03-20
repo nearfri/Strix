@@ -108,5 +108,12 @@ extension CharacterStream {
     }
 }
 
+extension CharacterStream {
+    open func skip() {
+        if isAtEnd { return }
+        nextIndex = string.index(after: nextIndex)
+    }
+}
+
 
 

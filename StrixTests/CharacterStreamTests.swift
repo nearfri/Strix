@@ -211,6 +211,22 @@ class CharacterStreamTests: XCTestCase {
             XCTFail("regex not matched")
         }
     }
+    
+    func test_skip() {
+        let string = "Bar"
+        let stream = CharacterStream(string: string)
+        
+        XCTAssertEqual(stream.peek(), "B")
+        
+        stream.skip()
+        XCTAssertEqual(stream.peek(), "a")
+        
+        stream.skip()
+        XCTAssertEqual(stream.peek(), "r")
+        
+        stream.skip()
+        XCTAssertNil(stream.peek())
+    }
 }
 
 
