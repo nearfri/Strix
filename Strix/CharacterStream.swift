@@ -7,14 +7,16 @@ public enum StringSensitivity {
 }
 
 extension String {
-    public func compare(_ aString: String, case caseSensitivity: StringSensitivity,
-                        range: Range<String.Index>, locale: Locale? = nil) -> ComparisonResult {
+    public func range(of aString: String,
+                      case caseSensitivity: StringSensitivity,
+                      range searchRange: Range<String.Index>,
+                      locale: Locale? = nil) -> Range<String.Index>? {
         let options: String.CompareOptions
         switch caseSensitivity {
         case .sensitive:    options = []
         case .insensitive:  options = .caseInsensitive
         }
-        return compare(aString, options: options, range: range, locale: locale)
+        return range(of: aString, options: options, range: searchRange, locale: locale)
     }
 }
 
@@ -79,15 +81,12 @@ extension CharacterStream {
         return matches({ $0 == c })
     }
     
-    open func matches(_ predicate: (Character) -> Bool) -> Bool {
-        return !isAtEnd && predicate(string[nextIndex])
+    open func matches(_ predicate: (Character) throws -> Bool) rethrows -> Bool {
+        return try !isAtEnd && predicate(string[nextIndex])
     }
     
     open func matches(_ str: String, case caseSensitivity: StringSensitivity) -> Bool {
-        guard let end = index(from: nextIndex, offset: str.characters.count) else {
-            return false
-        }
-        return string.compare(str, case: caseSensitivity, range: nextIndex..<end) == .orderedSame
+        return string.range(of: str, case: caseSensitivity, range: nextIndex..<endIndex) != nil
     }
     
     open func matches(_ regex: NSRegularExpression) -> NSTextCheckingResult? {
@@ -117,22 +116,19 @@ extension CharacterStream {
     }
     
     @discardableResult
-    open func skip(_ predicate: (Character) -> Bool) -> Bool {
-        guard matches(predicate) else { return false }
+    open func skip(_ predicate: (Character) throws -> Bool) rethrows -> Bool {
+        guard try matches(predicate) else { return false }
         nextIndex = string.index(after: nextIndex)
         return true
     }
     
     @discardableResult
     open func skip(_ str: String, case caseSensitivity: StringSensitivity) -> Bool {
-        guard let end = index(from: nextIndex, offset: str.characters.count) else {
-            return false
+        if let range = string.range(of: str, case: caseSensitivity, range: nextIndex..<endIndex) {
+            nextIndex = range.upperBound
+            return true
         }
-        if string.compare(str, case: caseSensitivity, range: nextIndex..<end) != .orderedSame {
-            return false
-        }
-        nextIndex = end
-        return true
+        return false
     }
 }
 
