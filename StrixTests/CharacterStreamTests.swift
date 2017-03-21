@@ -306,6 +306,36 @@ class CharacterStreamTests: XCTestCase {
         XCTAssertFalse(stream.skip(" ", case: .insensitive))
         XCTAssertFalse(stream.skip("\0", case: .insensitive))
     }
+    
+    func test_read() {
+        let string = "Bar"
+        let stream = CharacterStream(string: string)
+        
+        XCTAssertEqual(stream.read(), "B")
+        XCTAssertEqual(stream.read(), "a")
+        XCTAssertEqual(stream.read(), "r")
+        XCTAssertNil(stream.read())
+    }
+    
+    func test_readFrom() {
+        let string = "FooBar"
+        let stream = CharacterStream(string: string)
+        
+        stream.seek(to: stream.endIndex)
+        XCTAssertEqual(stream.read(from: stream.startIndex), "FooBar")
+        XCTAssertEqual(stream.read(from: string.index(after: string.startIndex)), "ooBar")
+        XCTAssertEqual(stream.read(from: stream.endIndex), "")
+        
+        let indexOfB = string.index(string.startIndex, offsetBy: 3)
+        stream.seek(to: indexOfB)
+        XCTAssertEqual(stream.peek(), "B")
+        XCTAssertEqual(stream.read(from: stream.startIndex), "Foo")
+        XCTAssertEqual(stream.read(from: string.index(after: string.startIndex)), "oo")
+        XCTAssertEqual(stream.read(from: indexOfB), "")
+        
+        stream.seek(to: stream.startIndex)
+        XCTAssertEqual(stream.read(from: stream.startIndex), "")
+    }
 }
 
 

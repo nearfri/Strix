@@ -136,5 +136,20 @@ extension CharacterStream {
     }
 }
 
+extension CharacterStream {
+    open func read() -> Character? {
+        if isAtEnd { return nil }
+        let result = string[nextIndex]
+        nextIndex = string.index(after: nextIndex)
+        return result
+    }
+    
+    open func read(from index: String.Index) -> String {
+        precondition(index <= nextIndex, "index is more than nextIndex")
+        precondition(index >= startIndex, "index is less than startIndex")
+        return string[index..<nextIndex]
+    }
+}
+
 
 
