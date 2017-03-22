@@ -74,6 +74,10 @@ extension CharacterStream {
         let limit = offset < 0 ? startIndex : endIndex
         return string.index(i, offsetBy: offset, limitedBy: limit)
     }
+}
+
+extension CharacterStream {
+    public typealias CheckingResult = (range: Range<String.Index>, length: String.IndexDistance)
     
     open func matches(_ c: Character) -> Bool {
         return matches({ $0 == c })
@@ -102,6 +106,27 @@ extension CharacterStream {
         
         let range = NSRange(utf16IntRange(in: string, from: nextIndex, to: endIndex))
         return regex.firstMatch(in: string, options: [], range: range)
+    }
+    
+    open func matches(minLength: String.IndexDistance = 0, maxLength: String.IndexDistance = .max,
+                      _ predicate: (Character) throws -> Bool) rethrows -> CheckingResult? {
+        var length = 0
+        var index = nextIndex
+        
+        while true {
+            guard length != maxLength,
+                index != endIndex,
+                try predicate(string[index])
+                else { break }
+            length += 1
+            index = string.index(after: index)
+        }
+        
+        if length < minLength {
+            return nil
+        }
+        
+        return (nextIndex..<index, length)
     }
 }
 

@@ -142,26 +142,72 @@ class CharacterStreamTests: XCTestCase {
         }))
     }
     
+    func test_matchesMinMaxPredicate() {
+        let string = "Foo Bar"
+        let stream = CharacterStream(string: string)
+        
+        var ret = stream.matches(minLength: 0, maxLength: 100, { $0 != " " })
+        XCTAssertEqual(ret?.range, string.startIndex..<string.index(string.startIndex, offsetBy: 3))
+        XCTAssertEqual(ret?.length, 3)
+        
+        ret = stream.matches(minLength: 0, maxLength: 100, { _ in true })
+        XCTAssertEqual(ret?.range, string.startIndex..<string.endIndex)
+        XCTAssertEqual(ret?.length, 7)
+        
+        ret = stream.matches(minLength: 0, maxLength: 3, { _ in true })
+        XCTAssertEqual(ret?.range, string.startIndex..<string.index(string.startIndex, offsetBy: 3))
+        XCTAssertEqual(ret?.length, 3)
+        
+        ret = stream.matches(minLength: 0, maxLength: 100, { _ in false })
+        XCTAssertEqual(ret?.range, string.startIndex..<string.startIndex)
+        XCTAssertEqual(ret?.length, 0)
+        
+        ret = stream.matches(minLength: 0, maxLength: 1, { $0 == "F" || $0 == "o" })
+        XCTAssertEqual(ret?.range, string.startIndex..<string.index(string.startIndex, offsetBy: 1))
+        XCTAssertEqual(ret?.length, 1)
+        
+        ret = stream.matches(minLength: 0, maxLength: 2, { $0 == "F" || $0 == "o" })
+        XCTAssertEqual(ret?.range, string.startIndex..<string.index(string.startIndex, offsetBy: 2))
+        XCTAssertEqual(ret?.length, 2)
+        
+        ret = stream.matches(minLength: 0, maxLength: 3, { $0 == "F" || $0 == "o" })
+        XCTAssertEqual(ret?.range, string.startIndex..<string.index(string.startIndex, offsetBy: 3))
+        XCTAssertEqual(ret?.length, 3)
+        
+        ret = stream.matches(minLength: 0, maxLength: 4, { $0 == "F" || $0 == "o" })
+        XCTAssertEqual(ret?.range, string.startIndex..<string.index(string.startIndex, offsetBy: 3))
+        XCTAssertEqual(ret?.length, 3)
+        
+        XCTAssertNil(stream.matches(minLength: 4, maxLength: 100, { $0 == "F" || $0 == "o" }))
+        XCTAssertNil(stream.matches(minLength: 100, maxLength: 100, { _ in true }))
+        XCTAssertNil(stream.matches(minLength: 1, maxLength: 100, { _ in false }))
+    }
+    
     func test_matchesString_caseSensitive() {
-        let string = "BarBar"
+        let string = "Bar"
         let stream = CharacterStream(string: string)
         
         XCTAssertTrue(stream.matches("Bar", case: .sensitive))
         XCTAssertTrue(stream.matches("B", case: .sensitive))
+        XCTAssertTrue(stream.matches("", case: .sensitive))
         XCTAssertFalse(stream.matches("Bar1", case: .sensitive))
         XCTAssertFalse(stream.matches("Bad", case: .sensitive))
         XCTAssertFalse(stream.matches("bar", case: .sensitive))
         XCTAssertFalse(stream.matches("b", case: .sensitive))
+        XCTAssertFalse(stream.matches("ar", case: .sensitive))
         
         stream.seek(to: string.index(after: string.startIndex))
         XCTAssertFalse(stream.matches("Bar", case: .sensitive))
         XCTAssertTrue(stream.matches("ar", case: .sensitive))
         XCTAssertTrue(stream.matches("a", case: .sensitive))
+        XCTAssertTrue(stream.matches("", case: .sensitive))
         XCTAssertFalse(stream.matches("ar1", case: .sensitive))
         XCTAssertFalse(stream.matches("Ar", case: .sensitive))
         XCTAssertFalse(stream.matches("A", case: .sensitive))
+        XCTAssertFalse(stream.matches("r", case: .sensitive))
         
         stream.seek(to: stream.endIndex)
+        XCTAssertTrue(stream.matches("", case: .sensitive))
         XCTAssertFalse(stream.matches("r", case: .sensitive))
         XCTAssertFalse(stream.matches(" ", case: .sensitive))
         XCTAssertFalse(stream.matches("\0", case: .sensitive))
@@ -176,17 +222,22 @@ class CharacterStreamTests: XCTestCase {
         XCTAssertTrue(stream.matches("bAR", case: .insensitive))
         XCTAssertTrue(stream.matches("B", case: .insensitive))
         XCTAssertTrue(stream.matches("b", case: .insensitive))
+        XCTAssertTrue(stream.matches("", case: .insensitive))
         XCTAssertFalse(stream.matches("Bar1", case: .insensitive))
         XCTAssertFalse(stream.matches("Bad", case: .insensitive))
+        XCTAssertFalse(stream.matches("ar", case: .sensitive))
         
         stream.seek(to: string.index(after: string.startIndex))
         XCTAssertTrue(stream.matches("ar", case: .insensitive))
         XCTAssertTrue(stream.matches("Ar", case: .insensitive))
         XCTAssertTrue(stream.matches("a", case: .insensitive))
         XCTAssertTrue(stream.matches("A", case: .insensitive))
+        XCTAssertTrue(stream.matches("", case: .insensitive))
         XCTAssertFalse(stream.matches("ar1", case: .insensitive))
+        XCTAssertFalse(stream.matches("r", case: .sensitive))
         
         stream.seek(to: stream.endIndex)
+        XCTAssertTrue(stream.matches("", case: .insensitive))
         XCTAssertFalse(stream.matches("r", case: .insensitive))
         XCTAssertFalse(stream.matches(" ", case: .insensitive))
         XCTAssertFalse(stream.matches("\0", case: .insensitive))
@@ -255,22 +306,28 @@ class CharacterStreamTests: XCTestCase {
         
         XCTAssertFalse(stream.skip("bar", case: .sensitive))
         XCTAssertFalse(stream.skip("BaR", case: .sensitive))
+        XCTAssertFalse(stream.skip("ar", case: .sensitive))
         XCTAssertTrue(stream.skip("Bar", case: .sensitive))
         XCTAssertFalse(stream.skip("Bar", case: .sensitive))
         XCTAssertTrue(stream.isAtEnd)
+        XCTAssertTrue(stream.skip("", case: .sensitive))
         
         stream.seek(to: stream.startIndex)
+        XCTAssertFalse(stream.skip("ar", case: .sensitive))
         XCTAssertTrue(stream.skip("Ba", case: .sensitive))
         XCTAssertTrue(stream.skip("r", case: .sensitive))
         XCTAssertTrue(stream.isAtEnd)
         
         stream.seek(to: string.index(after: string.startIndex))
+        XCTAssertFalse(stream.skip("r", case: .sensitive))
         XCTAssertFalse(stream.skip("Ar", case: .sensitive))
         XCTAssertFalse(stream.skip("A", case: .sensitive))
         XCTAssertTrue(stream.skip("ar", case: .sensitive))
         XCTAssertTrue(stream.isAtEnd)
+        XCTAssertTrue(stream.skip("", case: .sensitive))
 
         stream.seek(to: stream.endIndex)
+        XCTAssertTrue(stream.skip("", case: .sensitive))
         XCTAssertFalse(stream.skip("r", case: .sensitive))
         XCTAssertFalse(stream.skip(" ", case: .sensitive))
         XCTAssertFalse(stream.skip("\0", case: .sensitive))
@@ -280,6 +337,7 @@ class CharacterStreamTests: XCTestCase {
         let string = "Bar"
         let stream = CharacterStream(string: string)
         
+        XCTAssertFalse(stream.skip("ar", case: .insensitive))
         XCTAssertTrue(stream.skip("baR", case: .insensitive))
         XCTAssertTrue(stream.isAtEnd)
         
@@ -289,10 +347,12 @@ class CharacterStreamTests: XCTestCase {
         XCTAssertTrue(stream.isAtEnd)
         
         stream.seek(to: string.index(after: string.startIndex))
+        XCTAssertFalse(stream.skip("r", case: .insensitive))
         XCTAssertTrue(stream.skip("Ar", case: .insensitive))
         XCTAssertTrue(stream.isAtEnd)
         
         stream.seek(to: stream.endIndex)
+        XCTAssertTrue(stream.skip("", case: .insensitive))
         XCTAssertFalse(stream.skip("r", case: .insensitive))
         XCTAssertFalse(stream.skip(" ", case: .insensitive))
         XCTAssertFalse(stream.skip("\0", case: .insensitive))
