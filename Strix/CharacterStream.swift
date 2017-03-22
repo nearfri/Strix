@@ -7,16 +7,14 @@ public enum StringSensitivity {
 }
 
 extension String {
-    public func range(of aString: String,
-                      case caseSensitivity: StringSensitivity,
-                      range searchRange: Range<String.Index>,
-                      locale: Locale? = nil) -> Range<String.Index>? {
+    public func compare(_ aString: String, case caseSensitivity: StringSensitivity,
+                        range: Range<String.Index>, locale: Locale? = nil) -> ComparisonResult {
         let options: String.CompareOptions
         switch caseSensitivity {
         case .sensitive:    options = []
         case .insensitive:  options = .caseInsensitive
         }
-        return range(of: aString, options: options, range: searchRange, locale: locale)
+        return compare(aString, options: options, range: range, locale: locale)
     }
 }
 
@@ -86,7 +84,10 @@ extension CharacterStream {
     }
     
     open func matches(_ str: String, case caseSensitivity: StringSensitivity) -> Bool {
-        return string.range(of: str, case: caseSensitivity, range: nextIndex..<endIndex) != nil
+        guard let end = index(from: nextIndex, offset: str.characters.count) else {
+            return false
+        }
+        return string.compare(str, case: caseSensitivity, range: nextIndex..<end) == .orderedSame
     }
     
     open func matches(_ regex: NSRegularExpression) -> NSTextCheckingResult? {
@@ -124,11 +125,14 @@ extension CharacterStream {
     
     @discardableResult
     open func skip(_ str: String, case caseSensitivity: StringSensitivity) -> Bool {
-        if let range = string.range(of: str, case: caseSensitivity, range: nextIndex..<endIndex) {
-            nextIndex = range.upperBound
-            return true
+        guard let end = index(from: nextIndex, offset: str.characters.count) else {
+            return false
         }
-        return false
+        if string.compare(str, case: caseSensitivity, range: nextIndex..<end) != .orderedSame {
+            return false
+        }
+        nextIndex = end
+        return true
     }
 }
 

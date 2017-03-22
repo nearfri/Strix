@@ -143,7 +143,7 @@ class CharacterStreamTests: XCTestCase {
     }
     
     func test_matchesString_caseSensitive() {
-        let string = "Bar"
+        let string = "BarBar"
         let stream = CharacterStream(string: string)
         
         XCTAssertTrue(stream.matches("Bar", case: .sensitive))
@@ -154,6 +154,7 @@ class CharacterStreamTests: XCTestCase {
         XCTAssertFalse(stream.matches("b", case: .sensitive))
         
         stream.seek(to: string.index(after: string.startIndex))
+        XCTAssertFalse(stream.matches("Bar", case: .sensitive))
         XCTAssertTrue(stream.matches("ar", case: .sensitive))
         XCTAssertTrue(stream.matches("a", case: .sensitive))
         XCTAssertFalse(stream.matches("ar1", case: .sensitive))
