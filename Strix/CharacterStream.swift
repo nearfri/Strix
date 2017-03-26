@@ -113,11 +113,7 @@ extension CharacterStream {
         var length = 0
         var index = nextIndex
         
-        while true {
-            guard length != maxLength,
-                index != endIndex,
-                try predicate(string[index])
-                else { break }
+        while length != maxLength, index != endIndex, try predicate(string[index]) {
             length += 1
             index = string.index(after: index)
         }
@@ -159,6 +155,16 @@ extension CharacterStream {
         nextIndex = end
         return true
     }
+    
+    @discardableResult
+    open func skip(minLength: String.IndexDistance = 0, maxLength: String.IndexDistance = .max,
+                   while predicate: (Character) throws -> Bool) rethrows -> CheckingResult? {
+        guard let result = try matches(minLength: minLength, maxLength: maxLength, predicate) else {
+            return nil
+        }
+        nextIndex = result.range.upperBound
+        return result
+    }
 }
 
 extension CharacterStream {
@@ -173,6 +179,14 @@ extension CharacterStream {
         precondition(index <= nextIndex, "index is more than nextIndex")
         precondition(index >= startIndex, "index is less than startIndex")
         return string[index..<nextIndex]
+    }
+    
+    @discardableResult
+    open func read(minLength: String.IndexDistance = 0, maxLength: String.IndexDistance = .max,
+                   while predicate: (Character) throws -> Bool) rethrows -> String? {
+        guard let section = try skip(minLength: minLength, maxLength: maxLength, while: predicate)
+            else { return nil }
+        return string[section.range]
     }
 }
 
