@@ -77,7 +77,7 @@ extension CharacterStream {
 }
 
 extension CharacterStream {
-    public typealias CheckingResult = (range: Range<String.Index>, length: String.IndexDistance)
+    public typealias Section = (range: Range<String.Index>, length: String.IndexDistance)
     
     open func matches(_ c: Character) -> Bool {
         return matches({ $0 == c })
@@ -108,8 +108,8 @@ extension CharacterStream {
         return regex.firstMatch(in: string, options: [], range: range)
     }
     
-    open func matches(minLength: String.IndexDistance = 0, maxLength: String.IndexDistance = .max,
-                      _ predicate: (Character) throws -> Bool) rethrows -> CheckingResult? {
+    open func section(minLength: String.IndexDistance = 0, maxLength: String.IndexDistance = .max,
+                      while predicate: (Character) throws -> Bool) rethrows -> Section? {
         var length = 0
         var index = nextIndex
         
@@ -158,10 +158,9 @@ extension CharacterStream {
     
     @discardableResult
     open func skip(minLength: String.IndexDistance = 0, maxLength: String.IndexDistance = .max,
-                   while predicate: (Character) throws -> Bool) rethrows -> CheckingResult? {
-        guard let result = try matches(minLength: minLength, maxLength: maxLength, predicate) else {
-            return nil
-        }
+                   while predicate: (Character) throws -> Bool) rethrows -> Section? {
+        guard let result = try section(minLength: minLength, maxLength: maxLength, while: predicate)
+            else { return nil }
         nextIndex = result.range.upperBound
         return result
     }
