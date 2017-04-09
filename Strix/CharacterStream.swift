@@ -31,9 +31,6 @@ open class CharacterStream {
     open var userInfo: UserInfo = [:] {
         didSet { stateTag += 1 }
     }
-    open var name: String = "" {
-        didSet { stateTag += 1 }
-    }
     
     public init(string: String, bounds: Range<String.Index>) {
         self.string = string
@@ -186,6 +183,12 @@ extension CharacterStream {
         guard let section = try skip(minLength: minLength, maxLength: maxLength, while: predicate)
             else { return nil }
         return string[section.range]
+    }
+}
+
+extension CharacterStream {
+    public var position: CharacterPosition {
+        return CharacterPosition(string: string, index: nextIndex)
     }
 }
 

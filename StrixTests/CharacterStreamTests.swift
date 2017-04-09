@@ -3,14 +3,11 @@ import XCTest
 @testable import Strix
 
 class CharacterStreamTests: XCTestCase {
-
     override func setUp() {
         super.setUp()
-        // Put setup code here. This method is called before the invocation of each test method in the class.
     }
     
     override func tearDown() {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
         super.tearDown()
     }
     
@@ -44,9 +41,6 @@ class CharacterStreamTests: XCTestCase {
         
         stream.userInfo = ["info2": 20]
         XCTAssertEqual(stream.stateTag, 2)
-        
-        stream.name = "StreamName"
-        XCTAssertEqual(stream.stateTag, 3)
     }
     
     func test_seek() {
@@ -445,6 +439,19 @@ class CharacterStreamTests: XCTestCase {
         
         XCTAssertNil(stream.read(minLength: 1, maxLength: 100, while: { _ in false }))
         XCTAssertEqual(stream.nextIndex, stream.startIndex)
+    }
+    
+    func test_position() {
+        let string = "Foo\nBar"
+        let stream = CharacterStream(string: string)
+        
+        stream.seek(to: string.index(string.startIndex, offsetBy: 4))
+        XCTAssertEqual(stream.peek(), "B")
+        
+        let position = stream.position
+        XCTAssertEqual(position.line, 1)
+        XCTAssertEqual(position.column, 0)
+        XCTAssertEqual(position.substring, "Bar")
     }
 }
 
