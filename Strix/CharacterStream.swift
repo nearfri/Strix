@@ -186,7 +186,7 @@ extension CharacterStream {
 }
 
 extension CharacterStream {
-    public struct State {
+    open class State {
         fileprivate let stream: CharacterStream
         public let tag: Int
         public let index: String.Index
