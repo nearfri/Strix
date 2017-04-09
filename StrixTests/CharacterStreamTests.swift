@@ -441,6 +441,33 @@ class CharacterStreamTests: XCTestCase {
         XCTAssertEqual(stream.nextIndex, stream.startIndex)
     }
     
+    func test_state_init() {
+        let string = "Foo\nBar"
+        let stream = CharacterStream(string: string)
+        stream.userInfo["testKey"] = "testValue"
+        let tag = stream.stateTag
+        let state = stream.state
+        
+        XCTAssertEqual(state.index, string.startIndex)
+        XCTAssertEqual(state.tag, tag)
+        XCTAssertEqual(state.userInfo["testKey"] as? String, "testValue")
+    }
+    
+    func test_state_backtrack() {
+        let string = "Foo\nBar"
+        let stream = CharacterStream(string: string)
+        stream.userInfo["testKey"] = "testValue"
+        let tag = stream.stateTag
+        let state = stream.state
+        
+        stream.seek(to: stream.endIndex)
+        stream.userInfo["testKey"] = "newValue"
+        stream.backtrack(to: state)
+        XCTAssertEqual(stream.nextIndex, string.startIndex)
+        XCTAssertEqual(stream.stateTag, tag)
+        XCTAssertEqual(stream.userInfo["testKey"] as? String, "testValue")
+    }
+    
     func test_position() {
         let string = "Foo\nBar"
         let stream = CharacterStream(string: string)

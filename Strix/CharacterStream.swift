@@ -177,12 +177,38 @@ extension CharacterStream {
         return string[index..<nextIndex]
     }
     
-    @discardableResult
     open func read(minLength: String.IndexDistance = 0, maxLength: String.IndexDistance = .max,
                    while predicate: (Character) throws -> Bool) rethrows -> String? {
         guard let section = try skip(minLength: minLength, maxLength: maxLength, while: predicate)
             else { return nil }
         return string[section.range]
+    }
+}
+
+extension CharacterStream {
+    public struct State {
+        fileprivate let stream: CharacterStream
+        public let tag: Int
+        public let index: String.Index
+        public let userInfo: UserInfo
+        
+        public init(stream: CharacterStream) {
+            self.stream = stream
+            tag = stream.stateTag
+            index = stream.nextIndex
+            userInfo = stream.userInfo
+        }
+    }
+    
+    open var state: State {
+        return State(stream: self)
+    }
+    
+    open func backtrack(to state: State) {
+        assert(state.stream === self, "stream is different")
+        nextIndex = state.index
+        userInfo = state.userInfo
+        stateTag = state.tag
     }
 }
 
