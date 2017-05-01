@@ -18,17 +18,17 @@ extension String {
     }
 }
 
-open class CharacterStream {
+public class CharacterStream {
     public typealias UserInfo = [String: Any]
     
-    open let string: String
-    open let startIndex: String.Index
-    open let endIndex: String.Index
-    open var stateTag: Int = 0
-    open fileprivate(set) var nextIndex: String.Index {
+    public let string: String
+    public let startIndex: String.Index
+    public let endIndex: String.Index
+    public var stateTag: Int = 0
+    public fileprivate(set) var nextIndex: String.Index {
         didSet { stateTag += 1 }
     }
-    open var userInfo: UserInfo = [:] {
+    public var userInfo: UserInfo = [:] {
         didSet { stateTag += 1 }
     }
     
@@ -45,10 +45,10 @@ open class CharacterStream {
 }
 
 extension CharacterStream {
-    open var isAtStart: Bool { return nextIndex == startIndex }
-    open var isAtEnd: Bool { return nextIndex == endIndex }
+    public var isAtStart: Bool { return nextIndex == startIndex }
+    public var isAtEnd: Bool { return nextIndex == endIndex }
     
-    open func seek(to index: String.Index) {
+    public func seek(to index: String.Index) {
         precondition(index >= startIndex, "index is less than startIndex")
         precondition(index <= endIndex, "index is greater than endIndex")
         nextIndex = index
@@ -56,11 +56,11 @@ extension CharacterStream {
 }
 
 extension CharacterStream {
-    open func peek() -> Character? {
+    public func peek() -> Character? {
         return isAtEnd ? nil : string[nextIndex]
     }
     
-    open func peek(offset: String.IndexDistance) -> Character? {
+    public func peek(offset: String.IndexDistance) -> Character? {
         if let i = index(from: nextIndex, offset: offset), i != endIndex {
             return string[i]
         }
@@ -76,22 +76,22 @@ extension CharacterStream {
 extension CharacterStream {
     public typealias Section = (range: Range<String.Index>, length: String.IndexDistance)
     
-    open func matches(_ c: Character) -> Bool {
+    public func matches(_ c: Character) -> Bool {
         return matches({ $0 == c })
     }
     
-    open func matches(_ predicate: (Character) throws -> Bool) rethrows -> Bool {
+    public func matches(_ predicate: (Character) throws -> Bool) rethrows -> Bool {
         return try !isAtEnd && predicate(string[nextIndex])
     }
     
-    open func matches(_ str: String, case caseSensitivity: StringSensitivity) -> Bool {
+    public func matches(_ str: String, case caseSensitivity: StringSensitivity) -> Bool {
         guard let end = index(from: nextIndex, offset: str.characters.count) else {
             return false
         }
         return string.compare(str, case: caseSensitivity, range: nextIndex..<end) == .orderedSame
     }
     
-    open func matches(_ regex: NSRegularExpression) -> NSTextCheckingResult? {
+    public func matches(_ regex: NSRegularExpression) -> NSTextCheckingResult? {
         func utf16IntRange(in str: String, from: String.Index, to: String.Index) -> Range<Int> {
             let utf16View = str.utf16
             let utf16From = from.samePosition(in: utf16View)
@@ -105,8 +105,8 @@ extension CharacterStream {
         return regex.firstMatch(in: string, options: [], range: range)
     }
     
-    open func section(minLength: String.IndexDistance = 0, maxLength: String.IndexDistance = .max,
-                      while predicate: (Character) throws -> Bool) rethrows -> Section? {
+    public func section(minLength: String.IndexDistance = 0, maxLength: String.IndexDistance = .max,
+                        while predicate: (Character) throws -> Bool) rethrows -> Section? {
         var length = 0
         var index = nextIndex
         
@@ -124,25 +124,25 @@ extension CharacterStream {
 }
 
 extension CharacterStream {
-    open func skip() {
+    public func skip() {
         if isAtEnd { return }
         nextIndex = string.index(after: nextIndex)
     }
     
     @discardableResult
-    open func skip(_ c: Character) -> Bool {
+    public func skip(_ c: Character) -> Bool {
         return skip({ $0 == c })
     }
     
     @discardableResult
-    open func skip(_ predicate: (Character) throws -> Bool) rethrows -> Bool {
+    public func skip(_ predicate: (Character) throws -> Bool) rethrows -> Bool {
         guard try matches(predicate) else { return false }
         nextIndex = string.index(after: nextIndex)
         return true
     }
     
     @discardableResult
-    open func skip(_ str: String, case caseSensitivity: StringSensitivity) -> Bool {
+    public func skip(_ str: String, case caseSensitivity: StringSensitivity) -> Bool {
         guard let end = index(from: nextIndex, offset: str.characters.count) else {
             return false
         }
@@ -154,8 +154,8 @@ extension CharacterStream {
     }
     
     @discardableResult
-    open func skip(minLength: String.IndexDistance = 0, maxLength: String.IndexDistance = .max,
-                   while predicate: (Character) throws -> Bool) rethrows -> Section? {
+    public func skip(minLength: String.IndexDistance = 0, maxLength: String.IndexDistance = .max,
+                     while predicate: (Character) throws -> Bool) rethrows -> Section? {
         guard let result = try section(minLength: minLength, maxLength: maxLength, while: predicate)
             else { return nil }
         nextIndex = result.range.upperBound
@@ -164,21 +164,21 @@ extension CharacterStream {
 }
 
 extension CharacterStream {
-    open func read() -> Character? {
+    public func read() -> Character? {
         if isAtEnd { return nil }
         let result = string[nextIndex]
         nextIndex = string.index(after: nextIndex)
         return result
     }
     
-    open func read(from index: String.Index) -> String {
+    public func read(from index: String.Index) -> String {
         precondition(index <= nextIndex, "index is more than nextIndex")
         precondition(index >= startIndex, "index is less than startIndex")
         return string[index..<nextIndex]
     }
     
-    open func read(minLength: String.IndexDistance = 0, maxLength: String.IndexDistance = .max,
-                   while predicate: (Character) throws -> Bool) rethrows -> String? {
+    public func read(minLength: String.IndexDistance = 0, maxLength: String.IndexDistance = .max,
+                     while predicate: (Character) throws -> Bool) rethrows -> String? {
         guard let section = try skip(minLength: minLength, maxLength: maxLength, while: predicate)
             else { return nil }
         return string[section.range]
@@ -186,7 +186,7 @@ extension CharacterStream {
 }
 
 extension CharacterStream {
-    open class State {
+    public class State {
         fileprivate let stream: CharacterStream
         public let tag: Int
         public let index: String.Index
@@ -200,11 +200,11 @@ extension CharacterStream {
         }
     }
     
-    open var state: State {
+    public var state: State {
         return State(stream: self)
     }
     
-    open func backtrack(to state: State) {
+    public func backtrack(to state: State) {
         assert(state.stream === self, "stream is different")
         nextIndex = state.index
         userInfo = state.userInfo
