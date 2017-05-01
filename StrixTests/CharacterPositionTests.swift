@@ -32,36 +32,36 @@ class CharacterPositionTests: XCTestCase {
         
         for (column, i) in (0...4).enumerated() {
             let pos = CharacterPosition(string: str, index: str.index(str.startIndex, offsetBy: i))
-            XCTAssertEqual(pos.line, 0)
-            XCTAssertEqual(pos.column, column)
+            XCTAssertEqual(pos.lineNumber, 1)
+            XCTAssertEqual(pos.columnNumber, column + 1)
             XCTAssertEqual(pos.substring, "abcd")
         }
         
         for (column, i) in (5...9).enumerated() {
             let pos = CharacterPosition(string: str, index: str.index(str.startIndex, offsetBy: i))
-            XCTAssertEqual(pos.line, 1)
-            XCTAssertEqual(pos.column, column)
+            XCTAssertEqual(pos.lineNumber, 2)
+            XCTAssertEqual(pos.columnNumber, column + 1)
             XCTAssertEqual(pos.substring, "efgh")
         }
         
         for (column, i) in (10...14).enumerated() {
             let pos = CharacterPosition(string: str, index: str.index(str.startIndex, offsetBy: i))
-            XCTAssertEqual(pos.line, 2)
-            XCTAssertEqual(pos.column, column)
+            XCTAssertEqual(pos.lineNumber, 3)
+            XCTAssertEqual(pos.columnNumber, column + 1)
             XCTAssertEqual(pos.substring, "ijkl")
         }
         
         for (column, i) in (15...15).enumerated() {
             let pos = CharacterPosition(string: str, index: str.index(str.startIndex, offsetBy: i))
-            XCTAssertEqual(pos.line, 3)
-            XCTAssertEqual(pos.column, column)
+            XCTAssertEqual(pos.lineNumber, 4)
+            XCTAssertEqual(pos.columnNumber, column + 1)
             XCTAssertEqual(pos.substring, "")
         }
         
         for (column, i) in (16...20).enumerated() {
             let pos = CharacterPosition(string: str, index: str.index(str.startIndex, offsetBy: i))
-            XCTAssertEqual(pos.line, 4)
-            XCTAssertEqual(pos.column, column)
+            XCTAssertEqual(pos.lineNumber, 5)
+            XCTAssertEqual(pos.columnNumber, column + 1)
             XCTAssertEqual(pos.substring, "mnpq")
         }
         
@@ -73,22 +73,22 @@ class CharacterPositionTests: XCTestCase {
         
         for (column, i) in (0...0).enumerated() {
             let pos = CharacterPosition(string: str, index: str.index(str.startIndex, offsetBy: i))
-            XCTAssertEqual(pos.line, 0)
-            XCTAssertEqual(pos.column, column)
+            XCTAssertEqual(pos.lineNumber, 1)
+            XCTAssertEqual(pos.columnNumber, column + 1)
             XCTAssertEqual(pos.substring, "")
         }
         
         for (column, i) in (1...5).enumerated() {
             let pos = CharacterPosition(string: str, index: str.index(str.startIndex, offsetBy: i))
-            XCTAssertEqual(pos.line, 1)
-            XCTAssertEqual(pos.column, column)
+            XCTAssertEqual(pos.lineNumber, 2)
+            XCTAssertEqual(pos.columnNumber, column + 1)
             XCTAssertEqual(pos.substring, "abcd")
         }
         
         for (column, i) in (6...11).enumerated() {
             let pos = CharacterPosition(string: str, index: str.index(str.startIndex, offsetBy: i))
-            XCTAssertEqual(pos.line, 2)
-            XCTAssertEqual(pos.column, column)
+            XCTAssertEqual(pos.lineNumber, 3)
+            XCTAssertEqual(pos.columnNumber, column + 1)
             XCTAssertEqual(pos.substring, "efgh")
         }
         
@@ -100,36 +100,36 @@ class CharacterPositionTests: XCTestCase {
         
         for (column, i) in (0...0).enumerated() {
             let pos = CharacterPosition(string: str, index: str.index(str.startIndex, offsetBy: i))
-            XCTAssertEqual(pos.line, 0)
-            XCTAssertEqual(pos.column, column)
+            XCTAssertEqual(pos.lineNumber, 1)
+            XCTAssertEqual(pos.columnNumber, column + 1)
             XCTAssertEqual(pos.substring, "")
         }
         
         for (column, i) in (1...1).enumerated() {
             let pos = CharacterPosition(string: str, index: str.index(str.startIndex, offsetBy: i))
-            XCTAssertEqual(pos.line, 1)
-            XCTAssertEqual(pos.column, column)
+            XCTAssertEqual(pos.lineNumber, 2)
+            XCTAssertEqual(pos.columnNumber, column + 1)
             XCTAssertEqual(pos.substring, "")
         }
         
         for (column, i) in (2...6).enumerated() {
             let pos = CharacterPosition(string: str, index: str.index(str.startIndex, offsetBy: i))
-            XCTAssertEqual(pos.line, 2)
-            XCTAssertEqual(pos.column, column)
+            XCTAssertEqual(pos.lineNumber, 3)
+            XCTAssertEqual(pos.columnNumber, column + 1)
             XCTAssertEqual(pos.substring, "abcd")
         }
         
         for (column, i) in (7...7).enumerated() {
             let pos = CharacterPosition(string: str, index: str.index(str.startIndex, offsetBy: i))
-            XCTAssertEqual(pos.line, 3)
-            XCTAssertEqual(pos.column, column)
+            XCTAssertEqual(pos.lineNumber, 4)
+            XCTAssertEqual(pos.columnNumber, column + 1)
             XCTAssertEqual(pos.substring, "")
         }
         
         for (column, i) in (8...9).enumerated() {
             let pos = CharacterPosition(string: str, index: str.index(str.startIndex, offsetBy: i))
-            XCTAssertEqual(pos.line, 4)
-            XCTAssertEqual(pos.column, column)
+            XCTAssertEqual(pos.lineNumber, 5)
+            XCTAssertEqual(pos.columnNumber, column + 1)
             XCTAssertEqual(pos.substring, "")
         }
         

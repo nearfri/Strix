@@ -476,8 +476,8 @@ class CharacterStreamTests: XCTestCase {
         XCTAssertEqual(stream.peek(), "B")
         
         let position = stream.position
-        XCTAssertEqual(position.line, 1)
-        XCTAssertEqual(position.column, 0)
+        XCTAssertEqual(position.lineNumber, 2)
+        XCTAssertEqual(position.columnNumber, 1)
         XCTAssertEqual(position.substring, "Bar")
     }
 }

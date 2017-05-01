@@ -6,14 +6,14 @@ public struct CharacterPosition {
     public let index: String.Index
     private let info: Info = Info()
     
-    public var line: Int {
+    public var lineNumber: Int {
         calculateInfoIfNeeded()
-        return info.line
+        return info.lineNumber
     }
     
-    public var column: Int {
+    public var columnNumber: Int {
         calculateInfoIfNeeded()
-        return info.column
+        return info.columnNumber
     }
     
     public var substring: String {
@@ -30,12 +30,12 @@ public struct CharacterPosition {
 
 extension CharacterPosition {
     fileprivate class Info {
-        var line: Int = -1
-        var column: Int = -1
+        var lineNumber: Int = -1
+        var columnNumber: Int = -1
         var substring: String = ""
         
         var isCalculated: Bool {
-            return line != -1
+            return lineNumber != -1
         }
         
         func calculate(with string: String, index: String.Index) {
@@ -46,8 +46,8 @@ extension CharacterPosition {
                 let upperBound = enclosingRange.upperBound
                 if index < upperBound || (index == upperBound && index == string.endIndex) {
                     stop = true
-                    self.line = enumerationCount
-                    self.column = string[subRange.lowerBound..<index].characters.count
+                    self.lineNumber = enumerationCount + 1
+                    self.columnNumber = string[subRange.lowerBound..<index].characters.count + 1
                     self.substring = string[subRange]
                 }
                 enumerationCount += 1
