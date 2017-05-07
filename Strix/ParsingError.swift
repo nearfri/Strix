@@ -1,7 +1,7 @@
 
 import Foundation
 
-open class ParserError: Error, CustomStringConvertible {
+open class ParsingError: Error, CustomStringConvertible {
     public init() {
         
     }
@@ -11,8 +11,8 @@ open class ParserError: Error, CustomStringConvertible {
     }
 }
 
-extension ParserError {
-    public class Expected: ParserError {
+extension ParsingError {
+    public class Expected: ParsingError {
         public let label: String
         
         public init(_ label: String) {
@@ -25,7 +25,7 @@ extension ParserError {
         }
     }
     
-    public class ExpectedString: ParserError {
+    public class ExpectedString: ParsingError {
         public let string: String
         public let caseSensitivity: StringSensitivity
         
@@ -45,7 +45,7 @@ extension ParserError {
         }
     }
     
-    public class Unexpected: ParserError {
+    public class Unexpected: ParsingError {
         public let label: String
         
         public init(_ label: String) {
@@ -58,7 +58,7 @@ extension ParserError {
         }
     }
     
-    public class UnexpectedString: ParserError {
+    public class UnexpectedString: ParsingError {
         public let string: String
         public let caseSensitivity: StringSensitivity
         
@@ -78,7 +78,7 @@ extension ParserError {
         }
     }
     
-    public class Generic: ParserError {
+    public class Generic: ParsingError {
         public let message: String
         
         public init(message: String) {
@@ -91,7 +91,7 @@ extension ParserError {
         }
     }
     
-    public class Nested: ParserError {
+    public class Nested: ParsingError {
         let position: CharacterPosition
         let userInfo: CharacterStream.UserInfo
         let errors: [Error]
@@ -110,7 +110,7 @@ extension ParserError {
         }
     }
     
-    public class Compound: ParserError {
+    public class Compound: ParsingError {
         let label: String
         let position: CharacterPosition
         let userInfo: CharacterStream.UserInfo

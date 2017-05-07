@@ -2,7 +2,7 @@
 import XCTest
 @testable import Strix
 
-class ParserErrorTests: XCTestCase {
+class ParsingErrorTests: XCTestCase {
     override func setUp() {
         super.setUp()
     }
@@ -12,33 +12,33 @@ class ParserErrorTests: XCTestCase {
     }
     
     func test_baseError() {
-        XCTAssertEqual(ParserError().description, "Unknown")
+        XCTAssertEqual(ParsingError().description, "Unknown")
     }
     
     func test_expectedError() {
-        XCTAssertEqual(ParserError.Expected("number").description, "Expected(number)")
+        XCTAssertEqual(ParsingError.Expected("number").description, "Expected(number)")
     }
     
     func test_expectedStringError() {
-        XCTAssertEqual(ParserError.ExpectedString("any string", case: .sensitive).description,
+        XCTAssertEqual(ParsingError.ExpectedString("any string", case: .sensitive).description,
                        "ExpectedCaseSensitive(any string)")
-        XCTAssertEqual(ParserError.ExpectedString("any string", case: .insensitive).description,
+        XCTAssertEqual(ParsingError.ExpectedString("any string", case: .insensitive).description,
                        "ExpectedCaseInsensitive(any string)")
     }
     
     func test_unexpectedError() {
-        XCTAssertEqual(ParserError.Unexpected("number").description, "Unexpected(number)")
+        XCTAssertEqual(ParsingError.Unexpected("number").description, "Unexpected(number)")
     }
     
     func test_UnexpectedStringError() {
-        XCTAssertEqual(ParserError.UnexpectedString("any string", case: .sensitive).description,
+        XCTAssertEqual(ParsingError.UnexpectedString("any string", case: .sensitive).description,
                        "UnexpectedCaseSensitive(any string)")
-        XCTAssertEqual(ParserError.UnexpectedString("any string", case: .insensitive).description,
+        XCTAssertEqual(ParsingError.UnexpectedString("any string", case: .insensitive).description,
                        "UnexpectedCaseInsensitive(any string)")
     }
     
     func test_genericError() {
-        XCTAssertEqual(ParserError.Generic(message: "just error").description,
+        XCTAssertEqual(ParsingError.Generic(message: "just error").description,
                        "Generic(just error)")
     }
     
@@ -48,10 +48,10 @@ class ParserErrorTests: XCTestCase {
         let lineNumber = 1
         let columnNumber = 2
         let userInfo = ["infoKey": "infoValue"]
-        let errs = [ParserError.Expected("number"), ParserError.Unexpected("number")]
+        let errs = [ParsingError.Expected("number"), ParsingError.Unexpected("number")]
         let expectedDesc = "Nested(\(lineNumber):\(columnNumber), "
             + "[Expected(number), Unexpected(number)])"
-        let error = ParserError.Nested(position: position, userInfo: userInfo, errors: errs)
+        let error = ParsingError.Nested(position: position, userInfo: userInfo, errors: errs)
         XCTAssertEqual(error.description, expectedDesc)
     }
     
@@ -62,10 +62,10 @@ class ParserErrorTests: XCTestCase {
         let lineNumber = 1
         let columnNumber = 2
         let userInfo = ["infoKey": "infoValue"]
-        let errs = [ParserError.Expected("number"), ParserError.Unexpected("number")]
+        let errs = [ParsingError.Expected("number"), ParsingError.Unexpected("number")]
         let expectedDesc = "Compound(\(label), \(lineNumber):\(columnNumber), "
             + "[Expected(number), Unexpected(number)])"
-        let error = ParserError.Compound(label: label, position: position,
+        let error = ParsingError.Compound(label: label, position: position,
                                          userInfo: userInfo, errors: errs)
         XCTAssertEqual(error.description, expectedDesc)
     }
