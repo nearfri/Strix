@@ -1,6 +1,4 @@
 
-import Foundation
-
 open class ParsingError: Error, CustomStringConvertible {
     public init() {
         

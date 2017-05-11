@@ -1,6 +1,4 @@
 
-import Foundation
-
 public struct CharacterPosition {
     public let string: String
     public let index: String.Index
@@ -30,12 +28,14 @@ public struct CharacterPosition {
 
 extension CharacterPosition {
     fileprivate class Info {
-        var lineNumber: Int = -1
-        var columnNumber: Int = -1
+        private static let invalidNumber: Int = -1
+        
+        var lineNumber: Int = Info.invalidNumber
+        var columnNumber: Int = Info.invalidNumber
         var substring: String = ""
         
         var isCalculated: Bool {
-            return lineNumber != -1
+            return lineNumber != Info.invalidNumber
         }
         
         func calculate(with string: String, index: String.Index) {

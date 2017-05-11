@@ -1,6 +1,4 @@
 
-import Foundation
-
 public enum Reply<T> {
     case success(T, [Error])
     case failure([Error])
