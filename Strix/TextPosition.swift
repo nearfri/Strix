@@ -1,5 +1,5 @@
 
-public struct CharacterPosition {
+public struct TextPosition {
     public let string: String
     public let index: String.Index
     private let info: Info = Info()
@@ -26,7 +26,7 @@ public struct CharacterPosition {
     }
 }
 
-extension CharacterPosition {
+extension TextPosition {
     fileprivate class Info {
         private static let invalidNumber: Int = -1
         
@@ -58,13 +58,13 @@ extension CharacterPosition {
     }
 }
 
-extension CharacterPosition: Comparable {
-    public static func == (lhs: CharacterPosition, rhs: CharacterPosition) -> Bool {
+extension TextPosition: Comparable {
+    public static func == (lhs: TextPosition, rhs: TextPosition) -> Bool {
         return lhs.string == rhs.string
             && lhs.index == rhs.index
     }
     
-    public static func < (lhs: CharacterPosition, rhs: CharacterPosition) -> Bool {
+    public static func < (lhs: TextPosition, rhs: TextPosition) -> Bool {
         return lhs.string == rhs.string
             && lhs.index < rhs.index
     }

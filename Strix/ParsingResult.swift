@@ -17,7 +17,7 @@ extension ParsingResult: CustomStringConvertible {
 
 extension ParsingResult {
     public struct Error: Swift.Error {
-        public let position: CharacterPosition
+        public let position: TextPosition
         public let underlyingErrors: [Swift.Error]
     }
 }

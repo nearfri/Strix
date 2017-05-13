@@ -213,8 +213,8 @@ extension CharacterStream {
 }
 
 extension CharacterStream {
-    public var position: CharacterPosition {
-        return CharacterPosition(string: string, index: nextIndex)
+    public var position: TextPosition {
+        return TextPosition(string: string, index: nextIndex)
     }
 }
 

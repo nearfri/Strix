@@ -44,7 +44,7 @@ class ParsingErrorTests: XCTestCase {
     
     func test_nestedError() {
         let str = "abcd"
-        let position = CharacterPosition(string: str, index: str.index(after: str.startIndex))
+        let position = TextPosition(string: str, index: str.index(after: str.startIndex))
         let lineNumber = 1
         let columnNumber = 2
         let userInfo = ["infoKey": "infoValue"]
@@ -58,7 +58,7 @@ class ParsingErrorTests: XCTestCase {
     func test_compoundError() {
         let label = "custom label"
         let str = "abcd"
-        let position = CharacterPosition(string: str, index: str.index(after: str.startIndex))
+        let position = TextPosition(string: str, index: str.index(after: str.startIndex))
         let lineNumber = 1
         let columnNumber = 2
         let userInfo = ["infoKey": "infoValue"]

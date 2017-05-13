@@ -90,11 +90,11 @@ extension ParsingError {
     }
     
     public class Nested: ParsingError {
-        let position: CharacterPosition
+        let position: TextPosition
         let userInfo: CharacterStream.UserInfo
         let errors: [Error]
         
-        public init(position: CharacterPosition,
+        public init(position: TextPosition,
                     userInfo: CharacterStream.UserInfo,
                     errors: [Error]) {
             self.position = position
@@ -110,12 +110,12 @@ extension ParsingError {
     
     public class Compound: ParsingError {
         let label: String
-        let position: CharacterPosition
+        let position: TextPosition
         let userInfo: CharacterStream.UserInfo
         let errors: [Error]
         
         public init(label: String,
-                    position: CharacterPosition,
+                    position: TextPosition,
                     userInfo: CharacterStream.UserInfo,
                     errors: [Error]) {
             self.label = label
