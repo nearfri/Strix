@@ -39,6 +39,8 @@ extension CharacterPosition {
         }
         
         func calculate(with string: String, index: String.Index) {
+            lineNumber = 1
+            columnNumber = 1
             var enumerationCount = 0
             string.enumerateSubstrings(in: string.startIndex..<string.endIndex,
                                        options: [.byLines, .substringNotRequired])
