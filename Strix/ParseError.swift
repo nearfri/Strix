@@ -10,7 +10,7 @@ open class ParseError: Error, CustomStringConvertible {
 }
 
 extension ParseError {
-    public class Expected: ParseError {
+    public class Expected: ParseError, Comparable {
         public let label: String
         
         public init(_ label: String) {
@@ -21,9 +21,17 @@ extension ParseError {
         override public var description: String {
             return "Expected(\(label))"
         }
+        
+        public static func == (lhs: Expected, rhs: Expected) -> Bool {
+            return lhs.label == rhs.label
+        }
+        
+        public static func < (lhs: Expected, rhs: Expected) -> Bool {
+            return lhs.label < rhs.label
+        }
     }
     
-    public class ExpectedString: ParseError {
+    public class ExpectedString: ParseError, Comparable {
         public let string: String
         public let caseSensitivity: StringSensitivity
         
@@ -41,9 +49,25 @@ extension ParseError {
                 return "ExpectedCaseInsensitive(\(string))"
             }
         }
+        
+        public static func == (lhs: ExpectedString, rhs: ExpectedString) -> Bool {
+            return lhs.caseSensitivity == rhs.caseSensitivity
+                && lhs.string == rhs.string
+        }
+        
+        public static func < (lhs: ExpectedString, rhs: ExpectedString) -> Bool {
+            switch (lhs.caseSensitivity, rhs.caseSensitivity) {
+            case (.sensitive, .sensitive), (.insensitive, .insensitive):
+                return lhs.string < rhs.string
+            case (.sensitive, .insensitive):
+                return true
+            case (.insensitive, .sensitive):
+                return false
+            }
+        }
     }
     
-    public class Unexpected: ParseError {
+    public class Unexpected: ParseError, Comparable {
         public let label: String
         
         public init(_ label: String) {
@@ -54,9 +78,17 @@ extension ParseError {
         override public var description: String {
             return "Unexpected(\(label))"
         }
+        
+        public static func == (lhs: Unexpected, rhs: Unexpected) -> Bool {
+            return lhs.label == rhs.label
+        }
+        
+        public static func < (lhs: Unexpected, rhs: Unexpected) -> Bool {
+            return lhs.label < rhs.label
+        }
     }
     
-    public class UnexpectedString: ParseError {
+    public class UnexpectedString: ParseError, Comparable {
         public let string: String
         public let caseSensitivity: StringSensitivity
         
@@ -74,9 +106,25 @@ extension ParseError {
                 return "UnexpectedCaseInsensitive(\(string))"
             }
         }
+        
+        public static func == (lhs: UnexpectedString, rhs: UnexpectedString) -> Bool {
+            return lhs.caseSensitivity == rhs.caseSensitivity
+                && lhs.string == rhs.string
+        }
+        
+        public static func < (lhs: UnexpectedString, rhs: UnexpectedString) -> Bool {
+            switch (lhs.caseSensitivity, rhs.caseSensitivity) {
+            case (.sensitive, .sensitive), (.insensitive, .insensitive):
+                return lhs.string < rhs.string
+            case (.sensitive, .insensitive):
+                return true
+            case (.insensitive, .sensitive):
+                return false
+            }
+        }
     }
     
-    public class Generic: ParseError {
+    public class Generic: ParseError, Comparable {
         public let message: String
         
         public init(message: String) {
@@ -87,12 +135,20 @@ extension ParseError {
         override public var description: String {
             return "Generic(\(message))"
         }
+        
+        public static func == (lhs: Generic, rhs: Generic) -> Bool {
+            return lhs.message == rhs.message
+        }
+        
+        public static func < (lhs: Generic, rhs: Generic) -> Bool {
+            return lhs.message < rhs.message
+        }
     }
     
     public class Nested: ParseError {
-        let position: TextPosition
-        let userInfo: CharacterStream.UserInfo
-        let errors: [Error]
+        public let position: TextPosition
+        public let userInfo: CharacterStream.UserInfo
+        public let errors: [Error]
         
         public init(position: TextPosition,
                     userInfo: CharacterStream.UserInfo,
@@ -109,10 +165,10 @@ extension ParseError {
     }
     
     public class Compound: ParseError {
-        let label: String
-        let position: TextPosition
-        let userInfo: CharacterStream.UserInfo
-        let errors: [Error]
+        public let label: String
+        public let position: TextPosition
+        public let userInfo: CharacterStream.UserInfo
+        public let errors: [Error]
         
         public init(label: String,
                     position: TextPosition,
