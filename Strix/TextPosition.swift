@@ -70,5 +70,30 @@ extension TextPosition: Comparable {
     }
 }
 
+extension TextPosition {
+    var columnMarker: String? {
+        let tab: UnicodeScalar = "\t"
+        let printableASCIIRange: ClosedRange<UnicodeScalar> = " "..."~"
+        
+        var result = ""
+        for scalar in substring.unicodeScalars.prefix(columnNumber-1) {
+            // ASCII 외의 문자는 어떻게 프린트될지 모르므로 nil을 리턴한다
+            guard scalar.isASCII else { return nil }
+            
+            switch scalar {
+            case tab:
+                result.append("\t")
+            case printableASCIIRange:
+                result.append(" ")
+            default:
+                // 그 외 제어 문자는 프린트 되지 않으므로 아무 것도 더하지 않는다
+                break
+            }
+        }
+        result.append("^")
+        return result
+    }
+}
+
 
 

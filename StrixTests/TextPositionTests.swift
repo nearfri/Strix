@@ -135,6 +135,66 @@ class TextPositionTests: XCTestCase {
         
         XCTAssertEqual(str.index(str.startIndex, offsetBy: 9), str.endIndex)
     }
+    
+    func test_columnMarker_normal() {
+        let str = "1234567890"
+        let cmk = "    ^"
+        let column = 5
+        let index = str.index(str.startIndex, offsetBy: column-1)
+        XCTAssertEqual(str[index], "5")
+        let pos = TextPosition(string: str, index: index)
+        XCTAssertEqual(pos.columnMarker, cmk)
+    }
+    
+    func test_columnMarker_startsWithTab() {
+        let str = "\t234567890"
+        let cmk = "\t   ^"
+        let column = 5
+        let index = str.index(str.startIndex, offsetBy: column-1)
+        XCTAssertEqual(str[index], "5")
+        let pos = TextPosition(string: str, index: index)
+        XCTAssertEqual(pos.columnMarker, cmk)
+    }
+    
+    func test_columnMarker_startsWithSpace() {
+        let str = " 234567890"
+        let cmk = "    ^"
+        let column = 5
+        let index = str.index(str.startIndex, offsetBy: column-1)
+        XCTAssertEqual(str[index], "5")
+        let pos = TextPosition(string: str, index: index)
+        XCTAssertEqual(pos.columnMarker, cmk)
+    }
+    
+    func test_columnMarker_startsWithControlCharacter() {
+        let str = "\u{14}\u{15}34567890"
+        //        "34567890"
+        let cmk = "  ^"
+        let column = 5
+        let index = str.index(str.startIndex, offsetBy: column-1)
+        XCTAssertEqual(str[index], "5")
+        let pos = TextPosition(string: str, index: index)
+        XCTAssertEqual(pos.columnMarker, cmk)
+    }
+    
+    func test_columnMarker_startsWithHangul() {
+        let str = "한글34567890"
+        let column = 5
+        let index = str.index(str.startIndex, offsetBy: column-1)
+        XCTAssertEqual(str[index], "5")
+        let pos = TextPosition(string: str, index: index)
+        XCTAssertNil(pos.columnMarker)
+    }
+    
+    func test_columnMarker_endsWithHangul() {
+        let str = "1234567890한글"
+        let cmk = "    ^"
+        let column = 5
+        let index = str.index(str.startIndex, offsetBy: column-1)
+        XCTAssertEqual(str[index], "5")
+        let pos = TextPosition(string: str, index: index)
+        XCTAssertEqual(pos.columnMarker, cmk)
+    }
 }
 
 
