@@ -1,5 +1,5 @@
 
-open class ParsingError: Error, CustomStringConvertible {
+open class ParseError: Error, CustomStringConvertible {
     public init() {
         
     }
@@ -9,8 +9,8 @@ open class ParsingError: Error, CustomStringConvertible {
     }
 }
 
-extension ParsingError {
-    public class Expected: ParsingError {
+extension ParseError {
+    public class Expected: ParseError {
         public let label: String
         
         public init(_ label: String) {
@@ -23,7 +23,7 @@ extension ParsingError {
         }
     }
     
-    public class ExpectedString: ParsingError {
+    public class ExpectedString: ParseError {
         public let string: String
         public let caseSensitivity: StringSensitivity
         
@@ -43,7 +43,7 @@ extension ParsingError {
         }
     }
     
-    public class Unexpected: ParsingError {
+    public class Unexpected: ParseError {
         public let label: String
         
         public init(_ label: String) {
@@ -56,7 +56,7 @@ extension ParsingError {
         }
     }
     
-    public class UnexpectedString: ParsingError {
+    public class UnexpectedString: ParseError {
         public let string: String
         public let caseSensitivity: StringSensitivity
         
@@ -76,7 +76,7 @@ extension ParsingError {
         }
     }
     
-    public class Generic: ParsingError {
+    public class Generic: ParseError {
         public let message: String
         
         public init(message: String) {
@@ -89,7 +89,7 @@ extension ParsingError {
         }
     }
     
-    public class Nested: ParsingError {
+    public class Nested: ParseError {
         let position: TextPosition
         let userInfo: CharacterStream.UserInfo
         let errors: [Error]
@@ -108,7 +108,7 @@ extension ParsingError {
         }
     }
     
-    public class Compound: ParsingError {
+    public class Compound: ParseError {
         let label: String
         let position: TextPosition
         let userInfo: CharacterStream.UserInfo
