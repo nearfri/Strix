@@ -1,10 +1,10 @@
 
-public enum ParsingResult<T> {
+public enum ParseResult<T> {
     case success(T)
-    case failure(ParsingResult.Error)
+    case failure(ParseResult.Error)
 }
 
-extension ParsingResult: CustomStringConvertible {
+extension ParseResult: CustomStringConvertible {
     public var description: String {
         switch self {
         case let .success(v):
@@ -15,14 +15,14 @@ extension ParsingResult: CustomStringConvertible {
     }
 }
 
-extension ParsingResult {
+extension ParseResult {
     public struct Error: Swift.Error {
         public let position: TextPosition
         public let underlyingErrors: [Swift.Error]
     }
 }
 
-extension ParsingResult.Error: CustomStringConvertible {
+extension ParseResult.Error: CustomStringConvertible {
     public var description: String {
         return "Error in \(position.lineNumber):\(position.columnNumber)"
     }
