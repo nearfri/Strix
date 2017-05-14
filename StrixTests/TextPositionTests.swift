@@ -68,6 +68,14 @@ class TextPositionTests: XCTestCase {
         XCTAssertEqual(str.index(str.startIndex, offsetBy: 20), str.endIndex)
     }
     
+    func test_position_emptyString() {
+        let str = ""
+        let pos = TextPosition(string: str, index: str.startIndex)
+        XCTAssertEqual(pos.lineNumber, 1)
+        XCTAssertEqual(pos.columnNumber, 1)
+        XCTAssertEqual(pos.substring, "")
+    }
+    
     func test_position_surroundedWithNewline() {
         let str = "\nabcd\nefgh\n"
         
@@ -192,6 +200,14 @@ class TextPositionTests: XCTestCase {
         let column = 5
         let index = str.index(str.startIndex, offsetBy: column-1)
         XCTAssertEqual(str[index], "5")
+        let pos = TextPosition(string: str, index: index)
+        XCTAssertEqual(pos.columnMarker, cmk)
+    }
+    
+    func test_columnMarker_emptyString() {
+        let str = ""
+        let cmk = "^"
+        let index = str.startIndex
         let pos = TextPosition(string: str, index: index)
         XCTAssertEqual(pos.columnMarker, cmk)
     }
