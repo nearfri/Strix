@@ -122,6 +122,19 @@ class ParseErrorGroupTests: XCTestCase {
         XCTAssertEqual(lErr.domain, rErr.domain)
         XCTAssertEqual(lErr.code, rErr.code)
     }
+    
+    func test_isEmpty() {
+        XCTAssertFalse(sut.isEmpty)
+        XCTAssertTrue(ParseErrorGroup([]).isEmpty)
+        XCTAssertFalse(ParseErrorGroup([expectedErrors[0]]).isEmpty)
+        XCTAssertFalse(ParseErrorGroup([expectedStringErrors[0]]).isEmpty)
+        XCTAssertFalse(ParseErrorGroup([unexpectedErrors[0]]).isEmpty)
+        XCTAssertFalse(ParseErrorGroup([unexpectedStringErrors[0]]).isEmpty)
+        XCTAssertFalse(ParseErrorGroup([genericErrors[0]]).isEmpty)
+        XCTAssertFalse(ParseErrorGroup([nestedErrors[0]]).isEmpty)
+        XCTAssertFalse(ParseErrorGroup([compoundErrors[0]]).isEmpty)
+        XCTAssertFalse(ParseErrorGroup([unknownErrors[0]]).isEmpty)
+    }
 }
 
 

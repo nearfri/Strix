@@ -9,6 +9,12 @@ internal struct ParseErrorGroup {
     private(set) var compoundErrors: [ParseError.Compound] = []
     private(set) var unknownErrors: [Error] = []
     
+    var isEmpty: Bool {
+        return expectedErrors.isEmpty && expectedStringErrors.isEmpty && unexpectedErrors.isEmpty
+            && unexpectedStringErrors.isEmpty && genericErrors.isEmpty && nestedErrors.isEmpty
+            && compoundErrors.isEmpty && unknownErrors.isEmpty
+    }
+    
     init(_ errors: [Error]) {
         append(contentsOf: errors)
         sort()
