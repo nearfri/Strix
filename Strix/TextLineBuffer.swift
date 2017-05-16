@@ -13,12 +13,12 @@ internal struct Indent {
     }
 }
 
-internal class TextLineBuffer: TextOutputStream {
+internal struct TextLineBuffer: TextOutputStream {
     var indent: Indent = Indent()
     fileprivate(set) var text: String = ""
     fileprivate var needsIndent: Bool = true
     
-    func write(_ string: String) {
+    mutating func write(_ string: String) {
         if needsIndent {
             needsIndent = false
             text.write(indent.string)
@@ -26,7 +26,7 @@ internal class TextLineBuffer: TextOutputStream {
         text.write(string)
     }
     
-    func writeLine(_ string: String = "") {
+    mutating func writeLine(_ string: String = "") {
         write(string)
         write("\n")
         needsIndent = true

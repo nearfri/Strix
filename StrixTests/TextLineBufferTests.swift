@@ -25,7 +25,7 @@ class TextLineBufferTests: XCTestCase {
     }
     
     func test_write() {
-        let textBuffer = TextLineBuffer()
+        var textBuffer = TextLineBuffer()
         
         textBuffer.write("hello")
         XCTAssertEqual(textBuffer.text, "hello")
@@ -35,7 +35,7 @@ class TextLineBufferTests: XCTestCase {
     }
     
     func test_writeLine() {
-        let textBuffer = TextLineBuffer()
+        var textBuffer = TextLineBuffer()
         
         textBuffer.writeLine("hello")
         XCTAssertEqual(textBuffer.text, "hello\n")
@@ -45,7 +45,7 @@ class TextLineBufferTests: XCTestCase {
     }
     
     func test_writeLine_whenGivenIndent() {
-        let textBuffer = TextLineBuffer()
+        var textBuffer = TextLineBuffer()
         textBuffer.indent = Indent(width: 2)
         
         textBuffer.indent.level += 1
