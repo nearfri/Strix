@@ -18,19 +18,17 @@ class ParseResultTests: XCTestCase {
     }
     
     func test_description_failure() {
-        let str = "abcdefghi"
+        let str = "123456789"
         let offset = 5
         let pos = TextPosition(string: str, index: str.index(str.startIndex, offsetBy: offset))
-        let underlyingErrors = [
-            ParseError.Expected("number")
-        ]
+        let underlyingErrors = [ParseError.Expected("alphabet")]
         let err = ParseResult<Void>.Error(position: pos, underlyingErrors: underlyingErrors)
         let sut = ParseResult<Void>.failure(err)
         let expectedDescription = "Failure: Error in 1:\(offset+1)\n"
             + "\(str)\n"
             + "     ^\n"
-            + "Expecting: number"
-//        XCTAssertEqual(sut.description, expectedDescription)
+            + "Expecting: alphabet\n"
+        XCTAssertEqual(sut.description, expectedDescription)
     }
 }
 

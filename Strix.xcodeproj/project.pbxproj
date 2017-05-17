@@ -9,8 +9,10 @@
 /* Begin PBXBuildFile section */
 		750AADE91E98D29000BEB6C2 /* TextPosition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 750AADE81E98D29000BEB6C2 /* TextPosition.swift */; };
 		750AADEB1E98D2C800BEB6C2 /* TextPositionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 750AADEA1E98D2C800BEB6C2 /* TextPositionTests.swift */; };
-		755083301EC9F700000417F9 /* TextLineBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7550832F1EC9F700000417F9 /* TextLineBuffer.swift */; };
-		755083321ECA10CB000417F9 /* TextLineBufferTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755083311ECA10CB000417F9 /* TextLineBufferTests.swift */; };
+		753AA31F1ECC94550015EC11 /* ErrorMessageWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 753AA31E1ECC94550015EC11 /* ErrorMessageWriter.swift */; };
+		753AA3211ECC94C40015EC11 /* ErrorMessageWriterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 753AA3201ECC94C40015EC11 /* ErrorMessageWriterTests.swift */; };
+		755083301EC9F700000417F9 /* ErrorOutputBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7550832F1EC9F700000417F9 /* ErrorOutputBuffer.swift */; };
+		755083321ECA10CB000417F9 /* ErrorOutputBufferTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755083311ECA10CB000417F9 /* ErrorOutputBufferTests.swift */; };
 		7551CBE81EC48D8D001911B0 /* ParseResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7551CBE71EC48D8D001911B0 /* ParseResult.swift */; };
 		7551CBEA1EC4908A001911B0 /* ParseResultTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7551CBE91EC4908A001911B0 /* ParseResultTests.swift */; };
 		7556A2A21E7AE4B70094EF39 /* Strix.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7556A2981E7AE4B70094EF39 /* Strix.framework */; };
@@ -37,8 +39,10 @@
 /* Begin PBXFileReference section */
 		750AADE81E98D29000BEB6C2 /* TextPosition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextPosition.swift; sourceTree = "<group>"; };
 		750AADEA1E98D2C800BEB6C2 /* TextPositionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextPositionTests.swift; sourceTree = "<group>"; };
-		7550832F1EC9F700000417F9 /* TextLineBuffer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextLineBuffer.swift; sourceTree = "<group>"; };
-		755083311ECA10CB000417F9 /* TextLineBufferTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextLineBufferTests.swift; sourceTree = "<group>"; };
+		753AA31E1ECC94550015EC11 /* ErrorMessageWriter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ErrorMessageWriter.swift; sourceTree = "<group>"; };
+		753AA3201ECC94C40015EC11 /* ErrorMessageWriterTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ErrorMessageWriterTests.swift; sourceTree = "<group>"; };
+		7550832F1EC9F700000417F9 /* ErrorOutputBuffer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ErrorOutputBuffer.swift; sourceTree = "<group>"; };
+		755083311ECA10CB000417F9 /* ErrorOutputBufferTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ErrorOutputBufferTests.swift; sourceTree = "<group>"; };
 		7551CBE71EC48D8D001911B0 /* ParseResult.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ParseResult.swift; sourceTree = "<group>"; };
 		7551CBE91EC4908A001911B0 /* ParseResultTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ParseResultTests.swift; sourceTree = "<group>"; };
 		7556A2981E7AE4B70094EF39 /* Strix.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Strix.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -102,7 +106,8 @@
 				75F91C391E9BD56700A9208F /* Reply.swift */,
 				75BA2D611EB715790049FE04 /* ParseError.swift */,
 				75CA67EE1EC74B3000331EC0 /* ParseErrorGroup.swift */,
-				7550832F1EC9F700000417F9 /* TextLineBuffer.swift */,
+				7550832F1EC9F700000417F9 /* ErrorOutputBuffer.swift */,
+				753AA31E1ECC94550015EC11 /* ErrorMessageWriter.swift */,
 				7551CBE71EC48D8D001911B0 /* ParseResult.swift */,
 				7556A3561E7AEA710094EF39 /* Supporting Files */,
 			);
@@ -117,7 +122,8 @@
 				75F91C3B1E9BD59100A9208F /* ReplyTests.swift */,
 				75BA2D631EB716180049FE04 /* ParseErrorTests.swift */,
 				75CA67F01EC757FC00331EC0 /* ParseErrorGroupTests.swift */,
-				755083311ECA10CB000417F9 /* TextLineBufferTests.swift */,
+				755083311ECA10CB000417F9 /* ErrorOutputBufferTests.swift */,
+				753AA3201ECC94C40015EC11 /* ErrorMessageWriterTests.swift */,
 				7551CBE91EC4908A001911B0 /* ParseResultTests.swift */,
 				7556A2A81E7AE4B70094EF39 /* Info.plist */,
 			);
@@ -248,9 +254,10 @@
 				75F91C3A1E9BD56700A9208F /* Reply.swift in Sources */,
 				75CA67EF1EC74B3000331EC0 /* ParseErrorGroup.swift in Sources */,
 				7556A2D71E7AE6A00094EF39 /* CharacterStream.swift in Sources */,
-				755083301EC9F700000417F9 /* TextLineBuffer.swift in Sources */,
+				755083301EC9F700000417F9 /* ErrorOutputBuffer.swift in Sources */,
 				750AADE91E98D29000BEB6C2 /* TextPosition.swift in Sources */,
 				75BA2D621EB715790049FE04 /* ParseError.swift in Sources */,
+				753AA31F1ECC94550015EC11 /* ErrorMessageWriter.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -262,9 +269,10 @@
 				750AADEB1E98D2C800BEB6C2 /* TextPositionTests.swift in Sources */,
 				75CA67F11EC757FD00331EC0 /* ParseErrorGroupTests.swift in Sources */,
 				7551CBEA1EC4908A001911B0 /* ParseResultTests.swift in Sources */,
-				755083321ECA10CB000417F9 /* TextLineBufferTests.swift in Sources */,
+				755083321ECA10CB000417F9 /* ErrorOutputBufferTests.swift in Sources */,
 				75F91C3C1E9BD59100A9208F /* ReplyTests.swift in Sources */,
 				75BA2D641EB716180049FE04 /* ParseErrorTests.swift in Sources */,
+				753AA3211ECC94C40015EC11 /* ErrorMessageWriterTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

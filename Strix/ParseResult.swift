@@ -24,11 +24,9 @@ extension ParseResult {
 
 extension ParseResult.Error: CustomStringConvertible {
     public var description: String {
-        return "Error in \(position.lineNumber):\(position.columnNumber)"
-    }
-    
-    private func columnPositionString() -> String {
-        return ""
+        var outputBuffer = ErrorOutputBuffer()
+        ErrorMessageWriter.write(position: position, errors: underlyingErrors, to: &outputBuffer)
+        return outputBuffer.text
     }
 }
 
