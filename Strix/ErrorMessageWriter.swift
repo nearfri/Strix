@@ -42,7 +42,21 @@ internal struct ErrorMessageWriter {
         if let columnMarker = position.columnMarker {
             output.writeLine("\(columnMarker)")
         }
-        // TODO: Note 출력 추가
+        
+        let note: String?
+        if position.index == position.string.endIndex {
+            note = "The error occurred at the end of the input stream."
+        } else if position.substring.isEmpty {
+            note = "The error occurred on an empty line."
+        } else if position.columnNumber == position.substring.characters.count + 1 {
+            note = "The error occurred at the end of the line."
+        } else {
+            note = nil
+        }
+        
+        if let note = note {
+            output.writeLine("Note: \(note)")
+        }
     }
     
     private func makeExpectedMessages() -> [String] {
