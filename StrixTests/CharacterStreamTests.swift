@@ -480,6 +480,25 @@ class CharacterStreamTests: XCTestCase {
         XCTAssertEqual(position.columnNumber, 1)
         XCTAssertEqual(position.substring, "Bar")
     }
+    
+    func test_description() {
+        let string = "Foo\nBar"
+        let stream = CharacterStream(string: string)
+        
+        stream.seek(to: string.index(string.startIndex, offsetBy: 4))
+        XCTAssertEqual(stream.description,
+                       "CharacterStream(2:1, substring: \"Bar\", userInfo: [:])")
+    }
+    
+    func test_state_description() {
+        let string = "Foo\nBar"
+        let stream = CharacterStream(string: string)
+        
+        stream.seek(to: string.index(string.startIndex, offsetBy: 4))
+        let state = stream.state
+        XCTAssertEqual(state.description,
+                       "CharacterStream.State(2:1, substring: \"Bar\", tag: 1, userInfo: [:])")
+    }
 }
 
 
