@@ -211,6 +211,12 @@ class TextPositionTests: XCTestCase {
         let pos = TextPosition(string: str, index: index)
         XCTAssertEqual(pos.columnMarker, cmk)
     }
+    
+    func test_description() {
+        let str = "abcd\nefgh\nijkl\n\nmnpq"
+        let pos = TextPosition(string: str, index: str.index(str.startIndex, offsetBy: 2))
+        XCTAssertEqual(pos.description, "TextPosition(1:3, substring: \"abcd\")")
+    }
 }
 
 

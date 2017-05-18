@@ -26,6 +26,12 @@ public struct TextPosition {
     }
 }
 
+extension TextPosition: CustomStringConvertible {
+    public var description: String {
+        return "TextPosition(\(lineNumber):\(columnNumber), substring: \"\(substring)\")"
+    }
+}
+
 extension TextPosition {
     fileprivate class Info {
         private static let invalidNumber: Int = -1
