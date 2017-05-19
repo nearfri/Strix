@@ -19,44 +19,44 @@ class ErrorMessageWriterTests: XCTestCase {
     override func setUp() {
         super.setUp()
         
-        let str = "apple"
+        let str = "Banana"
         position = TextPosition(string: str, index: str.startIndex)
         outputBuffer = ErrorOutputBuffer()
         positionString = ""
             + "Error in 1:1\n"
-            + "apple\n"
+            + "Banana\n"
             + "^\n"
         
         expectedErrors = [
-            ParseError.Expected("abc"),
-            ParseError.Expected("def")
+            ParseError.Expected("apple"),
+            ParseError.Expected("strawberry")
         ]
         expectedStringErrors = [
-            ParseError.ExpectedString("abc", case: .sensitive),
-            ParseError.ExpectedString("def", case: .sensitive),
-            ParseError.ExpectedString("abc", case: .insensitive),
-            ParseError.ExpectedString("def", case: .insensitive)
+            ParseError.ExpectedString("Apple", case: .sensitive),
+            ParseError.ExpectedString("Strawberry", case: .sensitive),
+            ParseError.ExpectedString("chili", case: .insensitive),
+            ParseError.ExpectedString("tomato", case: .insensitive)
         ]
         unexpectedErrors = [
-            ParseError.Unexpected("abc"),
-            ParseError.Unexpected("def")
+            ParseError.Unexpected("banana"),
+            ParseError.Unexpected("melon")
         ]
         unexpectedStringErrors = [
-            ParseError.UnexpectedString("abc", case: .sensitive),
-            ParseError.UnexpectedString("def", case: .sensitive),
-            ParseError.UnexpectedString("abc", case: .insensitive),
-            ParseError.UnexpectedString("def", case: .insensitive)
+            ParseError.UnexpectedString("Banana", case: .sensitive),
+            ParseError.UnexpectedString("Melon", case: .sensitive),
+            ParseError.UnexpectedString("peach", case: .insensitive),
+            ParseError.UnexpectedString("pear", case: .insensitive)
         ]
         genericErrors = [
-            ParseError.Generic(message: "abc"),
-            ParseError.Generic(message: "def")
+            ParseError.Generic(message: "banana is yellow"),
+            ParseError.Generic(message: "melon is green")
         ]
         nestedErrors = [
             ParseError.Nested(position: TextPosition(string: str, index: str.index(after: str.startIndex)),
                               userInfo: [:], errors: [expectedErrors[0]])
         ]
         compoundErrors = [
-            ParseError.Compound(label: "abc def",
+            ParseError.Compound(label: "Red fruit",
                                 position: TextPosition(string: str, index: str.index(after: str.startIndex)),
                                 userInfo: [:], errors: expectedErrors)
         ]
@@ -77,53 +77,53 @@ class ErrorMessageWriterTests: XCTestCase {
     func test_expectedErrors() {
         ErrorMessageWriter.write(position: position, errors: expectedErrors, to: &outputBuffer)
         XCTAssertEqual(outputBuffer.text,
-                       "\(positionString)Expecting: abc or def\n")
+                       "\(positionString)Expecting: apple or strawberry\n")
     }
     
     func test_expectedStringErrors() {
         ErrorMessageWriter.write(position: position, errors: expectedStringErrors,
                                  to: &outputBuffer)
         XCTAssertEqual(outputBuffer.text, ""
-            + "\(positionString)Expecting: 'abc', 'def', "
-            + "'abc' (case-insensitive) or 'def' (case-insensitive)\n")
+            + "\(positionString)Expecting: 'Apple', 'Strawberry', "
+            + "'chili' (case-insensitive) or 'tomato' (case-insensitive)\n")
     }
     
     func test_unexpectedErrors() {
         ErrorMessageWriter.write(position: position, errors: unexpectedErrors, to: &outputBuffer)
         XCTAssertEqual(outputBuffer.text,
-                       "\(positionString)Unexpected: abc and def\n")
+                       "\(positionString)Unexpected: banana and melon\n")
     }
     
     func test_unexpectedStringErrors() {
         ErrorMessageWriter.write(position: position, errors: unexpectedStringErrors,
                                  to: &outputBuffer)
         XCTAssertEqual(outputBuffer.text, ""
-            + "\(positionString)Unexpected: 'abc', 'def', "
-            + "'abc' (case-insensitive) and 'def' (case-insensitive)\n")
+            + "\(positionString)Unexpected: 'Banana', 'Melon', "
+            + "'peach' (case-insensitive) and 'pear' (case-insensitive)\n")
     }
     
     func test_allExpectedErrors() {
         let errors: [Error] = expectedErrors as [Error] + expectedStringErrors
         ErrorMessageWriter.write(position: position, errors: errors, to: &outputBuffer)
         XCTAssertEqual(outputBuffer.text, ""
-            + "\(positionString)Expecting: abc, def, 'abc', 'def', "
-            + "'abc' (case-insensitive) or 'def' (case-insensitive)\n")
+            + "\(positionString)Expecting: apple, strawberry, 'Apple', 'Strawberry', "
+            + "'chili' (case-insensitive) or 'tomato' (case-insensitive)\n")
     }
     
     func test_allUnexpectedErrors() {
         let errors: [Error] = unexpectedErrors as [Error] + unexpectedStringErrors
         ErrorMessageWriter.write(position: position, errors: errors, to: &outputBuffer)
         XCTAssertEqual(outputBuffer.text, ""
-            + "\(positionString)Unexpected: abc, def, 'abc', 'def', "
-            + "'abc' (case-insensitive) and 'def' (case-insensitive)\n")
+            + "\(positionString)Unexpected: banana, melon, 'Banana', 'Melon', "
+            + "'peach' (case-insensitive) and 'pear' (case-insensitive)\n")
     }
     
     func test_otherMessages_whenNotGivenExpectedErrors() {
         let errors: [Error] = genericErrors as [Error] + unknownErrors
         ErrorMessageWriter.write(position: position, errors: errors, to: &outputBuffer)
         XCTAssertEqual(outputBuffer.text, ""
-            + "\(positionString)abc\n"
-            + "def\n"
+            + "\(positionString)banana is yellow\n"
+            + "melon is green\n"
             + "\(unknownErrors[0])\n")
     }
     
@@ -131,10 +131,10 @@ class ErrorMessageWriterTests: XCTestCase {
         let errors: [Error] = genericErrors as [Error] + unknownErrors + expectedErrors
         ErrorMessageWriter.write(position: position, errors: errors, to: &outputBuffer)
         XCTAssertEqual(outputBuffer.text, ""
-            + "\(positionString)Expecting: abc or def\n"
+            + "\(positionString)Expecting: apple or strawberry\n"
             + "Other error messages: \n"
-            + "  abc\n"
-            + "  def\n"
+            + "  banana is yellow\n"
+            + "  melon is green\n"
             + "  \(unknownErrors[0])\n")
     }
     
@@ -144,21 +144,21 @@ class ErrorMessageWriterTests: XCTestCase {
             + "\(positionString)\n"
             + "The parser backtracked after: \n"
             + "  Error in 1:2\n"
-            + "  apple\n"
+            + "  Banana\n"
             + "   ^\n"
-            + "  Expecting: abc\n")
+            + "  Expecting: apple\n")
     }
     
     func test_compoundErrors() {
         ErrorMessageWriter.write(position: position, errors: compoundErrors, to: &outputBuffer)
         XCTAssertEqual(outputBuffer.text, ""
-            + "\(positionString)Expecting: abc def\n"
+            + "\(positionString)Expecting: Red fruit\n"
             + "\n"
-            + "abc def could not be parsed because: \n"
+            + "Red fruit could not be parsed because: \n"
             + "  Error in 1:2\n"
-            + "  apple\n"
+            + "  Banana\n"
             + "   ^\n"
-            + "  Expecting: abc or def\n")
+            + "  Expecting: apple or strawberry\n")
     }
     
     func test_mixedErrors() {
@@ -167,24 +167,24 @@ class ErrorMessageWriterTests: XCTestCase {
             + unknownErrors
         ErrorMessageWriter.write(position: position, errors: errors, to: &outputBuffer)
         XCTAssertEqual(outputBuffer.text, ""
-            + "\(positionString)Expecting: abc, def or abc def\n"
-            + "Unexpected: abc and def\n"
+            + "\(positionString)Expecting: apple, strawberry or Red fruit\n"
+            + "Unexpected: banana and melon\n"
             + "Other error messages: \n"
-            + "  abc\n"
-            + "  def\n"
+            + "  banana is yellow\n"
+            + "  melon is green\n"
             + "  \(unknownErrors[0])\n"
             + "\n"
-            + "abc def could not be parsed because: \n"
+            + "Red fruit could not be parsed because: \n"
             + "  Error in 1:2\n"
-            + "  apple\n"
+            + "  Banana\n"
             + "   ^\n"
-            + "  Expecting: abc or def\n"
+            + "  Expecting: apple or strawberry\n"
             + "\n"
             + "The parser backtracked after: \n"
             + "  Error in 1:2\n"
-            + "  apple\n"
+            + "  Banana\n"
             + "   ^\n"
-            + "  Expecting: abc\n")
+            + "  Expecting: apple\n")
     }
     
     func test_positionStringNote_whenEndOfInput() {
