@@ -7,8 +7,12 @@ public enum Reply<T> {
 
 extension Reply {
     public var value: T? {
-        if case let .success(v, _) = self { return v }
-        return nil
+        switch self {
+        case .success(let v, _):
+            return v
+        case .failure, .fatalFailure:
+            return nil
+        }
     }
     
     public var errors: [Error] {

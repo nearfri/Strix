@@ -4,6 +4,22 @@ public enum ParseResult<T> {
     case failure(ParseResult.Error)
 }
 
+extension ParseResult {
+    public var value: T? {
+        switch self {
+        case .success(let v):   return v
+        case .failure:          return nil
+        }
+    }
+    
+    public var error: ParseResult.Error? {
+        switch self {
+        case .success:          return nil
+        case .failure(let e):   return e
+        }
+    }
+}
+
 extension ParseResult: CustomStringConvertible {
     public var description: String {
         switch self {

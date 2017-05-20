@@ -11,10 +11,10 @@ class ReplyTests: XCTestCase {
         super.tearDown()
     }
     
-    func test_value() {
+    func test_getValue() {
         XCTAssertEqual(Reply.success(3, []).value, 3)
-        XCTAssertEqual(Reply<Int>.failure([]).value, nil)
-        XCTAssertEqual(Reply<Int>.fatalFailure([]).value, nil)
+        XCTAssertNil(Reply<Int>.failure([]).value)
+        XCTAssertNil(Reply<Int>.fatalFailure([]).value)
     }
     
     func test_getErrors() {
