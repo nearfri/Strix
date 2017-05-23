@@ -25,7 +25,7 @@ extension Parser {
     
     public func map<U>(_ transform: @escaping (T) -> U) -> Parser<U> {
         return flatMap { (v) in
-            return Parser<U> { _ in .success(transform(v), []) }
+            return Parser<U>({ _ in .success(transform(v), []) })
         }
     }
 }

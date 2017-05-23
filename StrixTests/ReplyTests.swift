@@ -40,11 +40,12 @@ class ReplyTests: XCTestCase {
         XCTAssertEqual(reply.errors as [NSError], [])
         reply.errors = errors
         XCTAssertEqual(reply.errors as [NSError], errors)
+        var passed = false
         if case let .success(v, _) = reply {
             XCTAssertEqual(v, 1)
-        } else {
-            XCTFail()
+            passed = true
         }
+        XCTAssertTrue(passed)
         
         reply = .failure([])
         XCTAssertEqual(reply.errors as [NSError], [])
@@ -167,19 +168,21 @@ class ReplyTests: XCTestCase {
         
         reply = .failure(errors)
         XCTAssertEqual(reply.map({ _ in "a" }).value, nil)
+        var passed = false
         if case let .failure(e as [NSError]) = reply {
             XCTAssertEqual(e, errors)
-        } else {
-            XCTFail()
+            passed = true
         }
+        XCTAssertTrue(passed)
         
         reply = .fatalFailure(errors)
         XCTAssertEqual(reply.map({ _ in "a" }).value, nil)
+        passed = false
         if case let .fatalFailure(e as [NSError]) = reply {
             XCTAssertEqual(e, errors)
-        } else {
-            XCTFail()
+            passed = true
         }
+        XCTAssertTrue(passed)
     }
     
     func test_flatMap_whenSuccess() {
@@ -197,30 +200,33 @@ class ReplyTests: XCTestCase {
         var mappedReply: Reply<String> = reply.flatMap {
             return .success($0 == 1 ? "a" : "b", errors2)
         }
+        var passed = false
         if case let .success(v, e) = mappedReply {
             XCTAssertEqual(v, "a")
             XCTAssertEqual(e as [NSError], allErrors)
-        } else {
-            XCTFail()
+            passed = true
         }
+        XCTAssertTrue(passed)
         
         mappedReply = reply.flatMap { _ in
             return .failure(errors2)
         }
+        passed = false
         if case let .failure(e) = mappedReply {
             XCTAssertEqual(e as [NSError], allErrors)
-        } else {
-            XCTFail()
+            passed = true
         }
+        XCTAssertTrue(passed)
         
         mappedReply = reply.flatMap { _ in
             return .fatalFailure(errors2)
         }
+        passed = false
         if case let .fatalFailure(e) = mappedReply {
             XCTAssertEqual(e as [NSError], allErrors)
-        } else {
-            XCTFail()
+            passed = true
         }
+        XCTAssertTrue(passed)
     }
     
     func test_flatMap_whenFailure() {
@@ -238,11 +244,12 @@ class ReplyTests: XCTestCase {
             XCTFail()
             return .success("a", errors2)
         }
+        var passed = false
         if case let .failure(e) = mappedReply {
             XCTAssertEqual(e as [NSError], errors1)
-        } else {
-            XCTFail()
+            passed = true
         }
+        XCTAssertTrue(passed)
     }
     
     func test_flatMap_whenFatalFailure() {
@@ -260,11 +267,12 @@ class ReplyTests: XCTestCase {
             XCTFail()
             return .success("a", errors2)
         }
+        var passed = false
         if case let .fatalFailure(e) = mappedReply {
             XCTAssertEqual(e as [NSError], errors1)
-        } else {
-            XCTFail()
+            passed = true
         }
+        XCTAssertTrue(passed)
     }
 }
 
