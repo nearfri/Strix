@@ -35,6 +35,35 @@ class PrimitivesAlternativeTests: XCTestCase {
         XCTAssertEqual(reply.errors as! [DummyError], [DummyError.err0, DummyError.err1])
     }
     
+    func test_alternative_whenBothFailure_returnBothError() {
+        let p1 = Parser<Int> { _ in return .failure([DummyError.err0]) }
+        let p2 = Parser<Int> { _ in return .failure([DummyError.err1]) }
+        let p = p1 <|> p2
+        let reply = p.parse(CharacterStream(string: ""))
+        var passed = false
+        if case let .failure(e) = reply {
+            XCTAssertEqual(e as! [DummyError], [DummyError.err0, DummyError.err1])
+            passed = true
+        }
+        XCTAssertTrue(passed)
+    }
+    
+    func test_alternative_whenBothFailureWithChangeStateTag_returnOneError() {
+        let p1 = Parser<Int> { _ in return .failure([DummyError.err0]) }
+        let p2 = Parser<Int> { (stream) in
+            stream.stateTag += 1
+            return .failure([DummyError.err1])
+        }
+        let p = p1 <|> p2
+        let reply = p.parse(CharacterStream(string: ""))
+        var passed = false
+        if case let .failure(e) = reply {
+            XCTAssertEqual(e as! [DummyError], [DummyError.err1])
+            passed = true
+        }
+        XCTAssertTrue(passed)
+    }
+    
     func test_alternative_whenLeftFatalFailure_returnFatalFailure() {
         let p1 = Parser<Int> { _ in return .fatalFailure([DummyError.err0]) }
         let p2 = Parser<Int> { _ in
