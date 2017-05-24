@@ -82,11 +82,12 @@ public func <|> <T>(p1: Parser<T>, p2: Parser<T>) -> Parser<T> {
     return Parser { stream in
         let stateTag = stream.stateTag
         let reply = p1.parse(stream)
-        guard stateTag == stream.stateTag, case let .failure(e) = reply else {
+        if case let .failure(e) = reply, stateTag == stream.stateTag {
+            let reply2 = p2.parse(stream)
+            return stateTag == stream.stateTag && !e.isEmpty ? reply2.prepending(e) : reply2
+        } else {
             return reply
         }
-        let reply2 = p2.parse(stream)
-        return stateTag == stream.stateTag && !e.isEmpty ? reply2.prepending(e) : reply2
     }
 }
 
@@ -105,6 +106,10 @@ public func choice<T, S: Sequence>(_ ps: S) -> Parser<T> where S.Iterator.Elemen
         }
         return reply
     }
+}
+
+public func optional<T>(_ p: Parser<T>) -> Parser<T?> {
+    return p |>> Optional.init <|> pure(nil)
 }
 
 
