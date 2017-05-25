@@ -2,11 +2,6 @@
 import XCTest
 @testable import Strix
 
-private enum DummyError: Error {
-    case err0
-    case err1
-}
-
 class ParserTests: XCTestCase {
     override func setUp() {
         super.setUp()
@@ -150,8 +145,8 @@ class ParserTests: XCTestCase {
     }
     
     func test_run_whenFailure_returnFailure() {
-        let underlyingErrors: [NSError] = [
-            NSError(domain: "", code: 1, userInfo: nil)
+        let underlyingErrors: [DummyError] = [
+            DummyError.err0
         ]
         
         let parser = Parser { (_) -> Reply<Int> in
@@ -161,15 +156,15 @@ class ParserTests: XCTestCase {
         let result = parser.run("")
         var passed = false
         if case .failure(let e) = result {
-            XCTAssertEqual(e.underlyingErrors as [NSError], underlyingErrors)
+            XCTAssertEqual(e.underlyingErrors as! [DummyError], underlyingErrors)
             passed = true
         }
         XCTAssertTrue(passed)
     }
     
     func test_run_whenFailure_returnFatalFailure() {
-        let underlyingErrors: [NSError] = [
-            NSError(domain: "", code: 1, userInfo: nil)
+        let underlyingErrors: [DummyError] = [
+            DummyError.err0
         ]
         
         let parser = Parser { (_) -> Reply<Int> in
@@ -179,7 +174,7 @@ class ParserTests: XCTestCase {
         let result = parser.run("")
         var passed = false
         if case .failure(let e) = result {
-            XCTAssertEqual(e.underlyingErrors as [NSError], underlyingErrors)
+            XCTAssertEqual(e.underlyingErrors as! [DummyError], underlyingErrors)
             passed = true
         }
         XCTAssertTrue(passed)

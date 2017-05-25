@@ -18,28 +18,28 @@ class ReplyTests: XCTestCase {
     }
     
     func test_getErrors() {
-        let errors: [NSError] = [
-            NSError(domain: "", code: 1, userInfo: nil),
-            NSError(domain: "", code: 2, userInfo: nil),
-            NSError(domain: "", code: 3, userInfo: nil)
+        let errors: [DummyError] = [
+            DummyError.err0,
+            DummyError.err1,
+            DummyError.err2
         ]
         
-        XCTAssertEqual(Reply.success(1, errors).errors as [NSError], errors)
-        XCTAssertEqual(Reply<Void>.failure(errors).errors as [NSError], errors)
-        XCTAssertEqual(Reply<Void>.fatalFailure(errors).errors as [NSError], errors)
+        XCTAssertEqual(Reply.success(1, errors).errors as! [DummyError], errors)
+        XCTAssertEqual(Reply<Void>.failure(errors).errors as! [DummyError], errors)
+        XCTAssertEqual(Reply<Void>.fatalFailure(errors).errors as! [DummyError], errors)
     }
     
     func test_setErrors() {
-        let errors: [NSError] = [
-            NSError(domain: "", code: 1, userInfo: nil),
-            NSError(domain: "", code: 2, userInfo: nil),
-            NSError(domain: "", code: 3, userInfo: nil)
+        let errors: [DummyError] = [
+            DummyError.err0,
+            DummyError.err1,
+            DummyError.err2
         ]
         
         var reply: Reply<Int> = .success(1, [])
-        XCTAssertEqual(reply.errors as [NSError], [])
+        XCTAssertEqual(reply.errors as! [DummyError], [])
         reply.errors = errors
-        XCTAssertEqual(reply.errors as [NSError], errors)
+        XCTAssertEqual(reply.errors as! [DummyError], errors)
         var passed = false
         if case let .success(v, _) = reply {
             XCTAssertEqual(v, 1)
@@ -48,119 +48,119 @@ class ReplyTests: XCTestCase {
         XCTAssertTrue(passed)
         
         reply = .failure([])
-        XCTAssertEqual(reply.errors as [NSError], [])
+        XCTAssertEqual(reply.errors as! [DummyError], [])
         reply.errors = errors
-        XCTAssertEqual(reply.errors as [NSError], errors)
+        XCTAssertEqual(reply.errors as! [DummyError], errors)
         
         reply = .fatalFailure([])
-        XCTAssertEqual(reply.errors as [NSError], [])
+        XCTAssertEqual(reply.errors as! [DummyError], [])
         reply.errors = errors
-        XCTAssertEqual(reply.errors as [NSError], errors)
+        XCTAssertEqual(reply.errors as! [DummyError], errors)
     }
     
     func test_prependingErrors() {
-        let errors1: [NSError] = [
-            NSError(domain: "", code: 1, userInfo: nil),
-            NSError(domain: "", code: 2, userInfo: nil)
+        let errors1: [DummyError] = [
+            DummyError.err0,
+            DummyError.err1
         ]
-        let errors2: [NSError] = [
-            NSError(domain: "", code: 3, userInfo: nil),
-            NSError(domain: "", code: 4, userInfo: nil)
+        let errors2: [DummyError] = [
+            DummyError.err2,
+            DummyError.err3
         ]
         let allErrors = errors1 + errors2
         
         var reply: Reply<Int> = .success(1, errors2)
         reply = reply.prepending(errors1)
-        XCTAssertEqual(reply.errors as [NSError], allErrors)
+        XCTAssertEqual(reply.errors as! [DummyError], allErrors)
         
         reply = .failure(errors2)
         reply = reply.prepending(errors1)
-        XCTAssertEqual(reply.errors as [NSError], allErrors)
+        XCTAssertEqual(reply.errors as! [DummyError], allErrors)
         
         reply = .fatalFailure(errors2)
         reply = reply.prepending(errors1)
-        XCTAssertEqual(reply.errors as [NSError], allErrors)
+        XCTAssertEqual(reply.errors as! [DummyError], allErrors)
     }
     
     func test_prependErrors() {
-        let errors1: [NSError] = [
-            NSError(domain: "", code: 1, userInfo: nil),
-            NSError(domain: "", code: 2, userInfo: nil)
+        let errors1: [DummyError] = [
+            DummyError.err0,
+            DummyError.err1
         ]
-        let errors2: [NSError] = [
-            NSError(domain: "", code: 3, userInfo: nil),
-            NSError(domain: "", code: 4, userInfo: nil)
+        let errors2: [DummyError] = [
+            DummyError.err2,
+            DummyError.err3
         ]
         let allErrors = errors1 + errors2
         
         var reply: Reply<Int> = .success(1, errors2)
         reply.prepend(errors1)
-        XCTAssertEqual(reply.errors as [NSError], allErrors)
+        XCTAssertEqual(reply.errors as! [DummyError], allErrors)
         reply.prepend([])
-        XCTAssertEqual(reply.errors as [NSError], allErrors)
+        XCTAssertEqual(reply.errors as! [DummyError], allErrors)
         
         reply = .failure(errors2)
         reply.prepend(errors1)
-        XCTAssertEqual(reply.errors as [NSError], allErrors)
+        XCTAssertEqual(reply.errors as! [DummyError], allErrors)
         
         reply = .fatalFailure(errors2)
         reply.prepend(errors1)
-        XCTAssertEqual(reply.errors as [NSError], allErrors)
+        XCTAssertEqual(reply.errors as! [DummyError], allErrors)
     }
     
     func test_appendingErrors() {
-        let errors1: [NSError] = [
-            NSError(domain: "", code: 1, userInfo: nil),
-            NSError(domain: "", code: 2, userInfo: nil)
+        let errors1: [DummyError] = [
+            DummyError.err0,
+            DummyError.err1
         ]
-        let errors2: [NSError] = [
-            NSError(domain: "", code: 3, userInfo: nil),
-            NSError(domain: "", code: 4, userInfo: nil)
+        let errors2: [DummyError] = [
+            DummyError.err2,
+            DummyError.err3
         ]
         let allErrors = errors1 + errors2
         
         var reply: Reply<Int> = .success(1, errors1)
         reply = reply.appending(errors2)
-        XCTAssertEqual(reply.errors as [NSError], allErrors)
+        XCTAssertEqual(reply.errors as! [DummyError], allErrors)
         reply = reply.appending([])
-        XCTAssertEqual(reply.errors as [NSError], allErrors)
+        XCTAssertEqual(reply.errors as! [DummyError], allErrors)
         
         reply = .failure(errors1)
         reply = reply.appending(errors2)
-        XCTAssertEqual(reply.errors as [NSError], allErrors)
+        XCTAssertEqual(reply.errors as! [DummyError], allErrors)
         
         reply = .fatalFailure(errors1)
         reply = reply.appending(errors2)
-        XCTAssertEqual(reply.errors as [NSError], allErrors)
+        XCTAssertEqual(reply.errors as! [DummyError], allErrors)
     }
     
     func test_appendErrors() {
-        let errors1: [NSError] = [
-            NSError(domain: "", code: 1, userInfo: nil),
-            NSError(domain: "", code: 2, userInfo: nil)
+        let errors1: [DummyError] = [
+            DummyError.err0,
+            DummyError.err1
         ]
-        let errors2: [NSError] = [
-            NSError(domain: "", code: 3, userInfo: nil),
-            NSError(domain: "", code: 4, userInfo: nil)
+        let errors2: [DummyError] = [
+            DummyError.err2,
+            DummyError.err3
         ]
         let allErrors = errors1 + errors2
         
         var reply: Reply<Int> = .success(1, errors1)
         reply.append(errors2)
-        XCTAssertEqual(reply.errors as [NSError], allErrors)
+        XCTAssertEqual(reply.errors as! [DummyError], allErrors)
         
         reply = .failure(errors1)
         reply.append(errors2)
-        XCTAssertEqual(reply.errors as [NSError], allErrors)
+        XCTAssertEqual(reply.errors as! [DummyError], allErrors)
         
         reply = .fatalFailure(errors1)
         reply.append(errors2)
-        XCTAssertEqual(reply.errors as [NSError], allErrors)
+        XCTAssertEqual(reply.errors as! [DummyError], allErrors)
     }
     
     func test_map() {
-        let errors: [NSError] = [
-            NSError(domain: "", code: 1, userInfo: nil)
+        let errors: [DummyError] = [
+            DummyError.err0
         ]
         
         var reply: Reply<Int> = .success(1, [])
@@ -169,8 +169,8 @@ class ReplyTests: XCTestCase {
         reply = .failure(errors)
         XCTAssertEqual(reply.map({ _ in "a" }).value, nil)
         var passed = false
-        if case let .failure(e as [NSError]) = reply {
-            XCTAssertEqual(e, errors)
+        if case let .failure(e) = reply {
+            XCTAssertEqual(e as! [DummyError], errors)
             passed = true
         }
         XCTAssertTrue(passed)
@@ -178,21 +178,21 @@ class ReplyTests: XCTestCase {
         reply = .fatalFailure(errors)
         XCTAssertEqual(reply.map({ _ in "a" }).value, nil)
         passed = false
-        if case let .fatalFailure(e as [NSError]) = reply {
-            XCTAssertEqual(e, errors)
+        if case let .fatalFailure(e) = reply {
+            XCTAssertEqual(e as! [DummyError], errors)
             passed = true
         }
         XCTAssertTrue(passed)
     }
     
     func test_flatMap_whenSuccess() {
-        let errors1: [NSError] = [
-            NSError(domain: "", code: 1, userInfo: nil),
-            NSError(domain: "", code: 2, userInfo: nil)
+        let errors1: [DummyError] = [
+            DummyError.err0,
+            DummyError.err1
         ]
-        let errors2: [NSError] = [
-            NSError(domain: "", code: 3, userInfo: nil),
-            NSError(domain: "", code: 4, userInfo: nil)
+        let errors2: [DummyError] = [
+            DummyError.err2,
+            DummyError.err3
         ]
         let allErrors = errors1 + errors2
         
@@ -203,7 +203,7 @@ class ReplyTests: XCTestCase {
         var passed = false
         if case let .success(v, e) = mappedReply {
             XCTAssertEqual(v, "a")
-            XCTAssertEqual(e as [NSError], allErrors)
+            XCTAssertEqual(e as! [DummyError], allErrors)
             passed = true
         }
         XCTAssertTrue(passed)
@@ -213,7 +213,7 @@ class ReplyTests: XCTestCase {
         }
         passed = false
         if case let .failure(e) = mappedReply {
-            XCTAssertEqual(e as [NSError], allErrors)
+            XCTAssertEqual(e as! [DummyError], allErrors)
             passed = true
         }
         XCTAssertTrue(passed)
@@ -223,20 +223,20 @@ class ReplyTests: XCTestCase {
         }
         passed = false
         if case let .fatalFailure(e) = mappedReply {
-            XCTAssertEqual(e as [NSError], allErrors)
+            XCTAssertEqual(e as! [DummyError], allErrors)
             passed = true
         }
         XCTAssertTrue(passed)
     }
     
     func test_flatMap_whenFailure() {
-        let errors1: [NSError] = [
-            NSError(domain: "", code: 1, userInfo: nil),
-            NSError(domain: "", code: 2, userInfo: nil)
+        let errors1: [DummyError] = [
+            DummyError.err0,
+            DummyError.err1
         ]
-        let errors2: [NSError] = [
-            NSError(domain: "", code: 3, userInfo: nil),
-            NSError(domain: "", code: 4, userInfo: nil)
+        let errors2: [DummyError] = [
+            DummyError.err2,
+            DummyError.err3
         ]
         
         let reply: Reply<Int> = .failure(errors1)
@@ -246,20 +246,20 @@ class ReplyTests: XCTestCase {
         }
         var passed = false
         if case let .failure(e) = mappedReply {
-            XCTAssertEqual(e as [NSError], errors1)
+            XCTAssertEqual(e as! [DummyError], errors1)
             passed = true
         }
         XCTAssertTrue(passed)
     }
     
     func test_flatMap_whenFatalFailure() {
-        let errors1: [NSError] = [
-            NSError(domain: "", code: 1, userInfo: nil),
-            NSError(domain: "", code: 2, userInfo: nil)
+        let errors1: [DummyError] = [
+            DummyError.err0,
+            DummyError.err1
         ]
-        let errors2: [NSError] = [
-            NSError(domain: "", code: 3, userInfo: nil),
-            NSError(domain: "", code: 4, userInfo: nil)
+        let errors2: [DummyError] = [
+            DummyError.err2,
+            DummyError.err3
         ]
         
         let reply: Reply<Int> = .fatalFailure(errors1)
@@ -269,7 +269,7 @@ class ReplyTests: XCTestCase {
         }
         var passed = false
         if case let .fatalFailure(e) = mappedReply {
-            XCTAssertEqual(e as [NSError], errors1)
+            XCTAssertEqual(e as! [DummyError], errors1)
             passed = true
         }
         XCTAssertTrue(passed)

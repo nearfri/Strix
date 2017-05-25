@@ -24,16 +24,16 @@ class ParseResultTests: XCTestCase {
         
         let position = CharacterStream(string: "").position
         
-        let underlyingErrors: [NSError] = [
-            NSError(domain: "", code: 1, userInfo: nil),
-            NSError(domain: "", code: 2, userInfo: nil),
-            NSError(domain: "", code: 3, userInfo: nil)
+        let underlyingErrors: [DummyError] = [
+            DummyError.err0,
+            DummyError.err1,
+            DummyError.err2
         ]
         
         let error = ParseResult<Int>.Error(position: position, underlyingErrors: underlyingErrors)
         
         XCTAssertEqual(ParseResult.failure(error).error?.position, position)
-        XCTAssertEqual(ParseResult.failure(error).error?.underlyingErrors as [NSError]!,
+        XCTAssertEqual(ParseResult.failure(error).error?.underlyingErrors as! [DummyError],
                        underlyingErrors)
     }
     

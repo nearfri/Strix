@@ -2,11 +2,6 @@
 import XCTest
 @testable import Strix
 
-private enum DummyError: Error {
-    case err0
-    case err1
-}
-
 class PrimitivesChainTests: XCTestCase {
     override func setUp() {
         super.setUp()

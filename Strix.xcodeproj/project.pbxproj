@@ -24,6 +24,7 @@
 		7556A2D91E7AE7030094EF39 /* CharacterStreamTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7556A2D81E7AE7030094EF39 /* CharacterStreamTests.swift */; };
 		75B4C08F1ED44ADC00C93C1B /* PrimitivesChainTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75B4C08E1ED44ADC00C93C1B /* PrimitivesChainTests.swift */; };
 		75B4C0911ED4562C00C93C1B /* PrimitivesAlternativeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75B4C0901ED4562C00C93C1B /* PrimitivesAlternativeTests.swift */; };
+		75B4C0931ED6ABC500C93C1B /* DummyError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75B4C0921ED6ABC500C93C1B /* DummyError.swift */; };
 		75BA2D621EB715790049FE04 /* ParseError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75BA2D611EB715790049FE04 /* ParseError.swift */; };
 		75BA2D641EB716180049FE04 /* ParseErrorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75BA2D631EB716180049FE04 /* ParseErrorTests.swift */; };
 		75CA67EF1EC74B3000331EC0 /* ParseErrorGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75CA67EE1EC74B3000331EC0 /* ParseErrorGroup.swift */; };
@@ -65,6 +66,7 @@
 		7556A3621E7D80640094EF39 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = SOURCE_ROOT; };
 		75B4C08E1ED44ADC00C93C1B /* PrimitivesChainTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrimitivesChainTests.swift; sourceTree = "<group>"; };
 		75B4C0901ED4562C00C93C1B /* PrimitivesAlternativeTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrimitivesAlternativeTests.swift; sourceTree = "<group>"; };
+		75B4C0921ED6ABC500C93C1B /* DummyError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DummyError.swift; sourceTree = "<group>"; };
 		75BA2D611EB715790049FE04 /* ParseError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ParseError.swift; sourceTree = "<group>"; };
 		75BA2D631EB716180049FE04 /* ParseErrorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ParseErrorTests.swift; sourceTree = "<group>"; };
 		75CA67EE1EC74B3000331EC0 /* ParseErrorGroup.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ParseErrorGroup.swift; sourceTree = "<group>"; };
@@ -131,6 +133,7 @@
 		7556A2A51E7AE4B70094EF39 /* StrixTests */ = {
 			isa = PBXGroup;
 			children = (
+				75B4C0921ED6ABC500C93C1B /* DummyError.swift */,
 				7556A2D81E7AE7030094EF39 /* CharacterStreamTests.swift */,
 				750AADEA1E98D2C800BEB6C2 /* TextPositionTests.swift */,
 				75F91C3B1E9BD59100A9208F /* ReplyTests.swift */,
@@ -294,6 +297,7 @@
 				75B4C0911ED4562C00C93C1B /* PrimitivesAlternativeTests.swift in Sources */,
 				75526B211ED044C700EAA5B4 /* PrimitivesPureTests.swift in Sources */,
 				75F91C3C1E9BD59100A9208F /* ReplyTests.swift in Sources */,
+				75B4C0931ED6ABC500C93C1B /* DummyError.swift in Sources */,
 				75BA2D641EB716180049FE04 /* ParseErrorTests.swift in Sources */,
 				753AA3211ECC94C40015EC11 /* ErrorMessageWriterTests.swift in Sources */,
 				75526B1D1ECFE68700EAA5B4 /* ParserTests.swift in Sources */,

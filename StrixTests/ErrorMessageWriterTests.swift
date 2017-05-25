@@ -61,7 +61,7 @@ class ErrorMessageWriterTests: XCTestCase {
                                 userInfo: [:], errors: expectedErrors)
         ]
         unknownErrors = [
-            NSError(domain: "test", code: 1, userInfo: nil)
+            DummyError.err0
         ]
     }
     

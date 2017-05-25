@@ -59,7 +59,7 @@ class ParseErrorGroupTests: XCTestCase {
                                 userInfo: [:], errors: [])
         ]
         unknownErrors = [
-            NSError(domain: "test", code: 1, userInfo: nil)
+            DummyError.err0
         ]
         
         let shuffledErrors: [Error] = [
@@ -114,13 +114,12 @@ class ParseErrorGroupTests: XCTestCase {
     
     func test_unknownErrors_contained() {
         XCTAssertEqual(sut.unknownErrors.count, unknownErrors.count)
-        guard let lErr = sut.unknownErrors.first as NSError?,
-            let rErr = unknownErrors.first as NSError? else {
+        guard let lErr = sut.unknownErrors.first as? DummyError,
+            let rErr = unknownErrors.first as? DummyError else {
                 XCTFail()
                 return
         }
-        XCTAssertEqual(lErr.domain, rErr.domain)
-        XCTAssertEqual(lErr.code, rErr.code)
+        XCTAssertEqual(lErr, rErr)
     }
     
     func test_isEmpty() {

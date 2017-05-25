@@ -21,7 +21,7 @@ public struct TextPosition {
     
     private func calculateInfoIfNeeded() {
         if !info.isCalculated {
-            info.calculate(with: string, index: index)
+            info.calculate(string: string, index: index)
         }
     }
 }
@@ -44,7 +44,7 @@ extension TextPosition {
             return lineNumber != Info.invalidNumber
         }
         
-        func calculate(with string: String, index: String.Index) {
+        func calculate(string: String, index: String.Index) {
             lineNumber = 1
             columnNumber = 1
             var enumerationCount = 0
