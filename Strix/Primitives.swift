@@ -82,12 +82,11 @@ public func <|> <T>(p1: Parser<T>, p2: Parser<T>) -> Parser<T> {
     return Parser { stream in
         let stateTag = stream.stateTag
         let reply = p1.parse(stream)
-        if case let .failure(e) = reply, stateTag == stream.stateTag {
-            let reply2 = p2.parse(stream)
-            return stateTag == stream.stateTag && !e.isEmpty ? reply2.prepending(e) : reply2
-        } else {
+        guard case let .failure(e) = reply, stateTag == stream.stateTag else {
             return reply
         }
+        let reply2 = p2.parse(stream)
+        return stateTag == stream.stateTag && !e.isEmpty ? reply2.prepending(e) : reply2
     }
 }
 
@@ -97,7 +96,7 @@ public func choice<T, S: Sequence>(_ ps: S) -> Parser<T> where S.Iterator.Elemen
         var reply: Reply<T> = .failure([])
         var errors: [Error] = []
         for p in ps {
-            guard stateTag == stream.stateTag, case let .failure(e) = reply else { break }
+            guard case let .failure(e) = reply, stateTag == stream.stateTag else { break }
             errors += e
             reply = p.parse(stream)
         }
@@ -110,6 +109,33 @@ public func choice<T, S: Sequence>(_ ps: S) -> Parser<T> where S.Iterator.Elemen
 
 public func optional<T>(_ p: Parser<T>) -> Parser<T?> {
     return p |>> Optional.init <|> pure(nil)
+}
+
+public func skipOptional<T>(_ p: Parser<T>) -> Parser<Void> {
+    return p >>% () <|> pure(())
+}
+
+public func attempt<T>(_ p: Parser<T>) -> Parser<T> {
+    return Parser { (stream) in
+        let state = stream.state
+        let reply = p.parse(stream)
+        if case .success = reply { return reply }
+        
+        if state.tag == stream.stateTag {
+            return .failure(reply.errors)
+        }
+        defer { stream.backtrack(to: state) }
+        let nestedError = extractOrMakeNestedError(from: reply.errors, stream: stream)
+        return .failure([nestedError])
+    }
+}
+
+private func extractOrMakeNestedError(from errors: [Error],
+                                      stream: CharacterStream) -> ParseError.Nested {
+    if errors.count == 1, let error = errors[0] as? ParseError.Nested {
+        return error
+    }
+    return ParseError.Nested(position: stream.position, userInfo: stream.userInfo, errors: errors)
 }
 
 

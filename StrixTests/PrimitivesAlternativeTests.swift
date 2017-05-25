@@ -2,13 +2,6 @@
 import XCTest
 @testable import Strix
 
-private enum DummyError: Error {
-    case err0
-    case err1
-    case err2
-    case err3
-}
-
 class PrimitivesAlternativeTests: XCTestCase {
     override func setUp() {
         super.setUp()
@@ -19,8 +12,11 @@ class PrimitivesAlternativeTests: XCTestCase {
     }
     
     func test_alternative_whenLeftSuccess_returnLeft() {
-        let p1 = Parser { _ in return .success(1, []) }
-        let p2 = Parser { _ in return .success(2, []) }
+        let p1 = Parser<Int> { _ in return .success(1, []) }
+        let p2 = Parser<Int> { _ in
+            XCTFail()
+            return .success(2, [])
+        }
         let p = p1 <|> p2
         let reply = p.parse(CharacterStream(string: ""))
         XCTAssertEqual(reply.value, 1)
@@ -48,7 +44,7 @@ class PrimitivesAlternativeTests: XCTestCase {
         XCTAssertTrue(passed)
     }
     
-    func test_alternative_whenBothFailureWithStateTagChange_returnOneError() {
+    func test_alternative_whenBothFailureWithStateChange_returnOneError() {
         let p1 = Parser<Int> { _ in return .failure([DummyError.err0]) }
         let p2 = Parser<Int> { (stream) in
             stream.stateTag += 1
@@ -80,7 +76,7 @@ class PrimitivesAlternativeTests: XCTestCase {
         XCTAssertTrue(passed)
     }
     
-    func test_alternative_whenLeftFailureWithStateTagChange_returnFailure() {
+    func test_alternative_whenLeftFailureWithStateChange_returnFailure() {
         let p1 = Parser<Int> { (stream) in
             stream.stateTag += 1
             return .failure([DummyError.err0])
@@ -112,8 +108,14 @@ class PrimitivesAlternativeTests: XCTestCase {
     func test_choice_whenFatalFailure_returnFatalFailure() {
         let p1 = Parser<Int> { _ in return .failure([DummyError.err0]) }
         let p2 = Parser<Int> { _ in return .fatalFailure([DummyError.err1]) }
-        let p3 = Parser<Int> { _ in return .failure([DummyError.err2]) }
-        let p4 = Parser<Int> { _ in return .success(4, []) }
+        let p3 = Parser<Int> { _ in
+            XCTFail()
+            return .failure([DummyError.err2])
+        }
+        let p4 = Parser<Int> { _ in
+            XCTFail()
+            return .success(4, [])
+        }
         let p = choice([p1, p2, p3, p4])
         let reply = p.parse(CharacterStream(string: ""))
         var passed = false
@@ -124,14 +126,20 @@ class PrimitivesAlternativeTests: XCTestCase {
         XCTAssertTrue(passed)
     }
     
-    func test_choice_whenFailureWithStateTagChange_returnFailure() {
+    func test_choice_whenFailureWithStateChange_returnFailure() {
         let p1 = Parser<Int> { _ in return .failure([DummyError.err0]) }
         let p2 = Parser<Int> { (stream) in
             stream.stateTag += 1
             return .failure([DummyError.err1])
         }
-        let p3 = Parser<Int> { _ in return .failure([DummyError.err2]) }
-        let p4 = Parser<Int> { _ in return .success(4, []) }
+        let p3 = Parser<Int> { _ in
+            XCTFail()
+            return .failure([DummyError.err2])
+        }
+        let p4 = Parser<Int> { _ in
+            XCTFail()
+            return .success(4, [])
+        }
         let p = choice([p1, p2, p3, p4])
         let reply = p.parse(CharacterStream(string: ""))
         var passed = false
@@ -144,7 +152,7 @@ class PrimitivesAlternativeTests: XCTestCase {
     
     func test_optional_success() {
         let p1 = Parser<Int> { _ in return .success(1, []) }
-        let p = optional(p1)
+        let p: Parser<Int?> = optional(p1)
         let reply = p.parse(CharacterStream(string: ""))
         var passed = false
         if case let .success(v, _) = reply {
@@ -154,9 +162,9 @@ class PrimitivesAlternativeTests: XCTestCase {
         XCTAssertTrue(passed)
     }
     
-    func test_optional_whenFailureWithoutStateTageChange_returnSuccess() {
+    func test_optional_whenFailureWithoutStateChange_returnSuccess() {
         let p1 = Parser<Int> { _ in return .failure([DummyError.err0]) }
-        let p = optional(p1)
+        let p: Parser<Int?> = optional(p1)
         let reply = p.parse(CharacterStream(string: ""))
         var passed = false
         if case let .success(v, _) = reply {
@@ -166,12 +174,12 @@ class PrimitivesAlternativeTests: XCTestCase {
         XCTAssertTrue(passed)
     }
     
-    func test_optional_whenFailureWithStateTageChange_returnFailure() {
+    func test_optional_whenFailureWithStateChange_returnFailure() {
         let p1 = Parser<Int> { (stream) in
             stream.stateTag += 1
             return .failure([DummyError.err0])
         }
-        let p = optional(p1)
+        let p: Parser<Int?> = optional(p1)
         let reply = p.parse(CharacterStream(string: ""))
         var passed = false
         if case let .failure(e) = reply {
@@ -183,12 +191,113 @@ class PrimitivesAlternativeTests: XCTestCase {
     
     func test_optional_whenFatalFailure_returnFatalFailure() {
         let p1 = Parser<Int> { _ in return .fatalFailure([DummyError.err0]) }
-        let p = optional(p1)
+        let p: Parser<Int?> = optional(p1)
         let reply = p.parse(CharacterStream(string: ""))
         var passed = false
         if case let .fatalFailure(e) = reply {
             XCTAssertEqual(e as! [DummyError], [DummyError.err0])
             passed = true
+        }
+        XCTAssertTrue(passed)
+    }
+    
+    func test_skipOptional_success() {
+        let p1 = Parser<Int> { _ in return .success(1, []) }
+        let p: Parser<Void> = skipOptional(p1)
+        let reply = p.parse(CharacterStream(string: ""))
+        var passed = false
+        if case .success = reply {
+            passed = true
+        }
+        XCTAssertTrue(passed)
+    }
+    
+    func test_skipOptional_whenFailureWithoutStateChange_returnSuccess() {
+        let p1 = Parser<Int> { _ in return .failure([DummyError.err0]) }
+        let p: Parser<Void> = skipOptional(p1)
+        let reply = p.parse(CharacterStream(string: ""))
+        var passed = false
+        if case .success = reply {
+            passed = true
+        }
+        XCTAssertTrue(passed)
+    }
+    
+    func test_skipOptional_whenFailureWithStateChange_returnFailure() {
+        let p1 = Parser<Int> { (stream) in
+            stream.stateTag += 1
+            return .failure([DummyError.err0])
+        }
+        let p: Parser<Void> = skipOptional(p1)
+        let reply = p.parse(CharacterStream(string: ""))
+        var passed = false
+        if case let .failure(e) = reply {
+            XCTAssertEqual(e as! [DummyError], [DummyError.err0])
+            passed = true
+        }
+        XCTAssertTrue(passed)
+    }
+    
+    func test_skipOptional_whenFatalFailure_returnFatalFailure() {
+        let p1 = Parser<Int> { _ in return .fatalFailure([DummyError.err0]) }
+        let p: Parser<Void> = skipOptional(p1)
+        let reply = p.parse(CharacterStream(string: ""))
+        var passed = false
+        if case let .fatalFailure(e) = reply {
+            XCTAssertEqual(e as! [DummyError], [DummyError.err0])
+            passed = true
+        }
+        XCTAssertTrue(passed)
+    }
+    
+    func test_attempt_success() {
+        let p1 = Parser<Int> { _ in return .success(1, []) }
+        let p: Parser<Int> = attempt(p1)
+        let reply = p.parse(CharacterStream(string: ""))
+        var passed = false
+        if case let .success(v, _) = reply {
+            XCTAssertEqual(v, 1)
+            passed = true
+        }
+        XCTAssertTrue(passed)
+    }
+    
+    func test_attempt_whenFailure_returnFailureAndBacktrack() {
+        let p1 = Parser<Int> { (stream) in
+            stream.stateTag += 10
+            return .failure([DummyError.err0])
+        }
+        let p: Parser<Int> = attempt(p1)
+        let stream = CharacterStream(string: "")
+        let stateTag = stream.stateTag
+        let reply = p.parse(stream)
+        XCTAssertEqual(stream.stateTag, stateTag)
+        var passed = false
+        if case let .failure(e) = reply {
+            if let nestedError = e.first as? ParseError.Nested {
+                XCTAssertEqual(nestedError.errors as! [DummyError], [DummyError.err0])
+                passed = true
+            }
+        }
+        XCTAssertTrue(passed)
+    }
+    
+    func test_attempt_whenFatalFailure_returnFailureAndBacktrack() {
+        let p1 = Parser<Int> { (stream) in
+            stream.stateTag += 10
+            return .fatalFailure([DummyError.err0])
+        }
+        let p: Parser<Int> = attempt(p1)
+        let stream = CharacterStream(string: "")
+        let stateTag = stream.stateTag
+        let reply = p.parse(stream)
+        XCTAssertEqual(stream.stateTag, stateTag)
+        var passed = false
+        if case let .failure(e) = reply {
+            if let nestedError = e.first as? ParseError.Nested {
+                XCTAssertEqual(nestedError.errors as! [DummyError], [DummyError.err0])
+                passed = true
+            }
         }
         XCTAssertTrue(passed)
     }
