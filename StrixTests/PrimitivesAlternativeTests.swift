@@ -262,7 +262,22 @@ class PrimitivesAlternativeTests: XCTestCase {
         XCTAssertTrue(passed)
     }
     
-    func test_attempt_whenFailure_returnFailureAndBacktrack() {
+    func test_attempt_whenFailureWithoutStateChange_returnFailure() {
+        let p1 = Parser<Int> { (stream) in
+            return .failure([DummyError.err0])
+        }
+        let p: Parser<Int> = attempt(p1)
+        let stream = CharacterStream(string: "")
+        let reply = p.parse(stream)
+        var passed = false
+        if case let .failure(e) = reply {
+            XCTAssertEqual(e as! [DummyError], [DummyError.err0])
+            passed = true
+        }
+        XCTAssertTrue(passed)
+    }
+    
+    func test_attempt_whenFailureWithStateChange_backtrackAndReturnFailure() {
         let p1 = Parser<Int> { (stream) in
             stream.stateTag += 10
             return .failure([DummyError.err0])
@@ -282,7 +297,22 @@ class PrimitivesAlternativeTests: XCTestCase {
         XCTAssertTrue(passed)
     }
     
-    func test_attempt_whenFatalFailure_returnFailureAndBacktrack() {
+    func test_attempt_whenFatalFailureWithoutStateChange_returnFailure() {
+        let p1 = Parser<Int> { (stream) in
+            return .fatalFailure([DummyError.err0])
+        }
+        let p: Parser<Int> = attempt(p1)
+        let stream = CharacterStream(string: "")
+        let reply = p.parse(stream)
+        var passed = false
+        if case let .failure(e) = reply {
+            XCTAssertEqual(e as! [DummyError], [DummyError.err0])
+            passed = true
+        }
+        XCTAssertTrue(passed)
+    }
+    
+    func test_attempt_whenFatalFailure_backtrackAndReturnFailure() {
         let p1 = Parser<Int> { (stream) in
             stream.stateTag += 10
             return .fatalFailure([DummyError.err0])
@@ -295,6 +325,31 @@ class PrimitivesAlternativeTests: XCTestCase {
         var passed = false
         if case let .failure(e) = reply {
             if let nestedError = e.first as? ParseError.Nested {
+                XCTAssertEqual(nestedError.errors as! [DummyError], [DummyError.err0])
+                passed = true
+            }
+        }
+        XCTAssertTrue(passed)
+    }
+    
+    func test_attempt_whenNestedError_passthroughNestedError() {
+        let p1 = Parser<Int> { (stream) in
+            stream.stateTag += 10
+            return .failure([ParseError.Nested(position: stream.position,
+                                               userInfo: stream.userInfo,
+                                               errors: [DummyError.err0])])
+        }
+        let p: Parser<Int> = attempt(p1)
+        let stream = CharacterStream(string: "")
+        stream.skip()
+        let position = stream.position
+        let stateTag = stream.stateTag
+        let reply = p.parse(stream)
+        XCTAssertEqual(stream.stateTag, stateTag)
+        var passed = false
+        if case let .failure(e) = reply {
+            if let nestedError = e.first as? ParseError.Nested {
+                XCTAssertEqual(nestedError.position, position)
                 XCTAssertEqual(nestedError.errors as! [DummyError], [DummyError.err0])
                 passed = true
             }

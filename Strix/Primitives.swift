@@ -7,6 +7,8 @@ infix operator >>! : AdditionPrecedence
 infix operator !>> : AdditionPrecedence
 infix operator !>>! : AdditionPrecedence
 infix operator <|> : AdditionPrecedence
+infix operator <?> : AdditionPrecedence
+infix operator <??> : AdditionPrecedence
 
 // MARK: - Pure
 
@@ -124,18 +126,150 @@ public func attempt<T>(_ p: Parser<T>) -> Parser<T> {
         if state.tag == stream.stateTag {
             return .failure(reply.errors)
         }
-        defer { stream.backtrack(to: state) }
         let nestedError = extractOrMakeNestedError(from: reply.errors, stream: stream)
+        stream.backtrack(to: state)
         return .failure([nestedError])
     }
 }
 
+// MARK: - Conditional parsing and looking ahead
+
+public func notEmpty<T>(_ p: Parser<T>) -> Parser<T> {
+    return Parser { (stream) in
+        let stateTag = stream.stateTag
+        let reply = p.parse(stream)
+        if case let .success(_, e) = reply, stateTag == stream.stateTag {
+            return .failure(e)
+        }
+        return reply
+    }
+}
+
+public func followed<T>(by p: Parser<T>, errorLabel: String? = nil) -> Parser<Void> {
+    return Parser { (stream) in
+        let state = stream.state
+        let reply = p.parse(stream)
+        if state.tag != stream.stateTag {
+            stream.backtrack(to: state)
+        }
+        if case .success = reply {
+            return .success((), [])
+        }
+        return .failure(errorLabel.map({ [ParseError.Expected($0)] }) ?? [])
+    }
+}
+
+public func notFollowed<T>(by p: Parser<T>, errorLabel: String? = nil) -> Parser<Void> {
+    return Parser { (stream) in
+        let state = stream.state
+        let reply = p.parse(stream)
+        if state.tag != stream.stateTag {
+            stream.backtrack(to: state)
+        }
+        if case .success = reply {
+            return .failure(errorLabel.map({ [ParseError.Unexpected($0)] }) ?? [])
+        }
+        return .success((), [])
+    }
+}
+
+public func lookAhead<T>(_ p: Parser<T>) -> Parser<T> {
+    return Parser { (stream) in
+        let state = stream.state
+        let reply = p.parse(stream)
+        if case let .success(v, _) = reply {
+            if state.tag != stream.stateTag {
+                stream.backtrack(to: state)
+            }
+            return .success(v, [])
+        }
+        if state.tag == stream.stateTag {
+            return .failure(reply.errors)
+        }
+        let nestedError = extractOrMakeNestedError(from: reply.errors, stream: stream)
+        stream.backtrack(to: state)
+        return .failure([nestedError])
+    }
+}
+
+// MARK: - Customizing error messages
+
+public func <?> <T>(p: Parser<T>, errorLabel: String) -> Parser<T> {
+    return Parser { (stream) in
+        let stateTag = stream.stateTag
+        var reply = p.parse(stream)
+        if stateTag == stream.stateTag {
+            reply.errors = [ParseError.Expected(errorLabel)]
+        }
+        return reply
+    }
+}
+
+public func <??> <T>(p: Parser<T>, errorLabel: String) -> Parser<T> {
+    return Parser { (stream) in
+        let state = stream.state
+        var reply = p.parse(stream)
+        if case let .success(v, e) = reply {
+            return .success(v, state.tag == stream.stateTag ? [ParseError.Expected(errorLabel)] : e)
+        }
+        
+        if state.tag == stream.stateTag {
+            if let error = extractAndMakeCompoundError(from: reply.errors, label: errorLabel) {
+                reply.errors = [error]
+            } else {
+                reply.errors = [ParseError.Expected(errorLabel)]
+            }
+            return reply
+        }
+        
+        let compoundError: ParseError.Compound
+        if let error = extractAndMakeCompoundError(from: reply.errors, label: errorLabel) {
+            compoundError = error
+        } else {
+            compoundError = ParseError.Compound(label: errorLabel, position: stream.position,
+                                                userInfo: stream.userInfo, errors: reply.errors)
+        }
+        stream.backtrack(to: state)
+        // state가 바뀌었던 걸 backtrack 한거라 fatalFailure를 리턴해서 일반적인 파싱은 더 이상 진행하지 않도록 한다
+        return .fatalFailure([compoundError])
+    }
+}
+
+public func fail<T>(_ message: String) -> Parser<T> {
+    return pure(.failure([ParseError.Generic(message: message)]))
+}
+
+public func failFatally<T>(_ message: String) -> Parser<T> {
+    return pure(.fatalFailure([ParseError.Generic(message: message)]))
+}
+
+// MARK: - Helper functions
+
+private func extractSingleError<E: ParseError>(from errors: [Error]) -> E? {
+    if errors.count == 1, let error = errors[0] as? E {
+        return error
+    }
+    return nil
+}
+
 private func extractOrMakeNestedError(from errors: [Error],
                                       stream: CharacterStream) -> ParseError.Nested {
-    if errors.count == 1, let error = errors[0] as? ParseError.Nested {
+    if let error: ParseError.Nested = extractSingleError(from: errors) {
         return error
     }
     return ParseError.Nested(position: stream.position, userInfo: stream.userInfo, errors: errors)
+}
+
+private func extractAndMakeCompoundError(from errors: [Error],
+                                         label: String) -> ParseError.Compound? {
+    if let error: ParseError.Compound = extractSingleError(from: errors) {
+        return ParseError.Compound(label: label, position: error.position,
+                                   userInfo: error.userInfo, errors: error.errors)
+    } else if let error: ParseError.Nested = extractSingleError(from: errors) {
+        return ParseError.Compound(label: label, position: error.position,
+                                   userInfo: error.userInfo, errors: error.errors)
+    }
+    return nil
 }
 
 
