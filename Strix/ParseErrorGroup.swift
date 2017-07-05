@@ -7,12 +7,12 @@ internal struct ParseErrorGroup {
     private(set) var genericErrors: [ParseError.Generic] = []
     private(set) var nestedErrors: [ParseError.Nested] = []
     private(set) var compoundErrors: [ParseError.Compound] = []
-    private(set) var unknownErrors: [Error] = []
+    private(set) var userDefinedErrors: [Error] = []
     
     var isEmpty: Bool {
         return expectedErrors.isEmpty && expectedStringErrors.isEmpty && unexpectedErrors.isEmpty
             && unexpectedStringErrors.isEmpty && genericErrors.isEmpty && nestedErrors.isEmpty
-            && compoundErrors.isEmpty && unknownErrors.isEmpty
+            && compoundErrors.isEmpty && userDefinedErrors.isEmpty
     }
     
     init(_ errors: [Error]) {
@@ -38,7 +38,7 @@ internal struct ParseErrorGroup {
             case let error as ParseError.Compound:
                 compoundErrors.append(error)
             default:
-                unknownErrors.append(error)
+                userDefinedErrors.append(error)
             }
         }
     }

@@ -11,7 +11,7 @@ class ParseErrorGroupTests: XCTestCase {
     var genericErrors: [ParseError.Generic]!
     var nestedErrors: [ParseError.Nested]!
     var compoundErrors: [ParseError.Compound]!
-    var unknownErrors: [Error]!
+    var userDefinedErrors: [Error]!
     
     override func setUp() {
         super.setUp()
@@ -58,12 +58,12 @@ class ParseErrorGroupTests: XCTestCase {
                                 position: TextPosition(string: str, index: str.endIndex),
                                 userInfo: [:], errors: [])
         ]
-        unknownErrors = [
+        userDefinedErrors = [
             DummyError.err0
         ]
         
         let shuffledErrors: [Error] = [
-            compoundErrors[2], unknownErrors[0], compoundErrors[1], nestedErrors[1],
+            compoundErrors[2], userDefinedErrors[0], compoundErrors[1], nestedErrors[1],
             compoundErrors[0], nestedErrors[0], unexpectedStringErrors[3], genericErrors[1],
             unexpectedErrors[1], expectedStringErrors[3], genericErrors[0],
             expectedErrors[1], unexpectedStringErrors[2], unexpectedErrors[0],
@@ -112,10 +112,10 @@ class ParseErrorGroupTests: XCTestCase {
         }
     }
     
-    func test_unknownErrors_contained() {
-        XCTAssertEqual(sut.unknownErrors.count, unknownErrors.count)
-        guard let lErr = sut.unknownErrors.first as? DummyError,
-            let rErr = unknownErrors.first as? DummyError else {
+    func test_userDefinedErrors_contained() {
+        XCTAssertEqual(sut.userDefinedErrors.count, userDefinedErrors.count)
+        guard let lErr = sut.userDefinedErrors.first as? DummyError,
+            let rErr = userDefinedErrors.first as? DummyError else {
                 XCTFail()
                 return
         }
@@ -132,7 +132,7 @@ class ParseErrorGroupTests: XCTestCase {
         XCTAssertFalse(ParseErrorGroup([genericErrors[0]]).isEmpty)
         XCTAssertFalse(ParseErrorGroup([nestedErrors[0]]).isEmpty)
         XCTAssertFalse(ParseErrorGroup([compoundErrors[0]]).isEmpty)
-        XCTAssertFalse(ParseErrorGroup([unknownErrors[0]]).isEmpty)
+        XCTAssertFalse(ParseErrorGroup([userDefinedErrors[0]]).isEmpty)
     }
 }
 

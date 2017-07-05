@@ -17,16 +17,13 @@ internal struct ErrorMessageWriter {
     private func write<Target: ErrorOutputStream>(to output: inout Target) {
         writePosition(to: &output)
         
-        let expectedMessages = makeExpectedMessages()
-        let unexpectedMessages = makeUnexpectedMessages()
+        let writingResultExpected = writeExpectedMessages(to: &output)
+        let writingResultUnexpected = writeUnexpectedMessages(to: &output)
         
-        writeMessages(expectedMessages, title: "Expecting: ", separator: " or ", to: &output)
-        writeMessages(unexpectedMessages, title: "Unexpected: ", separator: " and ", to: &output)
+        let shouldIndentOtherMessages = writingResultExpected == .messagesWritten
+            || writingResultUnexpected == .messagesWritten
         
-        let otherMessageTitle = expectedMessages.isEmpty && unexpectedMessages.isEmpty
-            ? nil
-            : "Other error messages: "
-        writeOtherMessages(title: otherMessageTitle, to: &output)
+        writeOtherMessages(indented: shouldIndentOtherMessages, to: &output)
         
         writeCompoundErrors(to: &output)
         writeNestedErrors(to: &output)
@@ -59,18 +56,42 @@ internal struct ErrorMessageWriter {
         }
     }
     
+    private func writeExpectedMessages<Target: ErrorOutputStream>(
+        to output: inout Target) -> WritingResult {
+        
+        let messages = makeExpectedMessages()
+        if messages.isEmpty {
+            return .nothingWritten
+        }
+        
+        writeMessages(messages, title: "Expecting: ", separator: " or ", to: &output)
+        return .messagesWritten
+    }
+    
+    private func writeUnexpectedMessages<Target: ErrorOutputStream>(
+        to output: inout Target) -> WritingResult {
+        
+        let messages = makeUnexpectedMessages()
+        if messages.isEmpty {
+            return .nothingWritten
+        }
+        
+        writeMessages(messages, title: "Unexpected: ", separator: " and ", to: &output)
+        return .messagesWritten
+    }
+    
     private func makeExpectedMessages() -> [String] {
-        var result = errorGroup.expectedErrors.map({ $0.label })
-        result += errorGroup.expectedStringErrors.map({
+        var result = errorGroup.expectedErrors.map({ $0.label }).filter({ !$0.isEmpty })
+        result += errorGroup.expectedStringErrors.filter({ !$0.string.isEmpty }).map({
             makeQuotedString($0.string, case: $0.caseSensitivity)
         })
-        result += errorGroup.compoundErrors.filter({ !$0.label.isEmpty }).map({ $0.label })
+        result += errorGroup.compoundErrors.map({ $0.label }).filter({ !$0.isEmpty })
         return result
     }
     
     private func makeUnexpectedMessages() -> [String] {
-        var result = errorGroup.unexpectedErrors.map({ $0.label })
-        result += errorGroup.unexpectedStringErrors.map({
+        var result = errorGroup.unexpectedErrors.map({ $0.label }).filter({ !$0.isEmpty })
+        result += errorGroup.unexpectedStringErrors.filter({ !$0.string.isEmpty }).map({
             makeQuotedString($0.string, case: $0.caseSensitivity)
         })
         return result
@@ -86,8 +107,6 @@ internal struct ErrorMessageWriter {
     
     private func writeMessages<Target>(_ messages: [String], title: String, separator: String,
                                to output: inout Target) where Target: ErrorOutputStream {
-        if messages.isEmpty { return }
-        
         output.write(title)
         for message in messages.dropLast(2) {
             output.write("\(message), ")
@@ -101,21 +120,22 @@ internal struct ErrorMessageWriter {
         output.writeLine()
     }
     
-    private func writeOtherMessages<Target>(title: String?,
-                                    to output: inout Target) where Target: ErrorOutputStream {
-        if errorGroup.genericErrors.isEmpty && errorGroup.unknownErrors.isEmpty {
+    private func writeOtherMessages<Target: ErrorOutputStream>(
+        indented: Bool, to output: inout Target) {
+        
+        if errorGroup.genericErrors.isEmpty && errorGroup.userDefinedErrors.isEmpty {
             return
         }
         
-        if let title = title {
-            output.writeLine(title)
+        if indented {
+            output.writeLine("Other error messages: ")
             output.indent.level += 1
         }
         
         errorGroup.genericErrors.forEach { output.writeLine($0.message) }
-        errorGroup.unknownErrors.forEach { output.writeLine("\($0)") }
+        errorGroup.userDefinedErrors.forEach { output.writeLine("\($0)") }
         
-        if title != nil {
+        if indented {
             output.indent.level -= 1
         }
     }
@@ -138,6 +158,13 @@ internal struct ErrorMessageWriter {
             ErrorMessageWriter.write(position: error.position, errors: error.errors, to: &output)
             output.indent.level -= 1
         }
+    }
+}
+
+extension ErrorMessageWriter {
+    fileprivate enum WritingResult {
+        case nothingWritten
+        case messagesWritten
     }
 }
 
