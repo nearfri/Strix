@@ -22,6 +22,8 @@
 		7556A2A21E7AE4B70094EF39 /* Strix.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7556A2981E7AE4B70094EF39 /* Strix.framework */; };
 		7556A2D71E7AE6A00094EF39 /* CharacterStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7556A2D61E7AE6A00094EF39 /* CharacterStream.swift */; };
 		7556A2D91E7AE7030094EF39 /* CharacterStreamTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7556A2D81E7AE7030094EF39 /* CharacterStreamTests.swift */; };
+		75AC08881F10C48A00E5FCA2 /* Sequences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75AC08871F10C48A00E5FCA2 /* Sequences.swift */; };
+		75AC088A1F10C4F100E5FCA2 /* SequencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75AC08891F10C4F100E5FCA2 /* SequencesTests.swift */; };
 		75B4C08F1ED44ADC00C93C1B /* PrimitivesChainTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75B4C08E1ED44ADC00C93C1B /* PrimitivesChainTests.swift */; };
 		75B4C0911ED4562C00C93C1B /* PrimitivesAlternativeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75B4C0901ED4562C00C93C1B /* PrimitivesAlternativeTests.swift */; };
 		75B4C0931ED6ABC500C93C1B /* DummyError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75B4C0921ED6ABC500C93C1B /* DummyError.swift */; };
@@ -66,6 +68,8 @@
 		7556A2D81E7AE7030094EF39 /* CharacterStreamTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CharacterStreamTests.swift; sourceTree = "<group>"; };
 		7556A35B1E7AEB8B0094EF39 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = SOURCE_ROOT; };
 		7556A3621E7D80640094EF39 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = SOURCE_ROOT; };
+		75AC08871F10C48A00E5FCA2 /* Sequences.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sequences.swift; sourceTree = "<group>"; };
+		75AC08891F10C4F100E5FCA2 /* SequencesTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SequencesTests.swift; sourceTree = "<group>"; };
 		75B4C08E1ED44ADC00C93C1B /* PrimitivesChainTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrimitivesChainTests.swift; sourceTree = "<group>"; };
 		75B4C0901ED4562C00C93C1B /* PrimitivesAlternativeTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrimitivesAlternativeTests.swift; sourceTree = "<group>"; };
 		75B4C0921ED6ABC500C93C1B /* DummyError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DummyError.swift; sourceTree = "<group>"; };
@@ -129,6 +133,7 @@
 				7551CBE71EC48D8D001911B0 /* ParseResult.swift */,
 				751BD7411ECF02B600B4175D /* Parser.swift */,
 				75526B1E1ED044B500EAA5B4 /* Primitives.swift */,
+				75AC08871F10C48A00E5FCA2 /* Sequences.swift */,
 				7556A3561E7AEA710094EF39 /* Supporting Files */,
 			);
 			path = Strix;
@@ -152,6 +157,7 @@
 				75B4C0901ED4562C00C93C1B /* PrimitivesAlternativeTests.swift */,
 				75CB0CB51EE3D996002FD24F /* PrimitivesLookAheadTests.swift */,
 				75CB0CB71EE3EFA3002FD24F /* PrimitivesCustomizingErrorTests.swift */,
+				75AC08891F10C4F100E5FCA2 /* SequencesTests.swift */,
 				7556A2A81E7AE4B70094EF39 /* Info.plist */,
 			);
 			path = StrixTests;
@@ -281,6 +287,7 @@
 				75F91C3A1E9BD56700A9208F /* Reply.swift in Sources */,
 				75CA67EF1EC74B3000331EC0 /* ParseErrorGroup.swift in Sources */,
 				7556A2D71E7AE6A00094EF39 /* CharacterStream.swift in Sources */,
+				75AC08881F10C48A00E5FCA2 /* Sequences.swift in Sources */,
 				755083301EC9F700000417F9 /* ErrorOutputBuffer.swift in Sources */,
 				751BD7421ECF02B600B4175D /* Parser.swift in Sources */,
 				750AADE91E98D29000BEB6C2 /* TextPosition.swift in Sources */,
@@ -308,6 +315,7 @@
 				75B4C0931ED6ABC500C93C1B /* DummyError.swift in Sources */,
 				75BA2D641EB716180049FE04 /* ParseErrorTests.swift in Sources */,
 				753AA3211ECC94C40015EC11 /* ErrorMessageWriterTests.swift in Sources */,
+				75AC088A1F10C4F100E5FCA2 /* SequencesTests.swift in Sources */,
 				75526B1D1ECFE68700EAA5B4 /* ParserTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

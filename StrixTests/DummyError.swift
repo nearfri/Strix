@@ -1,5 +1,5 @@
 
-enum DummyError: Error {
+enum DummyError: Int, Error {
     case err0
     case err1
     case err2
