@@ -244,13 +244,12 @@ class CharacterStreamTests: XCTestCase {
         XCTAssertNil(stream.matches(try! NSRegularExpression(pattern: "^a[a-zA-Z]+", options: [])))
         
         let regex = try! NSRegularExpression(pattern: "a[a-zA-Z]+", options: [])
-        var passed = false
         if let checkingResult = stream.matches(regex) {
             let matchedStr = (string as NSString).substring(with: checkingResult.range) as String
             XCTAssertEqual(matchedStr, "arSwift")
-            passed = true
+        } else {
+            XCTFail()
         }
-        XCTAssertTrue(passed)
     }
     
     func test_skip() {

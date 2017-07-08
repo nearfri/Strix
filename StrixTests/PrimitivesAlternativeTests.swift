@@ -36,12 +36,11 @@ class PrimitivesAlternativeTests: XCTestCase {
         let p2 = Parser<Int> { _ in return .failure([DummyError.err1]) }
         let p = p1 <|> p2
         let reply = p.parse(CharacterStream(string: ""))
-        var passed = false
         if case let .failure(e) = reply {
             XCTAssertEqual(e as! [DummyError], [DummyError.err0, DummyError.err1])
-            passed = true
+        } else {
+            XCTFail()
         }
-        XCTAssertTrue(passed)
     }
     
     func test_alternative_whenBothFailureWithStateChange_returnOneError() {
@@ -52,12 +51,11 @@ class PrimitivesAlternativeTests: XCTestCase {
         }
         let p = p1 <|> p2
         let reply = p.parse(CharacterStream(string: ""))
-        var passed = false
         if case let .failure(e) = reply {
             XCTAssertEqual(e as! [DummyError], [DummyError.err1])
-            passed = true
+        } else {
+            XCTFail()
         }
-        XCTAssertTrue(passed)
     }
     
     func test_alternative_whenLeftFatalFailure_returnFatalFailure() {
@@ -68,12 +66,11 @@ class PrimitivesAlternativeTests: XCTestCase {
         }
         let p = p1 <|> p2
         let reply = p.parse(CharacterStream(string: ""))
-        var passed = false
         if case let .fatalFailure(e) = reply {
             XCTAssertEqual(e as! [DummyError], [DummyError.err0])
-            passed = true
+        } else {
+            XCTFail()
         }
-        XCTAssertTrue(passed)
     }
     
     func test_alternative_whenLeftFailureWithStateChange_returnFailure() {
@@ -87,12 +84,11 @@ class PrimitivesAlternativeTests: XCTestCase {
         }
         let p = p1 <|> p2
         let reply = p.parse(CharacterStream(string: ""))
-        var passed = false
         if case let .failure(e) = reply {
             XCTAssertEqual(e as! [DummyError], [DummyError.err0])
-            passed = true
+        } else {
+            XCTFail()
         }
-        XCTAssertTrue(passed)
     }
     
     func test_choice_success() {
@@ -118,12 +114,11 @@ class PrimitivesAlternativeTests: XCTestCase {
         }
         let p = choice([p1, p2, p3, p4])
         let reply = p.parse(CharacterStream(string: ""))
-        var passed = false
         if case let .fatalFailure(e) = reply {
             XCTAssertEqual(e as! [DummyError], [DummyError.err0, DummyError.err1])
-            passed = true
+        } else {
+            XCTFail()
         }
-        XCTAssertTrue(passed)
     }
     
     func test_choice_whenFailureWithStateChange_returnFailure() {
@@ -142,36 +137,33 @@ class PrimitivesAlternativeTests: XCTestCase {
         }
         let p = choice([p1, p2, p3, p4])
         let reply = p.parse(CharacterStream(string: ""))
-        var passed = false
         if case let .failure(e) = reply {
             XCTAssertEqual(e as! [DummyError], [DummyError.err1])
-            passed = true
+        } else {
+            XCTFail()
         }
-        XCTAssertTrue(passed)
     }
     
     func test_optional_success() {
         let p1 = Parser<Int> { _ in return .success(1, []) }
         let p: Parser<Int?> = optional(p1)
         let reply = p.parse(CharacterStream(string: ""))
-        var passed = false
         if case let .success(v, _) = reply {
             XCTAssertEqual(v, 1)
-            passed = true
+        } else {
+            XCTFail()
         }
-        XCTAssertTrue(passed)
     }
     
     func test_optional_whenFailureWithoutStateChange_returnSuccess() {
         let p1 = Parser<Int> { _ in return .failure([DummyError.err0]) }
         let p: Parser<Int?> = optional(p1)
         let reply = p.parse(CharacterStream(string: ""))
-        var passed = false
         if case let .success(v, _) = reply {
             XCTAssertNil(v)
-            passed = true
+        } else {
+            XCTFail()
         }
-        XCTAssertTrue(passed)
     }
     
     func test_optional_whenFailureWithStateChange_returnFailure() {
@@ -181,46 +173,44 @@ class PrimitivesAlternativeTests: XCTestCase {
         }
         let p: Parser<Int?> = optional(p1)
         let reply = p.parse(CharacterStream(string: ""))
-        var passed = false
         if case let .failure(e) = reply {
             XCTAssertEqual(e as! [DummyError], [DummyError.err0])
-            passed = true
+        } else {
+            XCTFail()
         }
-        XCTAssertTrue(passed)
     }
     
     func test_optional_whenFatalFailure_returnFatalFailure() {
         let p1 = Parser<Int> { _ in return .fatalFailure([DummyError.err0]) }
         let p: Parser<Int?> = optional(p1)
         let reply = p.parse(CharacterStream(string: ""))
-        var passed = false
         if case let .fatalFailure(e) = reply {
             XCTAssertEqual(e as! [DummyError], [DummyError.err0])
-            passed = true
+        } else {
+            XCTFail()
         }
-        XCTAssertTrue(passed)
     }
     
     func test_skipOptional_success() {
         let p1 = Parser<Int> { _ in return .success(1, []) }
         let p: Parser<Void> = skipOptional(p1)
         let reply = p.parse(CharacterStream(string: ""))
-        var passed = false
         if case .success = reply {
-            passed = true
+            
+        } else {
+            XCTFail()
         }
-        XCTAssertTrue(passed)
     }
     
     func test_skipOptional_whenFailureWithoutStateChange_returnSuccess() {
         let p1 = Parser<Int> { _ in return .failure([DummyError.err0]) }
         let p: Parser<Void> = skipOptional(p1)
         let reply = p.parse(CharacterStream(string: ""))
-        var passed = false
         if case .success = reply {
-            passed = true
+            
+        } else {
+            XCTFail()
         }
-        XCTAssertTrue(passed)
     }
     
     func test_skipOptional_whenFailureWithStateChange_returnFailure() {
@@ -230,36 +220,33 @@ class PrimitivesAlternativeTests: XCTestCase {
         }
         let p: Parser<Void> = skipOptional(p1)
         let reply = p.parse(CharacterStream(string: ""))
-        var passed = false
         if case let .failure(e) = reply {
             XCTAssertEqual(e as! [DummyError], [DummyError.err0])
-            passed = true
+        } else {
+            XCTFail()
         }
-        XCTAssertTrue(passed)
     }
     
     func test_skipOptional_whenFatalFailure_returnFatalFailure() {
         let p1 = Parser<Int> { _ in return .fatalFailure([DummyError.err0]) }
         let p: Parser<Void> = skipOptional(p1)
         let reply = p.parse(CharacterStream(string: ""))
-        var passed = false
         if case let .fatalFailure(e) = reply {
             XCTAssertEqual(e as! [DummyError], [DummyError.err0])
-            passed = true
+        } else {
+            XCTFail()
         }
-        XCTAssertTrue(passed)
     }
     
     func test_attempt_success() {
         let p1 = Parser<Int> { _ in return .success(1, []) }
         let p: Parser<Int> = attempt(p1)
         let reply = p.parse(CharacterStream(string: ""))
-        var passed = false
         if case let .success(v, _) = reply {
             XCTAssertEqual(v, 1)
-            passed = true
+        } else {
+            XCTFail()
         }
-        XCTAssertTrue(passed)
     }
     
     func test_attempt_whenFailureWithoutStateChange_returnFailure() {
@@ -269,12 +256,11 @@ class PrimitivesAlternativeTests: XCTestCase {
         let p: Parser<Int> = attempt(p1)
         let stream = CharacterStream(string: "")
         let reply = p.parse(stream)
-        var passed = false
         if case let .failure(e) = reply {
             XCTAssertEqual(e as! [DummyError], [DummyError.err0])
-            passed = true
+        } else {
+            XCTFail()
         }
-        XCTAssertTrue(passed)
     }
     
     func test_attempt_whenFailureWithStateChange_backtrackAndReturnFailure() {
@@ -287,14 +273,13 @@ class PrimitivesAlternativeTests: XCTestCase {
         let stateTag = stream.stateTag
         let reply = p.parse(stream)
         XCTAssertEqual(stream.stateTag, stateTag)
-        var passed = false
         if case let .failure(e) = reply {
             if let nestedError = e.first as? ParseError.Nested {
                 XCTAssertEqual(nestedError.errors as! [DummyError], [DummyError.err0])
-                passed = true
             }
+        } else {
+            XCTFail()
         }
-        XCTAssertTrue(passed)
     }
     
     func test_attempt_whenFatalFailureWithoutStateChange_returnFailure() {
@@ -304,12 +289,11 @@ class PrimitivesAlternativeTests: XCTestCase {
         let p: Parser<Int> = attempt(p1)
         let stream = CharacterStream(string: "")
         let reply = p.parse(stream)
-        var passed = false
         if case let .failure(e) = reply {
             XCTAssertEqual(e as! [DummyError], [DummyError.err0])
-            passed = true
+        } else {
+            XCTFail()
         }
-        XCTAssertTrue(passed)
     }
     
     func test_attempt_whenFatalFailure_backtrackAndReturnFailure() {
@@ -322,14 +306,13 @@ class PrimitivesAlternativeTests: XCTestCase {
         let stateTag = stream.stateTag
         let reply = p.parse(stream)
         XCTAssertEqual(stream.stateTag, stateTag)
-        var passed = false
         if case let .failure(e) = reply {
             if let nestedError = e.first as? ParseError.Nested {
                 XCTAssertEqual(nestedError.errors as! [DummyError], [DummyError.err0])
-                passed = true
             }
+        } else {
+            XCTFail()
         }
-        XCTAssertTrue(passed)
     }
     
     func test_attempt_whenNestedError_passthroughNestedError() {
@@ -346,15 +329,14 @@ class PrimitivesAlternativeTests: XCTestCase {
         let stateTag = stream.stateTag
         let reply = p.parse(stream)
         XCTAssertEqual(stream.stateTag, stateTag)
-        var passed = false
         if case let .failure(e) = reply {
             if let nestedError = e.first as? ParseError.Nested {
                 XCTAssertEqual(nestedError.position, position)
                 XCTAssertEqual(nestedError.errors as! [DummyError], [DummyError.err0])
-                passed = true
             }
+        } else {
+            XCTFail()
         }
-        XCTAssertTrue(passed)
     }
 }
 

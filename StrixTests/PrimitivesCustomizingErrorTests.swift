@@ -19,13 +19,12 @@ class PrimitivesCustomizingErrorTests: XCTestCase {
         }
         let p: Parser<Int> = p1 <?> errLabel
         let reply = p.parse(CharacterStream(string: ""))
-        var passed = false
         if case let .success(v, e) = reply {
             XCTAssertEqual(v, 1)
             XCTAssertEqual(e as! [ParseError.Expected], [ParseError.Expected(errLabel)])
-            passed = true
+        } else {
+            XCTFail()
         }
-        XCTAssertTrue(passed)
     }
     
     func test_customLabel_parseWithStateChange_notChangeError() {
@@ -35,13 +34,12 @@ class PrimitivesCustomizingErrorTests: XCTestCase {
         }
         let p: Parser<Int> = p1 <?> errLabel
         let reply = p.parse(CharacterStream(string: ""))
-        var passed = false
         if case let .success(v, e) = reply {
             XCTAssertEqual(v, 1)
             XCTAssertEqual(e as! [DummyError], [DummyError.err0])
-            passed = true
+        } else {
+            XCTFail()
         }
-        XCTAssertTrue(passed)
     }
     
     func test_customCompoundLabel_successWithoutStateChange_changeError() {
@@ -50,13 +48,12 @@ class PrimitivesCustomizingErrorTests: XCTestCase {
         }
         let p: Parser<Int> = p1 <??> errLabel
         let reply = p.parse(CharacterStream(string: ""))
-        var passed = false
         if case let .success(v, e) = reply {
             XCTAssertEqual(v, 1)
             XCTAssertEqual(e as! [ParseError.Expected], [ParseError.Expected(errLabel)])
-            passed = true
+        } else {
+            XCTFail()
         }
-        XCTAssertTrue(passed)
     }
     
     func test_customCompoundLabel_successWithStateChange_notChangeError() {
@@ -66,13 +63,12 @@ class PrimitivesCustomizingErrorTests: XCTestCase {
         }
         let p: Parser<Int> = p1 <??> errLabel
         let reply = p.parse(CharacterStream(string: ""))
-        var passed = false
         if case let .success(v, e) = reply {
             XCTAssertEqual(v, 1)
             XCTAssertEqual(e as! [DummyError], [DummyError.err0])
-            passed = true
+        } else {
+            XCTFail()
         }
-        XCTAssertTrue(passed)
     }
     
     func test_customCompoundLabel_failureNestedErrorWithoutStateChange_returnCompoundError() {
@@ -84,14 +80,15 @@ class PrimitivesCustomizingErrorTests: XCTestCase {
         }
         let p: Parser<Int> = p1 <??> errLabel
         let reply = p.parse(CharacterStream(string: ""))
-        var passed = false
         if case let .failure(e) = reply {
             if let err = e.first as? ParseError.Compound {
                 XCTAssertEqual(err.label, errLabel)
-                passed = true
+            } else {
+                XCTFail()
             }
+        } else {
+            XCTFail()
         }
-        XCTAssertTrue(passed)
     }
     
     func test_customCompoundLabel_failureCompoundErrorWithoutStateChange_returnCompoundError() {
@@ -104,14 +101,15 @@ class PrimitivesCustomizingErrorTests: XCTestCase {
         }
         let p: Parser<Int> = p1 <??> errLabel
         let reply = p.parse(CharacterStream(string: ""))
-        var passed = false
         if case let .failure(e) = reply {
             if let err = e.first as? ParseError.Compound {
                 XCTAssertEqual(err.label, errLabel)
-                passed = true
+            } else {
+                XCTFail()
             }
+        } else {
+            XCTFail()
         }
-        XCTAssertTrue(passed)
     }
     
     func test_customCompoundLabel_failureNormalErrorWithoutStateChange_returnExpectedError() {
@@ -120,12 +118,11 @@ class PrimitivesCustomizingErrorTests: XCTestCase {
         }
         let p: Parser<Int> = p1 <??> errLabel
         let reply = p.parse(CharacterStream(string: ""))
-        var passed = false
         if case let .failure(e) = reply {
             XCTAssertEqual(e as! [ParseError.Expected], [ParseError.Expected(errLabel)])
-            passed = true
+        } else {
+            XCTFail()
         }
-        XCTAssertTrue(passed)
     }
     
     func test_customCompoundLabel_failureCompoundErrorWithStateChange_backtrackAndReturnCompoundError() {
@@ -142,14 +139,15 @@ class PrimitivesCustomizingErrorTests: XCTestCase {
         let stateTag = stream.stateTag
         let reply = p.parse(stream)
         XCTAssertEqual(stream.stateTag, stateTag)
-        var passed = false
         if case let .fatalFailure(e) = reply {
             if let err = e.first as? ParseError.Compound {
                 XCTAssertEqual(err.label, errLabel)
-                passed = true
+            } else {
+                XCTFail()
             }
+        } else {
+            XCTFail()
         }
-        XCTAssertTrue(passed)
     }
     
     func test_customCompoundLabel_failureNormalErrorWithStateChange_backtrackAndReturnCompoundError() {
@@ -162,40 +160,43 @@ class PrimitivesCustomizingErrorTests: XCTestCase {
         let stateTag = stream.stateTag
         let reply = p.parse(stream)
         XCTAssertEqual(stream.stateTag, stateTag)
-        var passed = false
         if case let .fatalFailure(e) = reply {
             if let err = e.first as? ParseError.Compound {
                 XCTAssertEqual(err.label, errLabel)
-                passed = true
+            } else {
+                XCTFail()
             }
+        } else {
+            XCTFail()
         }
-        XCTAssertTrue(passed)
     }
     
     func test_fail_returnFailure() {
         let p: Parser<Int> = fail(errLabel)
         let reply = p.parse(CharacterStream(string: ""))
-        var passed = false
         if case let .failure(e) = reply {
             if let err = e.first as? ParseError.Generic {
                 XCTAssertEqual(err.message, errLabel)
-                passed = true
+            } else {
+                XCTFail()
             }
+        } else {
+            XCTFail()
         }
-        XCTAssertTrue(passed)
     }
     
     func test_fatalFailure_returnFatalFailure() {
         let p: Parser<Int> = failFatally(errLabel)
         let reply = p.parse(CharacterStream(string: ""))
-        var passed = false
         if case let .fatalFailure(e) = reply {
             if let err = e.first as? ParseError.Generic {
                 XCTAssertEqual(err.message, errLabel)
-                passed = true
+            } else {
+                XCTFail()
             }
+        } else {
+            XCTFail()
         }
-        XCTAssertTrue(passed)
     }
 }
 

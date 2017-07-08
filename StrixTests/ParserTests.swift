@@ -70,12 +70,11 @@ class ParserTests: XCTestCase {
         let p = alwaysFail.flatMap(toInt)
         let stream = CharacterStream(string: "")
         let reply = p.parse(stream)
-        var passed = false
         if case let .failure(errors) = reply {
             XCTAssertEqual(errors as! [DummyError], [DummyError.err0])
-            passed = true
+        } else {
+            XCTFail()
         }
-        XCTAssertTrue(passed)
     }
     
     func test_flatMap_fatalFailure() {
@@ -91,12 +90,11 @@ class ParserTests: XCTestCase {
         let p = alwaysFail.flatMap(toInt)
         let stream = CharacterStream(string: "")
         let reply = p.parse(stream)
-        var passed = false
         if case let .fatalFailure(errors) = reply {
             XCTAssertEqual(errors as! [DummyError], [DummyError.err0])
-            passed = true
+        } else {
+            XCTFail()
         }
-        XCTAssertTrue(passed)
     }
     
     func test_map_success() {
@@ -123,12 +121,11 @@ class ParserTests: XCTestCase {
         let p = alwaysFail.map(toInt)
         let stream = CharacterStream(string: "")
         let reply = p.parse(stream)
-        var passed = false
         if case let .failure(errors) = reply {
             XCTAssertEqual(errors as! [DummyError], [DummyError.err0])
-            passed = true
+        } else {
+            XCTFail()
         }
-        XCTAssertTrue(passed)
     }
     
     func test_run_whenSuccess_returnSuccess() {
@@ -136,12 +133,11 @@ class ParserTests: XCTestCase {
             return .success(7, [])
         }
         let result = parser.run("")
-        var passed = false
         if case .success(let v) = result {
             XCTAssertEqual(v, 7)
-            passed = true
+        } else {
+            XCTFail()
         }
-        XCTAssertTrue(passed)
     }
     
     func test_run_whenFailure_returnFailure() {
@@ -154,12 +150,11 @@ class ParserTests: XCTestCase {
         }
         
         let result = parser.run("")
-        var passed = false
         if case .failure(let e) = result {
             XCTAssertEqual(e.underlyingErrors as! [DummyError], underlyingErrors)
-            passed = true
+        } else {
+            XCTFail()
         }
-        XCTAssertTrue(passed)
     }
     
     func test_run_whenFailure_returnFatalFailure() {
@@ -172,12 +167,11 @@ class ParserTests: XCTestCase {
         }
         
         let result = parser.run("")
-        var passed = false
         if case .failure(let e) = result {
             XCTAssertEqual(e.underlyingErrors as! [DummyError], underlyingErrors)
-            passed = true
+        } else {
+            XCTFail()
         }
-        XCTAssertTrue(passed)
     }
 }
 

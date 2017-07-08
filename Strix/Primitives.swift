@@ -245,7 +245,7 @@ public func failFatally<T>(_ message: String) -> Parser<T> {
 
 // MARK: - Helper functions
 
-private func extractSingleError<E: ParseError>(from errors: [Error]) -> E? {
+private func extractSingleError<E: ParseError>(type: E.Type, from errors: [Error]) -> E? {
     if errors.count == 1, let error = errors[0] as? E {
         return error
     }
@@ -254,7 +254,7 @@ private func extractSingleError<E: ParseError>(from errors: [Error]) -> E? {
 
 private func extractOrMakeNestedError(from errors: [Error],
                                       stream: CharacterStream) -> ParseError.Nested {
-    if let error: ParseError.Nested = extractSingleError(from: errors) {
+    if let error = extractSingleError(type: ParseError.Nested.self, from: errors) {
         return error
     }
     return ParseError.Nested(position: stream.position, userInfo: stream.userInfo, errors: errors)
@@ -262,10 +262,10 @@ private func extractOrMakeNestedError(from errors: [Error],
 
 private func extractAndMakeCompoundError(from errors: [Error],
                                          label: String) -> ParseError.Compound? {
-    if let error: ParseError.Compound = extractSingleError(from: errors) {
+    if let error = extractSingleError(type: ParseError.Compound.self, from: errors) {
         return ParseError.Compound(label: label, position: error.position,
                                    userInfo: error.userInfo, errors: error.errors)
-    } else if let error: ParseError.Nested = extractSingleError(from: errors) {
+    } else if let error = extractSingleError(type: ParseError.Nested.self, from: errors) {
         return ParseError.Compound(label: label, position: error.position,
                                    userInfo: error.userInfo, errors: error.errors)
     }

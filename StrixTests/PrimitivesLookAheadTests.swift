@@ -18,13 +18,12 @@ class PrimitivesLookAheadTests: XCTestCase {
         }
         let p: Parser<Int> = notEmpty(p1)
         let reply = p.parse(CharacterStream(string: ""))
-        var passed = false
         if case let .success(v, e) = reply {
             XCTAssertEqual(v, 1)
             XCTAssertEqual(e as! [DummyError], [DummyError.err0])
-            passed = true
+        } else {
+            XCTFail()
         }
-        XCTAssertTrue(passed)
     }
     
     func test_NotEmpty_whenSuccessWithoutStateChange_returnFailure() {
@@ -33,12 +32,11 @@ class PrimitivesLookAheadTests: XCTestCase {
         }
         let p: Parser<Int> = notEmpty(p1)
         let reply = p.parse(CharacterStream(string: ""))
-        var passed = false
         if case let .failure(e) = reply {
             XCTAssertEqual(e as! [DummyError], [DummyError.err0])
-            passed = true
+        } else {
+            XCTFail()
         }
-        XCTAssertTrue(passed)
     }
     
     func test_followed_whenSuccess_backtrackAndReturnSuccess() {
@@ -51,12 +49,11 @@ class PrimitivesLookAheadTests: XCTestCase {
         let stateTag = stream.stateTag
         let reply = p.parse(stream)
         XCTAssertEqual(stream.stateTag, stateTag)
-        var passed = false
         if case let .success(_, e) = reply {
             XCTAssertTrue(e.isEmpty)
-            passed = true
+        } else {
+            XCTFail()
         }
-        XCTAssertTrue(passed)
     }
     
     func test_followed_whenFailureWithLabel_backtrackAndReturnFailure() {
@@ -69,12 +66,11 @@ class PrimitivesLookAheadTests: XCTestCase {
         let stateTag = stream.stateTag
         let reply = p.parse(stream)
         XCTAssertEqual(stream.stateTag, stateTag)
-        var passed = false
         if case let .failure(e) = reply {
             XCTAssertEqual(e as! [ParseError.Expected], [ParseError.Expected("one")])
-            passed = true
+        } else {
+            XCTFail()
         }
-        XCTAssertTrue(passed)
     }
     
     func test_followed_whenFailureWithoutLabel_backtrackAndReturnFailure() {
@@ -87,12 +83,11 @@ class PrimitivesLookAheadTests: XCTestCase {
         let stateTag = stream.stateTag
         let reply = p.parse(stream)
         XCTAssertEqual(stream.stateTag, stateTag)
-        var passed = false
         if case let .failure(e) = reply {
             XCTAssertTrue(e.isEmpty)
-            passed = true
+        } else {
+            XCTFail()
         }
-        XCTAssertTrue(passed)
     }
     
     func test_notFollowed_whenSuccessWithLabel_backtrackAndReturnFailure() {
@@ -105,12 +100,11 @@ class PrimitivesLookAheadTests: XCTestCase {
         let stateTag = stream.stateTag
         let reply = p.parse(stream)
         XCTAssertEqual(stream.stateTag, stateTag)
-        var passed = false
         if case let .failure(e) = reply {
             XCTAssertEqual(e as! [ParseError.Unexpected], [ParseError.Unexpected("one")])
-            passed = true
+        } else {
+            XCTFail()
         }
-        XCTAssertTrue(passed)
     }
     
     func test_notFollowed_whenSuccessWithoutLabel_backtrackAndReturnFailure() {
@@ -123,12 +117,11 @@ class PrimitivesLookAheadTests: XCTestCase {
         let stateTag = stream.stateTag
         let reply = p.parse(stream)
         XCTAssertEqual(stream.stateTag, stateTag)
-        var passed = false
         if case let .failure(e) = reply {
             XCTAssertTrue(e.isEmpty)
-            passed = true
+        } else {
+            XCTFail()
         }
-        XCTAssertTrue(passed)
     }
     
     func test_notFollowed_whenFailure_backtrackAndReturnSuccess() {
@@ -141,12 +134,11 @@ class PrimitivesLookAheadTests: XCTestCase {
         let stateTag = stream.stateTag
         let reply = p.parse(stream)
         XCTAssertEqual(stream.stateTag, stateTag)
-        var passed = false
         if case let .success(_, e) = reply {
             XCTAssertTrue(e.isEmpty)
-            passed = true
+        } else {
+            XCTFail()
         }
-        XCTAssertTrue(passed)
     }
     
     func test_lookAhead_whenSuccess_backtrackAndReturnSuccess() {
@@ -159,13 +151,12 @@ class PrimitivesLookAheadTests: XCTestCase {
         let stateTag = stream.stateTag
         let reply = p.parse(stream)
         XCTAssertEqual(stream.stateTag, stateTag)
-        var passed = false
         if case let .success(v, e) = reply {
             XCTAssertEqual(v, 1)
             XCTAssertTrue(e.isEmpty)
-            passed = true
+        } else {
+            XCTFail()
         }
-        XCTAssertTrue(passed)
     }
     
     func test_lookAhead_whenFailure_backtrackAndReturnFailure() {
@@ -178,14 +169,15 @@ class PrimitivesLookAheadTests: XCTestCase {
         let stateTag = stream.stateTag
         let reply = p.parse(stream)
         XCTAssertEqual(stream.stateTag, stateTag)
-        var passed = false
         if case let .failure(e) = reply {
             if let nestedError = e.first as? ParseError.Nested {
                 XCTAssertEqual(nestedError.errors as! [DummyError], [DummyError.err0])
-                passed = true
+            } else {
+                XCTFail()
             }
+        } else {
+            XCTFail()
         }
-        XCTAssertTrue(passed)
     }
     
     func test_lookAhead_whenFatalFailure_backtrackAndReturnFailure() {
@@ -198,14 +190,15 @@ class PrimitivesLookAheadTests: XCTestCase {
         let stateTag = stream.stateTag
         let reply = p.parse(stream)
         XCTAssertEqual(stream.stateTag, stateTag)
-        var passed = false
         if case let .failure(e) = reply {
             if let nestedError = e.first as? ParseError.Nested {
                 XCTAssertEqual(nestedError.errors as! [DummyError], [DummyError.err0])
-                passed = true
+            } else {
+                XCTFail()
             }
+        } else {
+            XCTFail()
         }
-        XCTAssertTrue(passed)
     }
     
     func test_lookAhead_whenFailureWithoutStateChange_returnFailureWithOriginalErrors() {
@@ -217,12 +210,11 @@ class PrimitivesLookAheadTests: XCTestCase {
         let stateTag = stream.stateTag
         let reply = p.parse(stream)
         XCTAssertEqual(stream.stateTag, stateTag)
-        var passed = false
         if case let .failure(e) = reply {
             XCTAssertEqual(e as! [DummyError], [DummyError.err0])
-            passed = true
+        } else {
+            XCTFail()
         }
-        XCTAssertTrue(passed)
     }
 }
 
