@@ -199,15 +199,29 @@ class SequencesTests: XCTestCase {
             }
             return .failure([DummyError(rawValue: count)!])
         }
-        let p: Parser<[Int]> = many(p1)
-        let reply = p.parse(CharacterStream(string: ""))
-        if case let .success(v, e) = reply {
-            let values = Array(1..<maxCount)
-            let errors = Array(Array(1..<maxCount+1).map({ DummyError(rawValue: $0)! }).suffix(2))
-            XCTAssertEqual(v, values)
-            XCTAssertEqual(e as! [DummyError], errors)
-        } else {
-            XCTFail()
+        let errors = Array(Array(1..<maxCount+1).map({ DummyError(rawValue: $0)! }).suffix(2))
+        
+        do {
+            let p: Parser<[Int]> = many(p1)
+            let reply = p.parse(CharacterStream(string: ""))
+            if case let .success(v, e) = reply {
+                let values = Array(1..<maxCount)
+                XCTAssertEqual(v, values)
+                XCTAssertEqual(e as! [DummyError], errors)
+            } else {
+                XCTFail()
+            }
+        }
+        
+        do {
+            count = 0
+            let p: Parser<Void> = skipMany(p1)
+            let reply = p.parse(CharacterStream(string: ""))
+            if case let .success(_, e) = reply {
+                XCTAssertEqual(e as! [DummyError], errors)
+            } else {
+                XCTFail()
+            }
         }
     }
     
@@ -222,13 +236,27 @@ class SequencesTests: XCTestCase {
             }
             return .fatalFailure([DummyError(rawValue: count)!])
         }
-        let p: Parser<[Int]> = many(p1)
-        let reply = p.parse(CharacterStream(string: ""))
-        if case let .fatalFailure(e) = reply {
-            let errors = Array(Array(1..<maxCount+1).map({ DummyError(rawValue: $0)! }).suffix(2))
-            XCTAssertEqual(e as! [DummyError], errors)
-        } else {
-            XCTFail()
+        let errors = Array(Array(1..<maxCount+1).map({ DummyError(rawValue: $0)! }).suffix(2))
+        
+        do {
+            let p: Parser<[Int]> = many(p1)
+            let reply = p.parse(CharacterStream(string: ""))
+            if case let .fatalFailure(e) = reply {
+                XCTAssertEqual(e as! [DummyError], errors)
+            } else {
+                XCTFail()
+            }
+        }
+        
+        do {
+            count = 0
+            let p: Parser<Void> = skipMany(p1)
+            let reply = p.parse(CharacterStream(string: ""))
+            if case let .fatalFailure(e) = reply {
+                XCTAssertEqual(e as! [DummyError], errors)
+            } else {
+                XCTFail()
+            }
         }
     }
     
@@ -243,13 +271,27 @@ class SequencesTests: XCTestCase {
             }
             return .failure([DummyError(rawValue: count)!])
         }
-        let p: Parser<[Int]> = many(p1)
-        let reply = p.parse(CharacterStream(string: ""))
-        if case let .failure(e) = reply {
-            let errors = [DummyError(rawValue: maxCount)!]
-            XCTAssertEqual(e as! [DummyError], errors)
-        } else {
-            XCTFail()
+        let errors = [DummyError(rawValue: maxCount)!]
+        
+        do {
+            let p: Parser<[Int]> = many(p1)
+            let reply = p.parse(CharacterStream(string: ""))
+            if case let .failure(e) = reply {
+                XCTAssertEqual(e as! [DummyError], errors)
+            } else {
+                XCTFail()
+            }
+        }
+        
+        do {
+            count = 0
+            let p: Parser<Void> = skipMany(p1)
+            let reply = p.parse(CharacterStream(string: ""))
+            if case let .failure(e) = reply {
+                XCTAssertEqual(e as! [DummyError], errors)
+            } else {
+                XCTFail()
+            }
         }
     }
     
@@ -264,13 +306,27 @@ class SequencesTests: XCTestCase {
             }
             return .fatalFailure([DummyError(rawValue: count)!])
         }
-        let p: Parser<[Int]> = many(p1)
-        let reply = p.parse(CharacterStream(string: ""))
-        if case let .fatalFailure(e) = reply {
-            let errors = [DummyError(rawValue: maxCount)!]
-            XCTAssertEqual(e as! [DummyError], errors)
-        } else {
-            XCTFail()
+        let errors = [DummyError(rawValue: maxCount)!]
+        
+        do {
+            let p: Parser<[Int]> = many(p1)
+            let reply = p.parse(CharacterStream(string: ""))
+            if case let .fatalFailure(e) = reply {
+                XCTAssertEqual(e as! [DummyError], errors)
+            } else {
+                XCTFail()
+            }
+        }
+        
+        do {
+            count = 0
+            let p: Parser<Void> = skipMany(p1)
+            let reply = p.parse(CharacterStream(string: ""))
+            if case let .fatalFailure(e) = reply {
+                XCTAssertEqual(e as! [DummyError], errors)
+            } else {
+                XCTFail()
+            }
         }
     }
     
@@ -278,13 +334,27 @@ class SequencesTests: XCTestCase {
         let p1 = Parser { stream -> Reply<Int> in
             return .failure([DummyError.err0])
         }
-        let p: Parser<[Int]> = many(p1, atLeastOne: false)
-        let reply = p.parse(CharacterStream(string: ""))
-        if case let .success(v, e) = reply {
-            XCTAssertTrue(v.isEmpty)
-            XCTAssertEqual(e as! [DummyError], [DummyError.err0])
-        } else {
-            XCTFail()
+        let errors = [DummyError.err0]
+        
+        do {
+            let p: Parser<[Int]> = many(p1, atLeastOne: false)
+            let reply = p.parse(CharacterStream(string: ""))
+            if case let .success(v, e) = reply {
+                XCTAssertTrue(v.isEmpty)
+                XCTAssertEqual(e as! [DummyError], errors)
+            } else {
+                XCTFail()
+            }
+        }
+        
+        do {
+            let p: Parser<Void> = skipMany(p1, atLeastOne: false)
+            let reply = p.parse(CharacterStream(string: ""))
+            if case let .success(_, e) = reply {
+                XCTAssertEqual(e as! [DummyError], errors)
+            } else {
+                XCTFail()
+            }
         }
     }
     
@@ -292,12 +362,26 @@ class SequencesTests: XCTestCase {
         let p1 = Parser { stream -> Reply<Int> in
             return .failure([DummyError.err0])
         }
-        let p: Parser<[Int]> = many(p1, atLeastOne: true)
-        let reply = p.parse(CharacterStream(string: ""))
-        if case let .failure(e) = reply {
-            XCTAssertEqual(e as! [DummyError], [DummyError.err0])
-        } else {
-            XCTFail()
+        let errors = [DummyError.err0]
+        
+        do {
+            let p: Parser<[Int]> = many(p1, atLeastOne: true)
+            let reply = p.parse(CharacterStream(string: ""))
+            if case let .failure(e) = reply {
+                XCTAssertEqual(e as! [DummyError], errors)
+            } else {
+                XCTFail()
+            }
+        }
+        
+        do {
+            let p: Parser<Void> = skipMany(p1, atLeastOne: true)
+            let reply = p.parse(CharacterStream(string: ""))
+            if case let .failure(e) = reply {
+                XCTAssertEqual(e as! [DummyError], errors)
+            } else {
+                XCTFail()
+            }
         }
     }
     

@@ -53,6 +53,8 @@ public func tuple<T1, T2, T3, T4, T5>(
     return pipe(p1, p2, p3, p4, p5) { ($0, $1, $2, $3, $4) }
 }
 
+// MARK: -
+
 public func array<T>(_ parser: Parser<T>, count: Int) -> Parser<[T]> {
     return array(parser, count: count, makeHandler: ValueCollector.init)
 }
@@ -91,8 +93,14 @@ private func array<T, H: ValueHandling>(
     }
 }
 
+// MARK: -
+
 public func many<T>(_ repeatedParser: Parser<T>, atLeastOne: Bool = false) -> Parser<[T]> {
     return many(first: repeatedParser, repeating: repeatedParser, atLeastOne: atLeastOne)
+}
+
+public func skipMany<T>(_ repeatedParser: Parser<T>, atLeastOne: Bool = false) -> Parser<Void> {
+    return skipMany(first: repeatedParser, repeating: repeatedParser, atLeastOne: atLeastOne)
 }
 
 public func many<T>(
@@ -101,6 +109,14 @@ public func many<T>(
     
     return many(first: firstParser, repeating: repeatedParser,
                 atLeastOne: atLeastOne, makeHandler: ValueCollector.init)
+}
+
+public func skipMany<T>(
+    first firstParser: Parser<T>, repeating repeatedParser: Parser<T>,
+    atLeastOne: Bool = false) -> Parser<Void> {
+    
+    return many(first: firstParser, repeating: repeatedParser,
+                atLeastOne: atLeastOne, makeHandler: ValueIgnorer.init)
 }
 
 public func many<T, H: ValueHandling>(
@@ -141,6 +157,8 @@ public func many<T, H: ValueHandling>(
         }
     }
 }
+
+// MARK: -
 
 private var infiniteLoopErrorMessage: String = ""
     + "The combinator 'many' was applied to a parser that succeeds "
