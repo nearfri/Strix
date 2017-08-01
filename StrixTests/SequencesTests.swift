@@ -187,6 +187,142 @@ class SequencesTests: XCTestCase {
             XCTFail()
         }
     }
+    
+    func test_many_whenFailWithoutStateChange_returnSuccess() {
+        let maxCount = 3
+        var count = 0
+        let p1 = Parser { stream -> Reply<Int> in
+            count += 1
+            if count < maxCount {
+                stream.stateTag += 1
+                return .success(count, [DummyError(rawValue: count)!])
+            }
+            return .failure([DummyError(rawValue: count)!])
+        }
+        let p: Parser<[Int]> = many(p1)
+        let reply = p.parse(CharacterStream(string: ""))
+        if case let .success(v, e) = reply {
+            let values = Array(1..<maxCount)
+            let errors = Array(Array(1..<maxCount+1).map({ DummyError(rawValue: $0)! }).suffix(2))
+            XCTAssertEqual(v, values)
+            XCTAssertEqual(e as! [DummyError], errors)
+        } else {
+            XCTFail()
+        }
+    }
+    
+    func test_many_whenFatalFailWithoutStateChange_returnFatalFailure() {
+        let maxCount = 3
+        var count = 0
+        let p1 = Parser { stream -> Reply<Int> in
+            count += 1
+            if count < maxCount {
+                stream.stateTag += 1
+                return .success(count, [DummyError(rawValue: count)!])
+            }
+            return .fatalFailure([DummyError(rawValue: count)!])
+        }
+        let p: Parser<[Int]> = many(p1)
+        let reply = p.parse(CharacterStream(string: ""))
+        if case let .fatalFailure(e) = reply {
+            let errors = Array(Array(1..<maxCount+1).map({ DummyError(rawValue: $0)! }).suffix(2))
+            XCTAssertEqual(e as! [DummyError], errors)
+        } else {
+            XCTFail()
+        }
+    }
+    
+    func test_many_whenFailWithStateChange_returnFailure() {
+        let maxCount = 3
+        var count = 0
+        let p1 = Parser { stream -> Reply<Int> in
+            count += 1
+            stream.stateTag += 1
+            if count < maxCount {
+                return .success(count, [DummyError(rawValue: count)!])
+            }
+            return .failure([DummyError(rawValue: count)!])
+        }
+        let p: Parser<[Int]> = many(p1)
+        let reply = p.parse(CharacterStream(string: ""))
+        if case let .failure(e) = reply {
+            let errors = [DummyError(rawValue: maxCount)!]
+            XCTAssertEqual(e as! [DummyError], errors)
+        } else {
+            XCTFail()
+        }
+    }
+    
+    func test_many_whenFatalFailWithStateChange_returnFatalFailure() {
+        let maxCount = 3
+        var count = 0
+        let p1 = Parser { stream -> Reply<Int> in
+            count += 1
+            stream.stateTag += 1
+            if count < maxCount {
+                return .success(count, [DummyError(rawValue: count)!])
+            }
+            return .fatalFailure([DummyError(rawValue: count)!])
+        }
+        let p: Parser<[Int]> = many(p1)
+        let reply = p.parse(CharacterStream(string: ""))
+        if case let .fatalFailure(e) = reply {
+            let errors = [DummyError(rawValue: maxCount)!]
+            XCTAssertEqual(e as! [DummyError], errors)
+        } else {
+            XCTFail()
+        }
+    }
+    
+    func test_many_whenNotRequireAtLeastOneAndFailAtFirst_returnSuccess() {
+        let p1 = Parser { stream -> Reply<Int> in
+            return .failure([DummyError.err0])
+        }
+        let p: Parser<[Int]> = many(p1, atLeastOne: false)
+        let reply = p.parse(CharacterStream(string: ""))
+        if case let .success(v, e) = reply {
+            XCTAssertTrue(v.isEmpty)
+            XCTAssertEqual(e as! [DummyError], [DummyError.err0])
+        } else {
+            XCTFail()
+        }
+    }
+    
+    func test_many_whenRequireAtLeastOneAndFailAtFirst_returnFailure() {
+        let p1 = Parser { stream -> Reply<Int> in
+            return .failure([DummyError.err0])
+        }
+        let p: Parser<[Int]> = many(p1, atLeastOne: true)
+        let reply = p.parse(CharacterStream(string: ""))
+        if case let .failure(e) = reply {
+            XCTAssertEqual(e as! [DummyError], [DummyError.err0])
+        } else {
+            XCTFail()
+        }
+    }
+    
+    // 현재로선 preconditionFailure를 catch하긴 번거로우므로 생략
+    func _test_many_whenSuccessWithoutStateChange_preconditionFailure() {
+        let maxCount = 3
+        var count = 0
+        let p1 = Parser { stream -> Reply<Int> in
+            count += 1
+            if count < maxCount {
+                return .success(count, [DummyError(rawValue: count)!])
+            }
+            return .failure([DummyError(rawValue: count)!])
+        }
+        
+        do {
+            let p: Parser<[Int]> = many(p1)
+            _ = p.parse(CharacterStream(string: ""))
+            
+            XCTFail("should not enter here")
+            throw DummyError.err0
+        } catch {
+            
+        }
+    }
 }
 
 

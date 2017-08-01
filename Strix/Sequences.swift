@@ -91,5 +91,62 @@ private func array<T, H: ValueHandling>(
     }
 }
 
+public func many<T>(_ repeatedParser: Parser<T>, atLeastOne: Bool = false) -> Parser<[T]> {
+    return many(first: repeatedParser, repeating: repeatedParser, atLeastOne: atLeastOne)
+}
+
+public func many<T>(
+    first firstParser: Parser<T>, repeating repeatedParser: Parser<T>,
+    atLeastOne: Bool = false) -> Parser<[T]> {
+    
+    return many(first: firstParser, repeating: repeatedParser,
+                atLeastOne: atLeastOne, makeHandler: ValueCollector.init)
+}
+
+public func many<T, H: ValueHandling>(
+    first firstParser: Parser<T>, repeating repeatedParser: Parser<T>, atLeastOne: Bool,
+    makeHandler: @escaping () -> H) -> Parser<H.Result> where H.Value == T {
+    
+    return Parser { stream in
+        var handler = makeHandler()
+        var errors: [Error] = []
+        var stateTag: Int
+        
+        func parse(with p: Parser<T>, finishIfFailed: Bool) -> Reply<H.Result>? {
+            switch p.parse(stream) {
+            case let .success(v, e):
+                handler.valueOccurred(v)
+                errors = e
+                return nil
+            case let .failure(e) where stateTag == stream.stateTag && finishIfFailed:
+                return .success(handler.result, errors + e)
+            case let .failure(e):
+                return .failure(e)
+            case let .fatalFailure(e):
+                return .fatalFailure(stateTag != stream.stateTag ? e : errors + e)
+            }
+        }
+        
+        stateTag = stream.stateTag
+        if let reply = parse(with: firstParser, finishIfFailed: !atLeastOne) {
+            return reply
+        }
+        
+        while true {
+            stateTag = stream.stateTag
+            if let reply = parse(with: repeatedParser, finishIfFailed: true) {
+                return reply
+            }
+            precondition(stateTag != stream.stateTag, infiniteLoopErrorMessage)
+        }
+    }
+}
+
+private var infiniteLoopErrorMessage: String = ""
+    + "The combinator 'many' was applied to a parser that succeeds "
+    + "without consuming input and without changing the parser state in any other way. "
+    + "(If no exception had been raised, the combinator likely would have "
+    + "entered an infinite loop.)"
+
 
 

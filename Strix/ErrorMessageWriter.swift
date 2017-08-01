@@ -20,8 +20,9 @@ internal struct ErrorMessageWriter {
         let writingResultExpected = writeExpectedMessages(to: &output)
         let writingResultUnexpected = writeUnexpectedMessages(to: &output)
         
-        let shouldIndentOtherMessages = writingResultExpected == .messagesWritten
-            || writingResultUnexpected == .messagesWritten
+        let didWriteMessageExpected = writingResultExpected == .messagesWritten
+        let didWriteMessageUnexpected = writingResultUnexpected == .messagesWritten
+        let shouldIndentOtherMessages = didWriteMessageExpected || didWriteMessageUnexpected
         
         writeOtherMessages(indented: shouldIndentOtherMessages, to: &output)
         
