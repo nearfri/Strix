@@ -5,6 +5,11 @@ enum DummyError: Int, Error {
     case err2
     case err3
     case err4
+    case err5
+    case err6
+    case err7
+    case err8
+    case err9
 }
 
 

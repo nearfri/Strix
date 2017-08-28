@@ -15,16 +15,18 @@ public protocol SeparatorHandling {
     mutating func separatorOccurred(_ separator: Separator)
 }
 
-private struct ValueCollector<Value>: ValueHandling {
+private struct ValueCollector<Value, Separator>: ValueHandling, SeparatorHandling {
     var result: [Value] = []
     mutating func valueOccurred(_ value: Value) {
         result.append(value)
     }
+    func separatorOccurred(_ separator: Separator) {}
 }
 
-private struct ValueIgnorer<Value>: ValueHandling {
+private struct ValueIgnorer<Value, Separator>: ValueHandling, SeparatorHandling {
     var result: Void { return () }
     func valueOccurred(_ value: Value) {}
+    func separatorOccurred(_ separator: Separator) {}
 }
 
 // MARK: - Parsing sequences
@@ -56,11 +58,11 @@ public func tuple<T1, T2, T3, T4, T5>(
 // MARK: -
 
 public func array<T>(_ parser: Parser<T>, count: Int) -> Parser<[T]> {
-    return array(parser, count: count, makeHandler: ValueCollector.init)
+    return array(parser, count: count, makeHandler: ValueCollector<T, Void>.init)
 }
 
 public func skipArray<T>(_ parser: Parser<T>, count: Int) -> Parser<Void> {
-    return array(parser, count: count, makeHandler: ValueIgnorer.init)
+    return array(parser, count: count, makeHandler: ValueIgnorer<T, Void>.init)
 }
 
 private func array<T, H: ValueHandling>(
@@ -108,7 +110,7 @@ public func many<T>(
     atLeastOne: Bool = false) -> Parser<[T]> {
     
     return many(first: firstParser, repeating: repeatedParser,
-                atLeastOne: atLeastOne, makeHandler: ValueCollector.init)
+                atLeastOne: atLeastOne, makeHandler: ValueCollector<T, Void>.init)
 }
 
 public func skipMany<T>(
@@ -116,25 +118,25 @@ public func skipMany<T>(
     atLeastOne: Bool = false) -> Parser<Void> {
     
     return many(first: firstParser, repeating: repeatedParser,
-                atLeastOne: atLeastOne, makeHandler: ValueIgnorer.init)
+                atLeastOne: atLeastOne, makeHandler: ValueIgnorer<T, Void>.init)
 }
 
-public func many<T, H: ValueHandling>(
+public func many<T, Handler: ValueHandling>(
     first firstParser: Parser<T>, repeating repeatedParser: Parser<T>, atLeastOne: Bool,
-    makeHandler: @escaping () -> H) -> Parser<H.Result> where H.Value == T {
+    makeHandler: @escaping () -> Handler) -> Parser<Handler.Result> where Handler.Value == T {
     
     return Parser { stream in
         var handler = makeHandler()
         var errors: [Error] = []
         var stateTag: Int
         
-        func parse(with p: Parser<T>, finishIfFailed: Bool) -> Reply<H.Result>? {
+        func parse(with p: Parser<T>, successIfGoodFailure: Bool) -> Reply<Handler.Result>? {
             switch p.parse(stream) {
             case let .success(v, e):
                 handler.valueOccurred(v)
                 errors = e
                 return nil
-            case let .failure(e) where stateTag == stream.stateTag && finishIfFailed:
+            case let .failure(e) where stateTag == stream.stateTag && successIfGoodFailure:
                 return .success(handler.result, errors + e)
             case let .failure(e):
                 return .failure(e)
@@ -144,16 +146,83 @@ public func many<T, H: ValueHandling>(
         }
         
         stateTag = stream.stateTag
-        if let reply = parse(with: firstParser, finishIfFailed: !atLeastOne) {
+        if let reply = parse(with: firstParser, successIfGoodFailure: !atLeastOne) {
             return reply
         }
         
         while true {
             stateTag = stream.stateTag
-            if let reply = parse(with: repeatedParser, finishIfFailed: true) {
+            if let reply = parse(with: repeatedParser, successIfGoodFailure: true) {
                 return reply
             }
             precondition(stateTag != stream.stateTag, infiniteLoopErrorMessage)
+        }
+    }
+}
+
+// MARK: -
+
+public func many<T1, T2>(
+    _ parser: Parser<T1>, separator: Parser<T2>, atLeastOne: Bool = false,
+    allowEndBySeparator: Bool = false) -> Parser<[T1]> {
+    
+    return many(parser, separator: separator,
+                atLeastOne: atLeastOne, allowEndBySeparator: allowEndBySeparator,
+                makeHandler: ValueCollector<T1, T2>.init)
+}
+
+public func skipMany<T1, T2>(
+    _ parser: Parser<T1>, separator: Parser<T2>, atLeastOne: Bool = false,
+    allowEndBySeparator: Bool = false) -> Parser<Void> {
+    
+    return many(parser, separator: separator,
+                atLeastOne: atLeastOne, allowEndBySeparator: allowEndBySeparator,
+                makeHandler: ValueIgnorer<T1, T2>.init)
+}
+
+public func many<T1, T2, Handler: ValueHandling & SeparatorHandling>(
+    _ parser: Parser<T1>, separator: Parser<T2>, atLeastOne: Bool,
+    allowEndBySeparator: Bool, makeHandler: @escaping () -> Handler
+    ) -> Parser<Handler.Result> where Handler.Value == T1, Handler.Separator == T2 {
+    
+    return Parser { stream in
+        var handler = makeHandler()
+        var errors: [Error] = []
+        var valueCount = 0
+        
+        while true {
+            let stateTag = stream.stateTag
+            switch parser.parse(stream) {
+            case let .success(v, e):
+                precondition(stateTag != stream.stateTag, infiniteLoopErrorMessage)
+                handler.valueOccurred(v)
+                errors = e
+                valueCount += 1
+            case let .failure(e) where stateTag == stream.stateTag:
+                let satisfiesAtLeastOne = !atLeastOne || valueCount > 0
+                if satisfiesAtLeastOne && (allowEndBySeparator || valueCount == 0) {
+                    return .success(handler.result, errors + e)
+                }
+                return .failure(errors + e)
+            case let .failure(e):
+                return .failure(e)
+            case let .fatalFailure(e):
+                return .fatalFailure(stateTag != stream.stateTag ? e : errors + e)
+            }
+            
+            let sepStateTag = stream.stateTag
+            switch separator.parse(stream) {
+            case let .success(v, e):
+                precondition(sepStateTag != stream.stateTag, infiniteLoopErrorMessage)
+                handler.separatorOccurred(v)
+                errors = e
+            case let .failure(e) where sepStateTag == stream.stateTag:
+                return .success(handler.result, errors + e)
+            case let .failure(e):
+                return .failure(e)
+            case let .fatalFailure(e):
+                return .fatalFailure(sepStateTag != stream.stateTag ? e : errors + e)
+            }
         }
     }
 }
