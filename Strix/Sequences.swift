@@ -229,11 +229,12 @@ public func many<T1, T2, Handler: ValueHandling & SeparatorHandling>(
 
 // MARK: -
 
-private var infiniteLoopErrorMessage: String = ""
-    + "The combinator 'many' was applied to a parser that succeeds "
-    + "without consuming input and without changing the parser state in any other way. "
-    + "(If no exception had been raised, the combinator likely would have "
-    + "entered an infinite loop.)"
+private var infiniteLoopErrorMessage: String = """
+The combinator 'many' was applied to a parser that succeeds \
+without consuming input and without changing the parser state in any other way. \
+(If no exception had been raised, the combinator likely would have \
+entered an infinite loop.)
+"""
 
 
 

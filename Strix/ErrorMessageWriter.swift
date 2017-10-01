@@ -46,7 +46,7 @@ internal struct ErrorMessageWriter {
             note = "The error occurred at the end of the input stream."
         } else if position.substring.isEmpty {
             note = "The error occurred on an empty line."
-        } else if position.columnNumber == position.substring.characters.count + 1 {
+        } else if position.columnNumber == position.substring.count + 1 {
             note = "The error occurred at the end of the line."
         } else {
             note = nil

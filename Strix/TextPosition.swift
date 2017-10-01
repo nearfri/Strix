@@ -55,7 +55,7 @@ extension TextPosition {
                 if index < upperBound || (index == upperBound && index == string.endIndex) {
                     stop = true
                     self.lineNumber = enumerationCount + 1
-                    self.columnNumber = string[subRange.lowerBound..<index].characters.count + 1
+                    self.columnNumber = string[subRange.lowerBound..<index].count + 1
                     self.substring = String(string[subRange])
                 }
                 enumerationCount += 1

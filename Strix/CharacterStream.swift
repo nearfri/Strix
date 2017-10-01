@@ -85,7 +85,7 @@ extension CharacterStream {
     }
     
     public func matches(_ str: String, case caseSensitivity: StringSensitivity) -> Bool {
-        guard let end = index(from: nextIndex, offset: str.characters.count) else {
+        guard let end = index(from: nextIndex, offset: str.count) else {
             return false
         }
         return string.compare(str, case: caseSensitivity, range: nextIndex..<end) == .orderedSame
@@ -141,7 +141,7 @@ extension CharacterStream {
     
     @discardableResult
     public func skip(_ str: String, case caseSensitivity: StringSensitivity) -> Bool {
-        guard let end = index(from: nextIndex, offset: str.characters.count) else {
+        guard let end = index(from: nextIndex, offset: str.count) else {
             return false
         }
         if string.compare(str, case: caseSensitivity, range: nextIndex..<end) != .orderedSame {
