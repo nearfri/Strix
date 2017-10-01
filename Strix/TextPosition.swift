@@ -56,7 +56,7 @@ extension TextPosition {
                     stop = true
                     self.lineNumber = enumerationCount + 1
                     self.columnNumber = string[subRange.lowerBound..<index].characters.count + 1
-                    self.substring = string[subRange]
+                    self.substring = String(string[subRange])
                 }
                 enumerationCount += 1
             }

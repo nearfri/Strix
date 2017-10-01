@@ -94,10 +94,8 @@ extension CharacterStream {
     public func matches(_ regex: NSRegularExpression) -> NSTextCheckingResult? {
         func utf16IntRange(in str: String, from: String.Index, to: String.Index) -> Range<Int> {
             let utf16View = str.utf16
-            let utf16From = from.samePosition(in: utf16View)
-            let utf16To = to.samePosition(in: utf16View)
-            let start = utf16View.distance(from: utf16View.startIndex, to: utf16From)
-            let count = utf16View.distance(from: utf16From, to: utf16To)
+            let start = utf16View.distance(from: str.startIndex, to: from)
+            let count = utf16View.distance(from: from, to: to)
             return start..<(start+count)
         }
         
@@ -174,14 +172,14 @@ extension CharacterStream {
     public func read(from index: String.Index) -> String {
         precondition(index <= nextIndex, "index is more than nextIndex")
         precondition(index >= startIndex, "index is less than startIndex")
-        return string[index..<nextIndex]
+        return String(string[index..<nextIndex])
     }
     
     public func read(minLength: String.IndexDistance = 0, maxLength: String.IndexDistance = .max,
                      while predicate: (Character) throws -> Bool) rethrows -> String? {
         guard let section = try skip(minLength: minLength, maxLength: maxLength, while: predicate)
             else { return nil }
-        return string[section.range]
+        return String(string[section.range])
     }
 }
 
