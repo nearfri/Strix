@@ -21,8 +21,8 @@ internal protocol ErrorOutputStream: TextOutputStream {
 
 internal struct ErrorOutputBuffer: ErrorOutputStream {
     var indent: Indent = Indent()
-    fileprivate(set) var text: String = ""
-    fileprivate var needsIndent: Bool = true
+    private(set) var text: String = ""
+    private var needsIndent: Bool = true
     
     mutating func write(_ string: String) {
         if needsIndent {

@@ -33,7 +33,7 @@ extension TextPosition: CustomStringConvertible {
 }
 
 extension TextPosition {
-    fileprivate class Info {
+    private class Info {
         private static let invalidNumber: Int = -1
         
         var lineNumber: Int = Info.invalidNumber

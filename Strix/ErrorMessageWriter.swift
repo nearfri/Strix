@@ -163,7 +163,7 @@ internal struct ErrorMessageWriter {
 }
 
 extension ErrorMessageWriter {
-    fileprivate enum WritingResult {
+    private enum WritingResult {
         case nothingWritten
         case messagesWritten
     }

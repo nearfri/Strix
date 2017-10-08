@@ -25,7 +25,7 @@ public class CharacterStream {
     public let startIndex: String.Index
     public let endIndex: String.Index
     public var stateTag: Int = 0
-    public fileprivate(set) var nextIndex: String.Index {
+    public private(set) var nextIndex: String.Index {
         didSet { stateTag += 1 }
     }
     public var userInfo: UserInfo = [:] {
@@ -67,7 +67,7 @@ extension CharacterStream {
         return nil
     }
     
-    fileprivate func index(from i: String.Index, offset: String.IndexDistance) -> String.Index? {
+    private func index(from i: String.Index, offset: String.IndexDistance) -> String.Index? {
         let limit = offset < 0 ? startIndex : endIndex
         return string.index(i, offsetBy: offset, limitedBy: limit)
     }
