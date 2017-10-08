@@ -129,7 +129,7 @@ internal struct ErrorMessageWriter {
         }
         
         if indented {
-            output.writeLine("Other error messages: ")
+            output.writeLine("Other error messages:")
             output.indent.level += 1
         }
         
@@ -144,7 +144,7 @@ internal struct ErrorMessageWriter {
     private func writeCompoundErrors<Target: ErrorOutputStream>(to output: inout Target) {
         for error in errorGroup.compoundErrors {
             output.writeLine()
-            output.writeLine("\(error.label) could not be parsed because: ")
+            output.writeLine("\(error.label) could not be parsed because:")
             output.indent.level += 1
             ErrorMessageWriter.write(position: error.position, errors: error.errors, to: &output)
             output.indent.level -= 1
@@ -154,7 +154,7 @@ internal struct ErrorMessageWriter {
     private func writeNestedErrors<Target: ErrorOutputStream>(to output: inout Target) {
         for error in errorGroup.nestedErrors {
             output.writeLine()
-            output.writeLine("The parser backtracked after: ")
+            output.writeLine("The parser backtracked after:")
             output.indent.level += 1
             ErrorMessageWriter.write(position: error.position, errors: error.errors, to: &output)
             output.indent.level -= 1

@@ -22,10 +22,12 @@ class ErrorMessageWriterTests: XCTestCase {
         let str = "Banana"
         position = TextPosition(string: str, index: str.startIndex)
         outputBuffer = ErrorOutputBuffer()
-        positionString = ""
-            + "Error in 1:1\n"
-            + "Banana\n"
-            + "^\n"
+        positionString = """
+        Error in 1:1
+        Banana
+        ^
+        
+        """
         
         expectedErrors = [
             ParseError.Expected("apple"),
@@ -121,44 +123,52 @@ class ErrorMessageWriterTests: XCTestCase {
     func test_otherMessages_whenNotGivenExpectedErrors() {
         let errors: [Error] = genericErrors as [Error] + unknownErrors
         ErrorMessageWriter.write(position: position, errors: errors, to: &outputBuffer)
-        XCTAssertEqual(outputBuffer.text, ""
-            + "\(positionString)banana is yellow\n"
-            + "melon is green\n"
-            + "\(unknownErrors[0])\n")
+        XCTAssertEqual(outputBuffer.text, """
+            \(positionString)banana is yellow
+            melon is green
+            \(unknownErrors[0])
+            
+            """)
     }
     
     func test_otherMessages_whenGivenExpectedErrors() {
         let errors: [Error] = genericErrors as [Error] + unknownErrors + expectedErrors
         ErrorMessageWriter.write(position: position, errors: errors, to: &outputBuffer)
-        XCTAssertEqual(outputBuffer.text, ""
-            + "\(positionString)Expecting: apple or strawberry\n"
-            + "Other error messages: \n"
-            + "  banana is yellow\n"
-            + "  melon is green\n"
-            + "  \(unknownErrors[0])\n")
+        XCTAssertEqual(outputBuffer.text, """
+            \(positionString)Expecting: apple or strawberry
+            Other error messages:
+              banana is yellow
+              melon is green
+              \(unknownErrors[0])
+            
+            """)
     }
     
     func test_nestedErrors() {
         ErrorMessageWriter.write(position: position, errors: nestedErrors, to: &outputBuffer)
-        XCTAssertEqual(outputBuffer.text, ""
-            + "\(positionString)\n"
-            + "The parser backtracked after: \n"
-            + "  Error in 1:2\n"
-            + "  Banana\n"
-            + "   ^\n"
-            + "  Expecting: apple\n")
+        XCTAssertEqual(outputBuffer.text, """
+            \(positionString)
+            The parser backtracked after:
+              Error in 1:2
+              Banana
+               ^
+              Expecting: apple
+            
+            """)
     }
     
     func test_compoundErrors() {
         ErrorMessageWriter.write(position: position, errors: compoundErrors, to: &outputBuffer)
-        XCTAssertEqual(outputBuffer.text, ""
-            + "\(positionString)Expecting: Red fruit\n"
-            + "\n"
-            + "Red fruit could not be parsed because: \n"
-            + "  Error in 1:2\n"
-            + "  Banana\n"
-            + "   ^\n"
-            + "  Expecting: apple or strawberry\n")
+        XCTAssertEqual(outputBuffer.text, """
+            \(positionString)Expecting: Red fruit
+            
+            Red fruit could not be parsed because:
+              Error in 1:2
+              Banana
+               ^
+              Expecting: apple or strawberry
+            
+            """)
     }
     
     func test_mixedErrors() {
@@ -166,61 +176,69 @@ class ErrorMessageWriterTests: XCTestCase {
             + genericErrors as [Error] + nestedErrors as [Error] + compoundErrors as [Error]
             + unknownErrors
         ErrorMessageWriter.write(position: position, errors: errors, to: &outputBuffer)
-        XCTAssertEqual(outputBuffer.text, ""
-            + "\(positionString)Expecting: apple, strawberry or Red fruit\n"
-            + "Unexpected: banana and melon\n"
-            + "Other error messages: \n"
-            + "  banana is yellow\n"
-            + "  melon is green\n"
-            + "  \(unknownErrors[0])\n"
-            + "\n"
-            + "Red fruit could not be parsed because: \n"
-            + "  Error in 1:2\n"
-            + "  Banana\n"
-            + "   ^\n"
-            + "  Expecting: apple or strawberry\n"
-            + "\n"
-            + "The parser backtracked after: \n"
-            + "  Error in 1:2\n"
-            + "  Banana\n"
-            + "   ^\n"
-            + "  Expecting: apple\n")
+        XCTAssertEqual(outputBuffer.text, """
+            \(positionString)Expecting: apple, strawberry or Red fruit
+            Unexpected: banana and melon
+            Other error messages:
+              banana is yellow
+              melon is green
+              \(unknownErrors[0])
+            
+            Red fruit could not be parsed because:
+              Error in 1:2
+              Banana
+               ^
+              Expecting: apple or strawberry
+            
+            The parser backtracked after:
+              Error in 1:2
+              Banana
+               ^
+              Expecting: apple
+            
+            """)
     }
     
     func test_positionStringNote_whenEndOfInput() {
         let str = "apple"
         let position = TextPosition(string: str, index: str.endIndex)
         ErrorMessageWriter.write(position: position, errors: [], to: &outputBuffer)
-        XCTAssertEqual(outputBuffer.text, ""
-            + "Error in 1:6\n"
-            + "apple\n"
-            + "     ^\n"
-            + "Note: The error occurred at the end of the input stream.\n"
-            + "Unknown Error(s)\n")
+        XCTAssertEqual(outputBuffer.text, """
+            Error in 1:6
+            apple
+                 ^
+            Note: The error occurred at the end of the input stream.
+            Unknown Error(s)
+            
+            """)
     }
     
     func test_positionStringNote_whenEmptyLine() {
         let str = "\napple"
         let position = TextPosition(string: str, index: str.startIndex)
         ErrorMessageWriter.write(position: position, errors: [], to: &outputBuffer)
-        XCTAssertEqual(outputBuffer.text, ""
-            + "Error in 1:1\n"
-            + "\n"
-            + "^\n"
-            + "Note: The error occurred on an empty line.\n"
-            + "Unknown Error(s)\n")
+        XCTAssertEqual(outputBuffer.text, """
+            Error in 1:1
+            
+            ^
+            Note: The error occurred on an empty line.
+            Unknown Error(s)
+            
+            """)
     }
     
     func test_positionStringNote_whenEndOfLine() {
         let str = "apple\npen"
         let position = TextPosition(string: str, index: str.index(str.startIndex, offsetBy: 5))
         ErrorMessageWriter.write(position: position, errors: [], to: &outputBuffer)
-        XCTAssertEqual(outputBuffer.text, ""
-            + "Error in 1:6\n"
-            + "apple\n"
-            + "     ^\n"
-            + "Note: The error occurred at the end of the line.\n"
-            + "Unknown Error(s)\n")
+        XCTAssertEqual(outputBuffer.text, """
+            Error in 1:6
+            apple
+                 ^
+            Note: The error occurred at the end of the line.
+            Unknown Error(s)
+            
+            """)
     }
 }
 
