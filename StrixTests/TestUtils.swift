@@ -22,6 +22,10 @@ func shouldNotEnterHere(
     XCTFail("should not enter here - \(message())", file: file, line: line)
 }
 
+func makeEmptyStream() -> CharacterStream {
+    return CharacterStream(string: "")
+}
+
 func checkSuccess(
     _ reply: Reply<Void>, _ message: @autoclosure () -> String = "",
     file: StaticString = #file, line: UInt = #line) {

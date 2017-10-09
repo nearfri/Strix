@@ -5,11 +5,11 @@ import XCTest
 private let dummyErrors: [DummyError] = [DummyError.err0]
 
 class PrimitivesChainTests: XCTestCase {
-    var defaultStream: CharacterStream = CharacterStream(string: "")
+    var defaultStream: CharacterStream = makeEmptyStream()
     
     override func setUp() {
         super.setUp()
-        defaultStream = CharacterStream(string: "")
+        defaultStream = makeEmptyStream()
     }
     
     override func tearDown() {

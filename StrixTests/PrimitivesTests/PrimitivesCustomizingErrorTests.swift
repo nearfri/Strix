@@ -3,13 +3,13 @@ import XCTest
 @testable import Strix
 
 class PrimitivesCustomizingErrorTests: XCTestCase {
-    var defaultStream: CharacterStream = CharacterStream(string: "")
+    var defaultStream: CharacterStream = makeEmptyStream()
     var startStateTag: Int = 0
     let errLabel: String = "Int literal"
     
     override func setUp() {
         super.setUp()
-        defaultStream = CharacterStream(string: "")
+        defaultStream = makeEmptyStream()
         startStateTag = defaultStream.stateTag
     }
     
