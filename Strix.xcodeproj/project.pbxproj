@@ -102,6 +102,18 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		753F08ED1F8B144100A3D6A9 /* PrimitivesTests */ = {
+			isa = PBXGroup;
+			children = (
+				75526B201ED044C700EAA5B4 /* PrimitivesPureTests.swift */,
+				75B4C08E1ED44ADC00C93C1B /* PrimitivesChainTests.swift */,
+				75B4C0901ED4562C00C93C1B /* PrimitivesAlternativeTests.swift */,
+				75CB0CB51EE3D996002FD24F /* PrimitivesLookAheadTests.swift */,
+				75CB0CB71EE3EFA3002FD24F /* PrimitivesCustomizingErrorTests.swift */,
+			);
+			path = PrimitivesTests;
+			sourceTree = "<group>";
+		};
 		7556A28E1E7AE4B70094EF39 = {
 			isa = PBXGroup;
 			children = (
@@ -152,11 +164,7 @@
 				753AA3201ECC94C40015EC11 /* ErrorMessageWriterTests.swift */,
 				7551CBE91EC4908A001911B0 /* ParseResultTests.swift */,
 				75526B1C1ECFE68700EAA5B4 /* ParserTests.swift */,
-				75526B201ED044C700EAA5B4 /* PrimitivesPureTests.swift */,
-				75B4C08E1ED44ADC00C93C1B /* PrimitivesChainTests.swift */,
-				75B4C0901ED4562C00C93C1B /* PrimitivesAlternativeTests.swift */,
-				75CB0CB51EE3D996002FD24F /* PrimitivesLookAheadTests.swift */,
-				75CB0CB71EE3EFA3002FD24F /* PrimitivesCustomizingErrorTests.swift */,
+				753F08ED1F8B144100A3D6A9 /* PrimitivesTests */,
 				75AC08891F10C4F100E5FCA2 /* SequencesTests.swift */,
 				7556A2A81E7AE4B70094EF39 /* Info.plist */,
 			);
