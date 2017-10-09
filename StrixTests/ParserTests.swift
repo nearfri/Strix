@@ -3,15 +3,18 @@ import XCTest
 @testable import Strix
 
 class ParserTests: XCTestCase {
+    var defaultStream: CharacterStream = CharacterStream(string: "")
+    
     override func setUp() {
         super.setUp()
+        defaultStream = CharacterStream(string: "")
     }
     
     override func tearDown() {
         super.tearDown()
     }
     
-    func test_flatMap_success() {
+    func test_flatMap_whenNotChangeStateTag_prependingErrors() {
         let numberString = Parser { (stream) -> Reply<String> in
             return .success("1", [DummyError.err0])
         }
@@ -21,9 +24,7 @@ class ParserTests: XCTestCase {
             }
         }
         let p = numberString.flatMap(toInt)
-        let stream = CharacterStream(string: "")
-        let reply = p.parse(stream)
-        XCTAssertEqual(reply.value, 1)
+        checkSuccess(p.parse(defaultStream), 1, [DummyError.err0, DummyError.err1])
     }
     
     func test_flatMap_whenChangesStateTag_notPrependingErrors() {
@@ -37,24 +38,7 @@ class ParserTests: XCTestCase {
             }
         }
         let p = numberString.flatMap(toInt)
-        let stream = CharacterStream(string: "")
-        let reply = p.parse(stream)
-        XCTAssertEqual(reply.errors as! [DummyError], [DummyError.err1])
-    }
-    
-    func test_flatMap_whenNotChangeStateTag_prependingErrors() {
-        let numberString = Parser { (stream) -> Reply<String> in
-            return .success("1", [DummyError.err0])
-        }
-        let toInt = { (str: String) -> Parser<Int> in
-            return Parser { (stream) -> Reply<Int> in
-                return .success(Int(str)!, [DummyError.err1])
-            }
-        }
-        let p = numberString.flatMap(toInt)
-        let stream = CharacterStream(string: "")
-        let reply = p.parse(stream)
-        XCTAssertEqual(reply.errors as! [DummyError], [DummyError.err0, DummyError.err1])
+        checkSuccess(p.parse(defaultStream), 1, [DummyError.err1])
     }
     
     func test_flatMap_failure() {
@@ -63,18 +47,12 @@ class ParserTests: XCTestCase {
         }
         let toInt = { (str: String) -> Parser<Int> in
             return Parser { (stream) -> Reply<Int> in
-                XCTFail()
+                shouldNotEnterHere()
                 return .success(Int(str)!, [DummyError.err1])
             }
         }
         let p = alwaysFail.flatMap(toInt)
-        let stream = CharacterStream(string: "")
-        let reply = p.parse(stream)
-        if case let .failure(errors) = reply {
-            XCTAssertEqual(errors as! [DummyError], [DummyError.err0])
-        } else {
-            XCTFail()
-        }
+        checkFailure(p.parse(defaultStream), [DummyError.err0])
     }
     
     func test_flatMap_fatalFailure() {
@@ -83,18 +61,12 @@ class ParserTests: XCTestCase {
         }
         let toInt = { (str: String) -> Parser<Int> in
             return Parser { (stream) -> Reply<Int> in
-                XCTFail()
+                shouldNotEnterHere()
                 return .success(Int(str)!, [DummyError.err1])
             }
         }
         let p = alwaysFail.flatMap(toInt)
-        let stream = CharacterStream(string: "")
-        let reply = p.parse(stream)
-        if case let .fatalFailure(errors) = reply {
-            XCTAssertEqual(errors as! [DummyError], [DummyError.err0])
-        } else {
-            XCTFail()
-        }
+        checkFatalFailure(p.parse(defaultStream), [DummyError.err0])
     }
     
     func test_map_success() {
@@ -105,9 +77,7 @@ class ParserTests: XCTestCase {
             return Int(str)!
         }
         let p = numberString.map(toInt)
-        let stream = CharacterStream(string: "")
-        let reply = p.parse(stream)
-        XCTAssertEqual(reply.value, 1)
+        checkSuccess(p.parse(defaultStream), 1, [DummyError.err0])
     }
     
     func test_map_failure() {
@@ -115,63 +85,34 @@ class ParserTests: XCTestCase {
             return .failure([DummyError.err0])
         }
         let toInt = { (str: String) -> Int in
-            XCTFail()
+            shouldNotEnterHere()
             return Int(str)!
         }
         let p = alwaysFail.map(toInt)
-        let stream = CharacterStream(string: "")
-        let reply = p.parse(stream)
-        if case let .failure(errors) = reply {
-            XCTAssertEqual(errors as! [DummyError], [DummyError.err0])
-        } else {
-            XCTFail()
-        }
+        checkFailure(p.parse(defaultStream), [DummyError.err0])
     }
     
     func test_run_whenSuccess_returnSuccess() {
         let parser = Parser { (_) -> Reply<Int> in
             return .success(7, [])
         }
-        let result = parser.run("")
-        if case .success(let v) = result {
-            XCTAssertEqual(v, 7)
-        } else {
-            XCTFail()
-        }
+        checkSuccess(parser.run(""), 7)
     }
     
     func test_run_whenFailure_returnFailure() {
-        let underlyingErrors: [DummyError] = [
-            DummyError.err0
-        ]
-        
+        let underlyingErrors = [DummyError.err0]
         let parser = Parser { (_) -> Reply<Int> in
             return .failure(underlyingErrors)
         }
-        
-        let result = parser.run("")
-        if case .failure(let e) = result {
-            XCTAssertEqual(e.underlyingErrors as! [DummyError], underlyingErrors)
-        } else {
-            XCTFail()
-        }
+        checkFailure(parser.run(""), underlyingErrors)
     }
     
-    func test_run_whenFailure_returnFatalFailure() {
-        let underlyingErrors: [DummyError] = [
-            DummyError.err0
-        ]
-        
+    func test_run_whenFatalFailure_returnFailure() {
+        let underlyingErrors = [DummyError.err0]
         let parser = Parser { (_) -> Reply<Int> in
             return .fatalFailure(underlyingErrors)
         }
-        
-        let result = parser.run("")
-        if case .failure(let e) = result {
-            XCTAssertEqual(e.underlyingErrors as! [DummyError], underlyingErrors)
-        } else {
-            XCTFail()
-        }
+        checkFailure(parser.run(""), underlyingErrors)
     }
 }
 

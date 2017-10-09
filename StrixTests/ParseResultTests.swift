@@ -50,10 +50,13 @@ class ParseResultTests: XCTestCase {
         let underlyingErrors = [ParseError.Expected("alphabet")]
         let err = ParseResult<Void>.Error(position: pos, underlyingErrors: underlyingErrors)
         let sut = ParseResult<Void>.failure(err)
-        let expectedDescription = "Failure: Error in 1:\(offset+1)\n"
-            + "\(str)\n"
-            + "     ^\n"
-            + "Expecting: alphabet\n"
+        let expectedDescription = """
+        Failure: Error in 1:\(offset+1)
+        \(str)
+             ^
+        Expecting: alphabet
+        
+        """
         XCTAssertEqual(sut.description, expectedDescription)
     }
 }

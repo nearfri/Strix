@@ -131,7 +131,7 @@ class CharacterStreamTests: XCTestCase {
         
         stream.seek(to: stream.endIndex)
         XCTAssertFalse(stream.matches({ _ in
-            XCTFail("should not be called")
+            shouldNotEnterHere()
             return true
         }))
     }
@@ -248,7 +248,7 @@ class CharacterStreamTests: XCTestCase {
             let matchedStr = (string as NSString).substring(with: checkingResult.range) as String
             XCTAssertEqual(matchedStr, "arSwift")
         } else {
-            XCTFail()
+            shouldNotEnterHere()
         }
     }
     

@@ -116,7 +116,7 @@ class ParseErrorGroupTests: XCTestCase {
         XCTAssertEqual(sut.userDefinedErrors.count, userDefinedErrors.count)
         guard let lErr = sut.userDefinedErrors.first as? DummyError,
             let rErr = userDefinedErrors.first as? DummyError else {
-                XCTFail()
+                shouldNotEnterHere()
                 return
         }
         XCTAssertEqual(lErr, rErr)

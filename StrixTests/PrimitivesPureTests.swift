@@ -3,8 +3,11 @@ import XCTest
 @testable import Strix
 
 class PrimitivesPureTests: XCTestCase {
+    var defaultStream: CharacterStream = CharacterStream(string: "")
+    
     override func setUp() {
         super.setUp()
+        defaultStream = CharacterStream(string: "")
     }
     
     override func tearDown() {
@@ -12,37 +15,18 @@ class PrimitivesPureTests: XCTestCase {
     }
     
     func test_pure_reply_success() {
-        let stream = CharacterStream(string: "")
-        
         let p = pure(.success(1, []))
-        if case let .success(v, e) = p.parse(stream) {
-            XCTAssertEqual(v, 1)
-            XCTAssertTrue(e.isEmpty)
-        } else {
-            XCTFail()
-        }
+        checkSuccess(p.parse(defaultStream), 1)
     }
     
     func test_pure_reply_failure() {
-        let stream = CharacterStream(string: "")
-        
         let p: Parser<Void> = pure(.failure([DummyError.err0]))
-        if case let .failure(e) = p.parse(stream) {
-            XCTAssertEqual(e as! [DummyError], [DummyError.err0])
-        } else {
-            XCTFail()
-        }
+        checkFailure(p.parse(defaultStream), [DummyError.err0])
     }
     
     func test_pure_value() {
-        let stream = CharacterStream(string: "")
-        let parser = pure(1)
-        if case let .success(v, e) = parser.parse(stream) {
-            XCTAssertEqual(v, 1)
-            XCTAssertTrue(e.isEmpty)
-        } else {
-            XCTFail()
-        }
+        let p = pure(1)
+        checkSuccess(p.parse(defaultStream), 1)
     }
 }
 
