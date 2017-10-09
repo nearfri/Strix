@@ -22,6 +22,29 @@ func shouldNotEnterHere(
     XCTFail("should not enter here - \(message())", file: file, line: line)
 }
 
+func checkSuccess(
+    _ reply: Reply<Void>, _ message: @autoclosure () -> String = "",
+    file: StaticString = #file, line: UInt = #line) {
+    
+    if case let .success(_, e) = reply {
+        XCTAssertTrue(e.isEmpty, messageForNotEmptyError(e, message), file: file, line: line)
+    } else {
+        fail(expected: .success, actual: reply, message: message, file: file, line: line)
+    }
+}
+
+func checkSuccess<E: Error & Equatable>(
+    _ reply: Reply<Void>, _ errors: [E],
+    _ message: @autoclosure () -> String = "",
+    file: StaticString = #file, line: UInt = #line) {
+    
+    if case let .success(_, e) = reply {
+        XCTAssertEqual(e as! [E], errors, message, file: file, line: line)
+    } else {
+        fail(expected: .success, actual: reply, message: message, file: file, line: line)
+    }
+}
+
 func checkSuccess<T: Equatable>(
     _ reply: Reply<T>, _ value: T,
     _ message: @autoclosure () -> String = "",
@@ -29,11 +52,9 @@ func checkSuccess<T: Equatable>(
     
     if case let .success(v, e) = reply {
         XCTAssertEqual(v, value, message, file: file, line: line)
-        XCTAssertTrue(e.isEmpty, "expected empty error but was \(e) - \(message())",
-            file: file, line: line)
+        XCTAssertTrue(e.isEmpty, messageForNotEmptyError(e, message), file: file, line: line)
     } else {
-        XCTFail("expected 'success' but was '\(label(of: reply))' - \(message())",
-            file: file, line: line)
+        fail(expected: .success, actual: reply, message: message, file: file, line: line)
     }
 }
 
@@ -44,24 +65,9 @@ func checkSuccess<T: Equatable>(
     
     if case let .success(v, e) = reply {
         XCTAssertEqual(v, value, message, file: file, line: line)
-        XCTAssertTrue(e.isEmpty, "expected empty error but was \(e) - \(message())",
-            file: file, line: line)
+        XCTAssertTrue(e.isEmpty, messageForNotEmptyError(e, message), file: file, line: line)
     } else {
-        XCTFail("expected 'success' but was '\(label(of: reply))' - \(message())",
-            file: file, line: line)
-    }
-}
-
-func checkSuccess(
-    _ reply: Reply<Void>, _ message: @autoclosure () -> String = "",
-    file: StaticString = #file, line: UInt = #line) {
-    
-    if case let .success(_, e) = reply {
-        XCTAssertTrue(e.isEmpty, "expected empty error but was \(e) - \(message())",
-            file: file, line: line)
-    } else {
-        XCTFail("expected 'success' but was '\(label(of: reply))' - \(message())",
-            file: file, line: line)
+        fail(expected: .success, actual: reply, message: message, file: file, line: line)
     }
 }
 
@@ -74,8 +80,7 @@ func checkSuccess<T: Equatable, E: Error & Equatable>(
         XCTAssertEqual(v, value, message, file: file, line: line)
         XCTAssertEqual(e as! [E], errors, message, file: file, line: line)
     } else {
-        XCTFail("expected 'success' but was '\(label(of: reply))' - \(message())",
-            file: file, line: line)
+        fail(expected: .success, actual: reply, message: message, file: file, line: line)
     }
 }
 
@@ -88,21 +93,20 @@ func checkSuccess<T: Equatable, E: Error & Equatable>(
         XCTAssertEqual(v, value, message, file: file, line: line)
         XCTAssertEqual(e as! [E], errors, message, file: file, line: line)
     } else {
-        XCTFail("expected 'success' but was '\(label(of: reply))' - \(message())",
-            file: file, line: line)
+        fail(expected: .success, actual: reply, message: message, file: file, line: line)
     }
 }
 
-func checkSuccess<E: Error & Equatable>(
-    _ reply: Reply<Void>, _ errors: [E],
+func checkSuccess<T: Equatable, E: Error & Equatable> (
+    _ reply: Reply<[T]>, _ value: [T], _ errors: [E],
     _ message: @autoclosure () -> String = "",
     file: StaticString = #file, line: UInt = #line) {
     
-    if case let .success(_, e) = reply {
+    if case let .success(v, e) = reply {
+        XCTAssertEqual(v, value, message, file: file, line: line)
         XCTAssertEqual(e as! [E], errors, message, file: file, line: line)
     } else {
-        XCTFail("expected 'success' but was '\(label(of: reply))' - \(message())",
-            file: file, line: line)
+        fail(expected: .success, actual: reply, message: message, file: file, line: line)
     }
 }
 
@@ -114,8 +118,7 @@ func checkFailure<T, E: Error & Equatable>(
     if case let .failure(e) = reply {
         XCTAssertEqual(e as! [E], errors, message, file: file, line: line)
     } else {
-        XCTFail("expected 'failure' but was '\(label(of: reply))' - \(message())",
-            file: file, line: line)
+        fail(expected: .failure, actual: reply, message: message, file: file, line: line)
     }
 }
 
@@ -127,8 +130,7 @@ func checkFatalFailure<T, E: Error & Equatable>(
     if case let .fatalFailure(e) = reply {
         XCTAssertEqual(e as! [E], errors, message, file: file, line: line)
     } else {
-        XCTFail("expected 'fatalFailure' but was '\(label(of: reply))' - \(message())",
-            file: file, line: line)
+        fail(expected: .fatalFailure, actual: reply, message: message, file: file, line: line)
     }
 }
 
@@ -140,8 +142,7 @@ func checkSuccess<T: Equatable>(
     if case let .success(v) = parseResult {
         XCTAssertEqual(v, value, message, file: file, line: line)
     } else {
-        XCTFail("expected 'success' but was '\(label(of: parseResult))' - \(message())",
-            file: file, line: line)
+        fail(expected: .success, actual: parseResult, message: message, file: file, line: line)
     }
 }
 
@@ -154,9 +155,36 @@ func checkFailure<T, E: Error & Equatable>(
         XCTAssertEqual(e.underlyingErrors as! [E], underlyingErrors, message,
                        file: file, line: line)
     } else {
-        XCTFail("expected 'failure' but was '\(label(of: parseResult))' - \(message())",
-            file: file, line: line)
+        fail(expected: .failure, actual: parseResult, message: message, file: file, line: line)
     }
+}
+
+private func messageForNotEmptyError(
+    _ errors: [Error], _ message: @autoclosure () -> String) -> String {
+    
+    return "expected empty error but was \(errors) - \(message())"
+}
+
+private func fail<T>(
+    expected: ReplyType, actual: Reply<T>,
+    message: @autoclosure () -> String,
+    file: StaticString, line: UInt) {
+    
+    XCTFail("expected '\(expected)' but was '\(label(of: actual))' - \(message())",
+        file: file, line: line)
+}
+
+private func fail<T>(
+    expected: ReplyType, actual: ParseResult<T>,
+    message: @autoclosure () -> String,
+    file: StaticString, line: UInt) {
+    
+    XCTFail("expected '\(expected)' but was '\(label(of: actual))' - \(message())",
+        file: file, line: line)
+}
+
+private enum ReplyType: String {
+    case success, failure, fatalFailure
 }
 
 private func label<T>(of reply: Reply<T>) -> String {
