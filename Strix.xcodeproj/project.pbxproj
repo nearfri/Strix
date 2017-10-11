@@ -26,6 +26,7 @@
 		7556A2A21E7AE4B70094EF39 /* Strix.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7556A2981E7AE4B70094EF39 /* Strix.framework */; };
 		7556A2D71E7AE6A00094EF39 /* CharacterStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7556A2D61E7AE6A00094EF39 /* CharacterStream.swift */; };
 		7556A2D91E7AE7030094EF39 /* CharacterStreamTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7556A2D81E7AE7030094EF39 /* CharacterStreamTests.swift */; };
+		7576BE6F1F8E124E008DC09C /* Package.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7576BE6E1F8E1249008DC09C /* Package.swift */; };
 		75AC08881F10C48A00E5FCA2 /* Sequences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75AC08871F10C48A00E5FCA2 /* Sequences.swift */; };
 		75B4C08F1ED44ADC00C93C1B /* PrimitivesChainTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75B4C08E1ED44ADC00C93C1B /* PrimitivesChainTests.swift */; };
 		75B4C0911ED4562C00C93C1B /* PrimitivesAlternativeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75B4C0901ED4562C00C93C1B /* PrimitivesAlternativeTests.swift */; };
@@ -71,6 +72,7 @@
 		7556A2A11E7AE4B70094EF39 /* StrixTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = StrixTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		7556A2D61E7AE6A00094EF39 /* CharacterStream.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CharacterStream.swift; sourceTree = "<group>"; };
 		7556A2D81E7AE7030094EF39 /* CharacterStreamTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CharacterStreamTests.swift; sourceTree = "<group>"; };
+		7576BE6E1F8E1249008DC09C /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
 		75AC08871F10C48A00E5FCA2 /* Sequences.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sequences.swift; sourceTree = "<group>"; };
 		75B4C08E1ED44ADC00C93C1B /* PrimitivesChainTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrimitivesChainTests.swift; sourceTree = "<group>"; };
 		75B4C0901ED4562C00C93C1B /* PrimitivesAlternativeTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrimitivesAlternativeTests.swift; sourceTree = "<group>"; };
@@ -130,6 +132,7 @@
 		7556A28E1E7AE4B70094EF39 = {
 			isa = PBXGroup;
 			children = (
+				7576BE6E1F8E1249008DC09C /* Package.swift */,
 				7576BE211F8E04C6008DC09C /* Sources */,
 				7576BE231F8E04FC008DC09C /* Tests */,
 				7556A2991E7AE4B70094EF39 /* Products */,
@@ -247,6 +250,20 @@
 			productReference = 7556A2A11E7AE4B70094EF39 /* StrixTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		7576BE651F8E10A5008DC09C /* StrixPackageDescription */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7576BE6D1F8E10A5008DC09C /* Build configuration list for PBXNativeTarget "StrixPackageDescription" */;
+			buildPhases = (
+				7576BE611F8E10A5008DC09C /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = StrixPackageDescription;
+			productName = StrixPackageDescription;
+			productType = "com.apple.product-type.framework";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -267,6 +284,10 @@
 						LastSwiftMigration = 0900;
 						ProvisioningStyle = Automatic;
 					};
+					7576BE651F8E10A5008DC09C = {
+						CreatedOnToolsVersion = 9.0;
+						LastSwiftMigration = 0900;
+					};
 				};
 			};
 			buildConfigurationList = 7556A2921E7AE4B70094EF39 /* Build configuration list for PBXProject "Strix" */;
@@ -283,6 +304,7 @@
 			targets = (
 				7556A2971E7AE4B70094EF39 /* Strix */,
 				7556A2A01E7AE4B70094EF39 /* StrixTests */,
+				7576BE651F8E10A5008DC09C /* StrixPackageDescription */,
 			);
 		};
 /* End PBXProject section */
@@ -346,6 +368,14 @@
 				753F08F11F8B598900A3D6A9 /* SequencesArrayTests.swift in Sources */,
 				753AA3211ECC94C40015EC11 /* ErrorMessageWriterTests.swift in Sources */,
 				75526B1D1ECFE68700EAA5B4 /* ParserTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7576BE611F8E10A5008DC09C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7576BE6F1F8E124E008DC09C /* Package.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -547,6 +577,30 @@
 			};
 			name = Release;
 		};
+		7576BE6B1F8E10A5008DC09C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				LD = /usr/bin/true;
+				OTHER_SWIFT_FLAGS = "-swift-version 4 -I /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/pm/4";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = macosx;
+				SWIFT_VERSION = 4.0;
+			};
+			name = Debug;
+		};
+		7576BE6C1F8E10A5008DC09C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				LD = /usr/bin/true;
+				OTHER_SWIFT_FLAGS = "-swift-version 4 -I /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/pm/4";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = macosx;
+				SWIFT_VERSION = 4.0;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -573,6 +627,15 @@
 			buildConfigurations = (
 				7556A2B01E7AE4B70094EF39 /* Debug */,
 				7556A2B11E7AE4B70094EF39 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		7576BE6D1F8E10A5008DC09C /* Build configuration list for PBXNativeTarget "StrixPackageDescription" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7576BE6B1F8E10A5008DC09C /* Debug */,
+				7576BE6C1F8E10A5008DC09C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
