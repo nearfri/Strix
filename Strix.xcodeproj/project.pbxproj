@@ -71,8 +71,6 @@
 		7556A2A11E7AE4B70094EF39 /* StrixTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = StrixTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		7556A2D61E7AE6A00094EF39 /* CharacterStream.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CharacterStream.swift; sourceTree = "<group>"; };
 		7556A2D81E7AE7030094EF39 /* CharacterStreamTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CharacterStreamTests.swift; sourceTree = "<group>"; };
-		7556A35B1E7AEB8B0094EF39 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = SOURCE_ROOT; };
-		7556A3621E7D80640094EF39 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = SOURCE_ROOT; };
 		75AC08871F10C48A00E5FCA2 /* Sequences.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sequences.swift; sourceTree = "<group>"; };
 		75B4C08E1ED44ADC00C93C1B /* PrimitivesChainTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrimitivesChainTests.swift; sourceTree = "<group>"; };
 		75B4C0901ED4562C00C93C1B /* PrimitivesAlternativeTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrimitivesAlternativeTests.swift; sourceTree = "<group>"; };
@@ -132,8 +130,8 @@
 		7556A28E1E7AE4B70094EF39 = {
 			isa = PBXGroup;
 			children = (
-				7556A29A1E7AE4B70094EF39 /* Strix */,
-				7556A2A51E7AE4B70094EF39 /* StrixTests */,
+				7576BE211F8E04C6008DC09C /* Sources */,
+				7576BE231F8E04FC008DC09C /* Tests */,
 				7556A2991E7AE4B70094EF39 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -161,7 +159,6 @@
 				751BD7411ECF02B600B4175D /* Parser.swift */,
 				75526B1E1ED044B500EAA5B4 /* Primitives.swift */,
 				75AC08871F10C48A00E5FCA2 /* Sequences.swift */,
-				7556A3561E7AEA710094EF39 /* Supporting Files */,
 			);
 			path = Strix;
 			sourceTree = "<group>";
@@ -185,13 +182,20 @@
 			path = StrixTests;
 			sourceTree = "<group>";
 		};
-		7556A3561E7AEA710094EF39 /* Supporting Files */ = {
+		7576BE211F8E04C6008DC09C /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				7556A35B1E7AEB8B0094EF39 /* README.md */,
-				7556A3621E7D80640094EF39 /* LICENSE */,
+				7556A29A1E7AE4B70094EF39 /* Strix */,
 			);
-			name = "Supporting Files";
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		7576BE231F8E04FC008DC09C /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				7556A2A51E7AE4B70094EF39 /* StrixTests */,
+			);
+			path = Tests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
