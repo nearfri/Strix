@@ -108,7 +108,7 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		753F08ED1F8B144100A3D6A9 /* PrimitivesTests */ = {
+		753F08ED1F8B144100A3D6A9 /* Primitives */ = {
 			isa = PBXGroup;
 			children = (
 				75526B201ED044C700EAA5B4 /* PrimitivesPureTests.swift */,
@@ -117,10 +117,10 @@
 				75CB0CB51EE3D996002FD24F /* PrimitivesLookAheadTests.swift */,
 				75CB0CB71EE3EFA3002FD24F /* PrimitivesCustomizingErrorTests.swift */,
 			);
-			path = PrimitivesTests;
+			path = Primitives;
 			sourceTree = "<group>";
 		};
-		753F08F81F8B5CEC00A3D6A9 /* SequencesTests */ = {
+		753F08F81F8B5CEC00A3D6A9 /* Sequences */ = {
 			isa = PBXGroup;
 			children = (
 				753F08EE1F8B593700A3D6A9 /* SequencesTupleTests.swift */,
@@ -128,7 +128,7 @@
 				753F08F21F8B59D600A3D6A9 /* SequencesManyTests.swift */,
 				753F08F61F8B5A5000A3D6A9 /* SequencesManySeparatorTests.swift */,
 			);
-			path = SequencesTests;
+			path = Sequences;
 			sourceTree = "<group>";
 		};
 		7556A28E1E7AE4B70094EF39 = {
@@ -181,8 +181,8 @@
 				753AA3201ECC94C40015EC11 /* ErrorMessageWriterTests.swift */,
 				7551CBE91EC4908A001911B0 /* ParseResultTests.swift */,
 				75526B1C1ECFE68700EAA5B4 /* ParserTests.swift */,
-				753F08ED1F8B144100A3D6A9 /* PrimitivesTests */,
-				753F08F81F8B5CEC00A3D6A9 /* SequencesTests */,
+				753F08ED1F8B144100A3D6A9 /* Primitives */,
+				753F08F81F8B5CEC00A3D6A9 /* Sequences */,
 				7556A2A81E7AE4B70094EF39 /* Info.plist */,
 			);
 			path = StrixTests;
