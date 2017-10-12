@@ -19,7 +19,7 @@ class ParserTests: XCTestCase {
             return .success("1", [DummyError.err0])
         }
         let toInt = { (str: String) -> Parser<Int> in
-            return Parser { (stream) -> Reply<Int> in
+            return Parser { stream -> Reply<Int> in
                 return .success(Int(str)!, [DummyError.err1])
             }
         }
@@ -32,7 +32,7 @@ class ParserTests: XCTestCase {
             return .success("1", [DummyError.err0])
         }
         let toInt = { (str: String) -> Parser<Int> in
-            return Parser { (stream) -> Reply<Int> in
+            return Parser { stream -> Reply<Int> in
                 stream.stateTag += 1
                 return .success(Int(str)!, [DummyError.err1])
             }
@@ -46,7 +46,7 @@ class ParserTests: XCTestCase {
             return .failure([DummyError.err0])
         }
         let toInt = { (str: String) -> Parser<Int> in
-            return Parser { (stream) -> Reply<Int> in
+            return Parser { stream -> Reply<Int> in
                 shouldNotEnterHere()
                 return .success(Int(str)!, [DummyError.err1])
             }
@@ -60,7 +60,7 @@ class ParserTests: XCTestCase {
             return .fatalFailure([DummyError.err0])
         }
         let toInt = { (str: String) -> Parser<Int> in
-            return Parser { (stream) -> Reply<Int> in
+            return Parser { stream -> Reply<Int> in
                 shouldNotEnterHere()
                 return .success(Int(str)!, [DummyError.err1])
             }

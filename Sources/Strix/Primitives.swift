@@ -118,7 +118,7 @@ public func skipOptional<T>(_ p: Parser<T>) -> Parser<Void> {
 }
 
 public func attempt<T>(_ p: Parser<T>) -> Parser<T> {
-    return Parser { (stream) in
+    return Parser { stream in
         let state = stream.state
         let reply = p.parse(stream)
         if case .success = reply { return reply }
@@ -135,7 +135,7 @@ public func attempt<T>(_ p: Parser<T>) -> Parser<T> {
 // MARK: - Conditional parsing and looking ahead
 
 public func notEmpty<T>(_ p: Parser<T>) -> Parser<T> {
-    return Parser { (stream) in
+    return Parser { stream in
         let stateTag = stream.stateTag
         let reply = p.parse(stream)
         if case let .success(_, e) = reply, stateTag == stream.stateTag {
@@ -146,7 +146,7 @@ public func notEmpty<T>(_ p: Parser<T>) -> Parser<T> {
 }
 
 public func followed<T>(by p: Parser<T>, errorLabel: String? = nil) -> Parser<Void> {
-    return Parser { (stream) in
+    return Parser { stream in
         let state = stream.state
         let reply = p.parse(stream)
         if state.tag != stream.stateTag {
@@ -160,7 +160,7 @@ public func followed<T>(by p: Parser<T>, errorLabel: String? = nil) -> Parser<Vo
 }
 
 public func notFollowed<T>(by p: Parser<T>, errorLabel: String? = nil) -> Parser<Void> {
-    return Parser { (stream) in
+    return Parser { stream in
         let state = stream.state
         let reply = p.parse(stream)
         if state.tag != stream.stateTag {
@@ -174,7 +174,7 @@ public func notFollowed<T>(by p: Parser<T>, errorLabel: String? = nil) -> Parser
 }
 
 public func lookAhead<T>(_ p: Parser<T>) -> Parser<T> {
-    return Parser { (stream) in
+    return Parser { stream in
         let state = stream.state
         let reply = p.parse(stream)
         if case let .success(v, _) = reply {
@@ -195,7 +195,7 @@ public func lookAhead<T>(_ p: Parser<T>) -> Parser<T> {
 // MARK: - Customizing error messages
 
 public func <?> <T>(p: Parser<T>, errorLabel: String) -> Parser<T> {
-    return Parser { (stream) in
+    return Parser { stream in
         let stateTag = stream.stateTag
         var reply = p.parse(stream)
         if stateTag == stream.stateTag {
@@ -206,7 +206,7 @@ public func <?> <T>(p: Parser<T>, errorLabel: String) -> Parser<T> {
 }
 
 public func <??> <T>(p: Parser<T>, errorLabel: String) -> Parser<T> {
-    return Parser { (stream) in
+    return Parser { stream in
         let state = stream.state
         var reply = p.parse(stream)
         if case let .success(v, e) = reply {

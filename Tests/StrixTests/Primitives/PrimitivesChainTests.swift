@@ -21,7 +21,7 @@ class PrimitivesChainTests: XCTestCase {
             return .success("1", [])
         }
         let toInt = { (str: String) -> Parser<Int> in
-            return Parser { (_) -> Reply<Int> in
+            return Parser { _ -> Reply<Int> in
                 return .success(Int(str)!, [])
             }
         }
@@ -35,7 +35,7 @@ class PrimitivesChainTests: XCTestCase {
         }
         let toInt = { (str: String) -> Parser<Int> in
             shouldNotEnterHere()
-            return Parser { (_) -> Reply<Int> in
+            return Parser { _ -> Reply<Int> in
                 return .success(Int(str)!, [])
             }
         }

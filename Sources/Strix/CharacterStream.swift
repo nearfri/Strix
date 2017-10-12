@@ -91,19 +91,7 @@ extension CharacterStream {
         return string.compare(str, case: caseSensitivity, range: nextIndex..<end) == .orderedSame
     }
     
-    public func matches(_ regex: NSRegularExpression) -> NSTextCheckingResult? {
-        func utf16IntRange(in str: String, from: String.Index, to: String.Index) -> Range<Int> {
-            let utf16View = str.utf16
-            let start = utf16View.distance(from: str.startIndex, to: from)
-            let count = utf16View.distance(from: from, to: to)
-            return start..<(start+count)
-        }
-        
-        let range = NSRange(utf16IntRange(in: string, from: nextIndex, to: endIndex))
-        return regex.firstMatch(in: string, options: [], range: range)
-    }
-    
-    public func section(minLength: String.IndexDistance = 0, maxLength: String.IndexDistance = .max,
+    public func matches(minLength: String.IndexDistance = 0, maxLength: String.IndexDistance = .max,
                         while predicate: (Character) throws -> Bool) rethrows -> Section? {
         var length = 0
         var index = nextIndex
@@ -118,6 +106,18 @@ extension CharacterStream {
         }
         
         return (nextIndex..<index, length)
+    }
+    
+    public func matches(_ regex: NSRegularExpression) -> NSTextCheckingResult? {
+        func utf16IntRange(in str: String, from: String.Index, to: String.Index) -> Range<Int> {
+            let utf16View = str.utf16
+            let start = utf16View.distance(from: str.startIndex, to: from)
+            let count = utf16View.distance(from: from, to: to)
+            return start..<(start+count)
+        }
+        
+        let range = NSRange(utf16IntRange(in: string, from: nextIndex, to: endIndex))
+        return regex.firstMatch(in: string, options: [], range: range)
     }
 }
 
@@ -154,7 +154,7 @@ extension CharacterStream {
     @discardableResult
     public func skip(minLength: String.IndexDistance = 0, maxLength: String.IndexDistance = .max,
                      while predicate: (Character) throws -> Bool) rethrows -> Section? {
-        guard let result = try section(minLength: minLength, maxLength: maxLength, while: predicate)
+        guard let result = try matches(minLength: minLength, maxLength: maxLength, while: predicate)
             else { return nil }
         nextIndex = result.range.upperBound
         return result
@@ -169,17 +169,25 @@ extension CharacterStream {
         return result
     }
     
-    public func read(from index: String.Index) -> String {
+    public func readUpToNextIndex(from index: String.Index) -> Substring {
         precondition(index <= nextIndex, "index is more than nextIndex")
         precondition(index >= startIndex, "index is less than startIndex")
-        return String(string[index..<nextIndex])
+        return string[index..<nextIndex]
+    }
+    
+    public func read(_ str: String, case caseSensitivity: StringSensitivity) -> Substring? {
+        let start = nextIndex
+        if skip(str, case: caseSensitivity) {
+            return string[start..<nextIndex]
+        }
+        return nil
     }
     
     public func read(minLength: String.IndexDistance = 0, maxLength: String.IndexDistance = .max,
-                     while predicate: (Character) throws -> Bool) rethrows -> String? {
+                     while predicate: (Character) throws -> Bool) rethrows -> Substring? {
         guard let section = try skip(minLength: minLength, maxLength: maxLength, while: predicate)
             else { return nil }
-        return String(string[section.range])
+        return string[section.range]
     }
 }
 
