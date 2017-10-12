@@ -128,15 +128,15 @@ public func many<T, Handler: ValueHandling>(
     return Parser { stream in
         var handler = makeHandler()
         var errors: [Error] = []
-        var stateTag: Int
         
-        func parse(with p: Parser<T>, successIfGoodFailure: Bool) -> Reply<Handler.Result>? {
+        func parse(with p: Parser<T>, successIfNoChangeFailure: Bool) -> Reply<Handler.Result>? {
+            let stateTag: Int = stream.stateTag
             switch p.parse(stream) {
             case let .success(v, e):
                 handler.valueOccurred(v)
                 errors = e
                 return nil
-            case let .failure(e) where stateTag == stream.stateTag && successIfGoodFailure:
+            case let .failure(e) where stateTag == stream.stateTag && successIfNoChangeFailure:
                 return .success(handler.result, errors + e)
             case let .failure(e):
                 return .failure(e)
@@ -145,14 +145,13 @@ public func many<T, Handler: ValueHandling>(
             }
         }
         
-        stateTag = stream.stateTag
-        if let reply = parse(with: firstParser, successIfGoodFailure: !atLeastOne) {
+        if let reply = parse(with: firstParser, successIfNoChangeFailure: !atLeastOne) {
             return reply
         }
         
         while true {
-            stateTag = stream.stateTag
-            if let reply = parse(with: repeatedParser, successIfGoodFailure: true) {
+            let stateTag = stream.stateTag
+            if let reply = parse(with: repeatedParser, successIfNoChangeFailure: true) {
                 return reply
             }
             precondition(stateTag != stream.stateTag, infiniteLoopErrorMessage)
