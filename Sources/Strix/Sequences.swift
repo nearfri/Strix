@@ -128,16 +128,22 @@ public func many<T, Handler: ValueHandling>(
     return Parser { stream in
         var handler = makeHandler()
         var errors: [Error] = []
+        var valueCount = 0
+        let minValueCount = atLeastOne ? 1 : 0
         
-        func parse(with p: Parser<T>, successIfNoChangeFailure: Bool) -> Reply<Handler.Result>? {
+        func parse(with p: Parser<T>) -> Reply<Handler.Result>? {
             let stateTag: Int = stream.stateTag
             switch p.parse(stream) {
             case let .success(v, e):
                 handler.valueOccurred(v)
                 errors = e
+                valueCount += 1
                 return nil
-            case let .failure(e) where stateTag == stream.stateTag && successIfNoChangeFailure:
-                return .success(handler.result, errors + e)
+            case let .failure(e) where stateTag == stream.stateTag:
+                if valueCount >= minValueCount {
+                    return .success(handler.result, errors + e)
+                }
+                return .failure(errors + e)
             case let .failure(e):
                 return .failure(e)
             case let .fatalFailure(e):
@@ -145,13 +151,13 @@ public func many<T, Handler: ValueHandling>(
             }
         }
         
-        if let reply = parse(with: firstParser, successIfNoChangeFailure: !atLeastOne) {
+        if let reply = parse(with: firstParser) {
             return reply
         }
         
         while true {
             let stateTag = stream.stateTag
-            if let reply = parse(with: repeatedParser, successIfNoChangeFailure: true) {
+            if let reply = parse(with: repeatedParser) {
                 return reply
             }
             precondition(stateTag != stream.stateTag, infiniteLoopErrorMessage)
@@ -188,6 +194,7 @@ public func many<T1, T2, Handler: ValueHandling & SeparatorHandling>(
         var handler = makeHandler()
         var errors: [Error] = []
         var valueCount = 0
+        let minValueCount = atLeastOne ? 1 : 0
         
         while true {
             let stateTag = stream.stateTag
@@ -198,8 +205,7 @@ public func many<T1, T2, Handler: ValueHandling & SeparatorHandling>(
                 errors = e
                 valueCount += 1
             case let .failure(e) where stateTag == stream.stateTag:
-                let satisfiesAtLeastOne = !atLeastOne || valueCount > 0
-                if satisfiesAtLeastOne && (allowEndBySeparator || valueCount == 0) {
+                if valueCount >= minValueCount && (allowEndBySeparator || valueCount == 0) {
                     return .success(handler.result, errors + e)
                 }
                 return .failure(errors + e)
