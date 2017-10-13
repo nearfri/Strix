@@ -136,45 +136,54 @@ class CharacterStreamTests: XCTestCase {
         }))
     }
     
-    func test_sectionMinMaxPredicate() {
+    func test_matchesMinMaxPredicate() {
         let string = "Foo Bar"
         let stream = CharacterStream(string: string)
         
-        var ret = stream.matches(minLength: 0, maxLength: 100, while: { $0 != " " })
+        var ret = stream.matches(minCount: 0, maxCount: 100, while: { $0 != " " })
         XCTAssertEqual(ret?.range, string.startIndex..<string.index(string.startIndex, offsetBy: 3))
-        XCTAssertEqual(ret?.length, 3)
+        XCTAssertEqual(ret?.count, 3)
         
-        ret = stream.matches(minLength: 0, maxLength: 100, while: { _ in true })
+        ret = stream.matches(minCount: 0, maxCount: 100, while: { _ in true })
         XCTAssertEqual(ret?.range, string.startIndex..<string.endIndex)
-        XCTAssertEqual(ret?.length, 7)
+        XCTAssertEqual(ret?.count, 7)
         
-        ret = stream.matches(minLength: 0, maxLength: 3, while: { _ in true })
+        ret = stream.matches(minCount: 0, maxCount: 3, while: { _ in true })
         XCTAssertEqual(ret?.range, string.startIndex..<string.index(string.startIndex, offsetBy: 3))
-        XCTAssertEqual(ret?.length, 3)
+        XCTAssertEqual(ret?.count, 3)
         
-        ret = stream.matches(minLength: 0, maxLength: 100, while: { _ in false })
+        ret = stream.matches(minCount: 0, maxCount: 100, while: { _ in false })
         XCTAssertEqual(ret?.range, string.startIndex..<string.startIndex)
-        XCTAssertEqual(ret?.length, 0)
+        XCTAssertEqual(ret?.count, 0)
         
-        ret = stream.matches(minLength: 0, maxLength: 1, while: { $0 == "F" || $0 == "o" })
+        ret = stream.matches(minCount: 0, maxCount: 1, while: { $0 == "F" || $0 == "o" })
         XCTAssertEqual(ret?.range, string.startIndex..<string.index(string.startIndex, offsetBy: 1))
-        XCTAssertEqual(ret?.length, 1)
+        XCTAssertEqual(ret?.count, 1)
         
-        ret = stream.matches(minLength: 0, maxLength: 2, while: { $0 == "F" || $0 == "o" })
+        ret = stream.matches(minCount: 0, maxCount: 2, while: { $0 == "F" || $0 == "o" })
         XCTAssertEqual(ret?.range, string.startIndex..<string.index(string.startIndex, offsetBy: 2))
-        XCTAssertEqual(ret?.length, 2)
+        XCTAssertEqual(ret?.count, 2)
         
-        ret = stream.matches(minLength: 0, maxLength: 3, while: { $0 == "F" || $0 == "o" })
+        ret = stream.matches(minCount: 0, maxCount: 3, while: { $0 == "F" || $0 == "o" })
         XCTAssertEqual(ret?.range, string.startIndex..<string.index(string.startIndex, offsetBy: 3))
-        XCTAssertEqual(ret?.length, 3)
+        XCTAssertEqual(ret?.count, 3)
         
-        ret = stream.matches(minLength: 0, maxLength: 4, while: { $0 == "F" || $0 == "o" })
+        ret = stream.matches(minCount: 0, maxCount: 4, while: { $0 == "F" || $0 == "o" })
         XCTAssertEqual(ret?.range, string.startIndex..<string.index(string.startIndex, offsetBy: 3))
-        XCTAssertEqual(ret?.length, 3)
+        XCTAssertEqual(ret?.count, 3)
         
-        XCTAssertNil(stream.matches(minLength: 4, maxLength: 50, while: { $0 == "F" || $0 == "o" }))
-        XCTAssertNil(stream.matches(minLength: 100, maxLength: 100, while: { _ in true }))
-        XCTAssertNil(stream.matches(minLength: 1, maxLength: 100, while: { _ in false }))
+        XCTAssertNil(stream.matches(minCount: 4, maxCount: 50, while: { $0 == "F" || $0 == "o" }))
+        XCTAssertNil(stream.matches(minCount: 100, maxCount: 100, while: { _ in true }))
+        XCTAssertNil(stream.matches(minCount: 1, maxCount: 100, while: { _ in false }))
+    }
+    
+    func test_matchesWhile() {
+        let string = "Foo Bar"
+        let stream = CharacterStream(string: string)
+        
+        let ret = stream.matches(while: { $0 != " " })
+        XCTAssertEqual(ret.range, string.startIndex..<string.index(string.startIndex, offsetBy: 3))
+        XCTAssertEqual(ret.count, 3)
     }
     
     func test_matchesString_caseSensitive() {
@@ -352,35 +361,46 @@ class CharacterStreamTests: XCTestCase {
         XCTAssertFalse(stream.skip("\0", case: .insensitive))
     }
     
-    func test_skip_MinMaxPredicate() {
+    func test_skipMinMaxPredicate() {
         let string = "Foo Bar"
         let stream = CharacterStream(string: string)
         
-        var ret = stream.skip(minLength: 0, maxLength: 100, while: { $0 != " " })
+        var ret = stream.skip(minCount: 0, maxCount: 100, while: { $0 != " " })
         XCTAssertEqual(ret?.range, string.startIndex..<string.index(string.startIndex, offsetBy: 3))
-        XCTAssertEqual(ret?.length, 3)
+        XCTAssertEqual(ret?.count, 3)
         XCTAssertEqual(stream.nextIndex, string.index(string.startIndex, offsetBy: 3))
         XCTAssertEqual(stream.peek(), " ")
         
         stream.seek(to: stream.startIndex)
-        ret = stream.skip(minLength: 0, maxLength: 4, while: { $0 == "F" || $0 == "o" })
+        ret = stream.skip(minCount: 0, maxCount: 4, while: { $0 == "F" || $0 == "o" })
         XCTAssertEqual(ret?.range, string.startIndex..<string.index(string.startIndex, offsetBy: 3))
-        XCTAssertEqual(ret?.length, 3)
+        XCTAssertEqual(ret?.count, 3)
         
         stream.seek(to: stream.startIndex)
-        ret = stream.skip(minLength: 0, maxLength: 4, while: { _ in false })
+        ret = stream.skip(minCount: 0, maxCount: 4, while: { _ in false })
         XCTAssertEqual(ret?.range, string.startIndex..<string.startIndex)
-        XCTAssertEqual(ret?.length, 0)
+        XCTAssertEqual(ret?.count, 0)
         
         stream.seek(to: stream.startIndex)
-        XCTAssertNil(stream.skip(minLength: 4, maxLength: 100, while: { $0 == "F" || $0 == "o" }))
+        XCTAssertNil(stream.skip(minCount: 4, maxCount: 100, while: { $0 == "F" || $0 == "o" }))
         XCTAssertEqual(stream.nextIndex, stream.startIndex)
         
-        XCTAssertNil(stream.skip(minLength: 100, maxLength: 100, while: { _ in true }))
+        XCTAssertNil(stream.skip(minCount: 100, maxCount: 100, while: { _ in true }))
         XCTAssertEqual(stream.nextIndex, stream.startIndex)
         
-        XCTAssertNil(stream.skip(minLength: 1, maxLength: 100, while: { _ in false }))
+        XCTAssertNil(stream.skip(minCount: 1, maxCount: 100, while: { _ in false }))
         XCTAssertEqual(stream.nextIndex, stream.startIndex)
+    }
+    
+    func test_skipWhile() {
+        let string = "Foo Bar"
+        let stream = CharacterStream(string: string)
+        
+        let ret = stream.skip(maxCount: 100, while: { $0 != " " })
+        XCTAssertEqual(ret.range, string.startIndex..<string.index(string.startIndex, offsetBy: 3))
+        XCTAssertEqual(ret.count, 3)
+        XCTAssertEqual(stream.nextIndex, string.index(string.startIndex, offsetBy: 3))
+        XCTAssertEqual(stream.peek(), " ")
     }
     
     func test_read() {
@@ -475,28 +495,37 @@ class CharacterStreamTests: XCTestCase {
         let string = "Foo Bar"
         let stream = CharacterStream(string: string)
         
-        XCTAssertEqual(stream.read(minLength: 0, maxLength: 100, while: { $0 != " " }), "Foo")
+        XCTAssertEqual(stream.read(minCount: 0, maxCount: 100, while: { $0 != " " }), "Foo")
         XCTAssertEqual(stream.nextIndex, string.index(string.startIndex, offsetBy: 3))
         XCTAssertEqual(stream.peek(), " ")
         
         stream.seek(to: stream.startIndex)
-        XCTAssertEqual(stream.read(minLength: 0, maxLength: 4, while: { $0 == "F" || $0 == "o" }),
+        XCTAssertEqual(stream.read(minCount: 0, maxCount: 4, while: { $0 == "F" || $0 == "o" }),
                        "Foo")
         XCTAssertEqual(stream.peek(), " ")
         
         stream.seek(to: stream.startIndex)
-        XCTAssertEqual(stream.read(minLength: 0, maxLength: 4, while: { _ in false }), "")
+        XCTAssertEqual(stream.read(minCount: 0, maxCount: 4, while: { _ in false }), "")
         XCTAssertEqual(stream.nextIndex, stream.startIndex)
         
         stream.seek(to: stream.startIndex)
-        XCTAssertNil(stream.read(minLength: 4, maxLength: 100, while: { $0 == "F" || $0 == "o" }))
+        XCTAssertNil(stream.read(minCount: 4, maxCount: 100, while: { $0 == "F" || $0 == "o" }))
         XCTAssertEqual(stream.nextIndex, stream.startIndex)
         
-        XCTAssertNil(stream.read(minLength: 100, maxLength: 100, while: { _ in true }))
+        XCTAssertNil(stream.read(minCount: 100, maxCount: 100, while: { _ in true }))
         XCTAssertEqual(stream.nextIndex, stream.startIndex)
         
-        XCTAssertNil(stream.read(minLength: 1, maxLength: 100, while: { _ in false }))
+        XCTAssertNil(stream.read(minCount: 1, maxCount: 100, while: { _ in false }))
         XCTAssertEqual(stream.nextIndex, stream.startIndex)
+    }
+    
+    func test_readWhile() {
+        let string = "Foo Bar"
+        let stream = CharacterStream(string: string)
+        
+        XCTAssertEqual(stream.read(maxCount: 100, while: { $0 != " " }), "Foo")
+        XCTAssertEqual(stream.nextIndex, string.index(string.startIndex, offsetBy: 3))
+        XCTAssertEqual(stream.peek(), " ")
     }
     
     func test_state_init() {

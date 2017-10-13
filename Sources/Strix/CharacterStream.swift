@@ -74,7 +74,7 @@ extension CharacterStream {
 }
 
 extension CharacterStream {
-    public typealias Section = (range: Range<String.Index>, length: String.IndexDistance)
+    public typealias Section = (range: Range<String.Index>, count: String.IndexDistance)
     
     public func matches(_ c: Character) -> Bool {
         return matches({ $0 == c })
@@ -91,21 +91,23 @@ extension CharacterStream {
         return string.compare(str, case: caseSensitivity, range: nextIndex..<end) == .orderedSame
     }
     
-    public func matches(minLength: String.IndexDistance = 0, maxLength: String.IndexDistance = .max,
+    public func matches(minCount: String.IndexDistance, maxCount: String.IndexDistance = .max,
                         while predicate: (Character) throws -> Bool) rethrows -> Section? {
-        var length = 0
+        let section = try matches(maxCount: maxCount, while: predicate)
+        return section.count >= minCount ? section : nil
+    }
+    
+    public func matches(maxCount: String.IndexDistance = .max,
+                        while predicate: (Character) throws -> Bool) rethrows -> Section {
+        var count = 0
         var index = nextIndex
         
-        while length != maxLength, index != endIndex, try predicate(string[index]) {
-            length += 1
+        while count != maxCount, index != endIndex, try predicate(string[index]) {
+            count += 1
             index = string.index(after: index)
         }
         
-        if length < minLength {
-            return nil
-        }
-        
-        return (nextIndex..<index, length)
+        return (nextIndex..<index, count)
     }
     
     public func matches(_ regex: NSRegularExpression) -> NSTextCheckingResult? {
@@ -152,10 +154,18 @@ extension CharacterStream {
     }
     
     @discardableResult
-    public func skip(minLength: String.IndexDistance = 0, maxLength: String.IndexDistance = .max,
+    public func skip(minCount: String.IndexDistance, maxCount: String.IndexDistance = .max,
                      while predicate: (Character) throws -> Bool) rethrows -> Section? {
-        guard let result = try matches(minLength: minLength, maxLength: maxLength, while: predicate)
+        guard let result = try matches(minCount: minCount, maxCount: maxCount, while: predicate)
             else { return nil }
+        nextIndex = result.range.upperBound
+        return result
+    }
+    
+    @discardableResult
+    public func skip(maxCount: String.IndexDistance = .max,
+                     while predicate: (Character) throws -> Bool) rethrows -> Section {
+        let result = try matches(maxCount: maxCount, while: predicate)
         nextIndex = result.range.upperBound
         return result
     }
@@ -183,10 +193,16 @@ extension CharacterStream {
         return nil
     }
     
-    public func read(minLength: String.IndexDistance = 0, maxLength: String.IndexDistance = .max,
+    public func read(minCount: String.IndexDistance, maxCount: String.IndexDistance = .max,
                      while predicate: (Character) throws -> Bool) rethrows -> Substring? {
-        guard let section = try skip(minLength: minLength, maxLength: maxLength, while: predicate)
+        guard let section = try skip(minCount: minCount, maxCount: maxCount, while: predicate)
             else { return nil }
+        return string[section.range]
+    }
+    
+    public func read(maxCount: String.IndexDistance = .max,
+                     while predicate: (Character) throws -> Bool) rethrows -> Substring {
+        let section = try skip(maxCount: maxCount, while: predicate)
         return string[section.range]
     }
 }
