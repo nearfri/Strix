@@ -250,12 +250,14 @@ class CharacterStreamTests: XCTestCase {
         let string = "FooBarSwift3"
         let stream = CharacterStream(string: string)
         
-        XCTAssertNil(stream.matches(try! NSRegularExpression(pattern: "^a[a-zA-Z]+", options: [])))
+        XCTAssertTrue(stream.skip("Foo", case: .sensitive))
         
-        let regex = try! NSRegularExpression(pattern: "a[a-zA-Z]+", options: [])
-        if let checkingResult = stream.matches(regex) {
-            let matchedStr = (string as NSString).substring(with: checkingResult.range) as String
-            XCTAssertEqual(matchedStr, "arSwift")
+        XCTAssertNil(stream.matches(try! NSRegularExpression(pattern: "F[a-zA-Z]+", options: [])))
+        
+        let regex = try! NSRegularExpression(pattern: "B[a-zA-Z]+", options: [])
+        if let section = stream.matches(regex) {
+            XCTAssertEqual(stream.string[section.range], "BarSwift")
+            XCTAssertEqual(section.count, "BarSwift".count)
         } else {
             shouldNotEnterHere()
         }
@@ -403,6 +405,24 @@ class CharacterStreamTests: XCTestCase {
         XCTAssertEqual(stream.peek(), " ")
     }
     
+    func test_skip_regex() {
+        let string = "FooBarSwift3"
+        let stream = CharacterStream(string: string)
+        
+        XCTAssertTrue(stream.skip("Foo", case: .sensitive))
+        
+        XCTAssertNil(stream.skip(try! NSRegularExpression(pattern: "F[a-zA-Z]+", options: [])))
+        
+        let regex = try! NSRegularExpression(pattern: "B[a-zA-Z]+", options: [])
+        if let section = stream.skip(regex) {
+            XCTAssertEqual(stream.string[section.range], "BarSwift")
+            XCTAssertEqual(section.count, "BarSwift".count)
+            XCTAssertTrue(stream.matches("3"))
+        } else {
+            shouldNotEnterHere()
+        }
+    }
+    
     func test_read() {
         let string = "Bar"
         let stream = CharacterStream(string: string)
@@ -526,6 +546,24 @@ class CharacterStreamTests: XCTestCase {
         XCTAssertEqual(stream.read(maxCount: 100, while: { $0 != " " }), "Foo")
         XCTAssertEqual(stream.nextIndex, string.index(string.startIndex, offsetBy: 3))
         XCTAssertEqual(stream.peek(), " ")
+    }
+    
+    func test_read_regex() {
+        let string = "FooBarSwift3"
+        let stream = CharacterStream(string: string)
+        
+        XCTAssertTrue(stream.skip("Foo", case: .sensitive))
+        
+        XCTAssertNil(stream.read(try! NSRegularExpression(pattern: "F[a-zA-Z]+", options: [])))
+        XCTAssertTrue(stream.matches("Bar", case: .sensitive))
+        
+        let regex = try! NSRegularExpression(pattern: "B[a-zA-Z]+", options: [])
+        if let substr = stream.read(regex) {
+            XCTAssertEqual(substr, "BarSwift")
+            XCTAssertTrue(stream.matches("3"))
+        } else {
+            shouldNotEnterHere()
+        }
     }
     
     func test_state_init() {

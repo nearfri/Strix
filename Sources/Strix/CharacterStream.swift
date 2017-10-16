@@ -85,10 +85,19 @@ extension CharacterStream {
     }
     
     public func matches(_ str: String, case caseSensitivity: StringSensitivity) -> Bool {
+        return indexAfterMatches(str, case: caseSensitivity) != nil
+    }
+    
+    private func indexAfterMatches(
+        _ str: String, case caseSensitivity: StringSensitivity) -> String.Index? {
+        
         guard let end = index(from: nextIndex, offset: str.count) else {
-            return false
+            return nil
         }
-        return string.compare(str, case: caseSensitivity, range: nextIndex..<end) == .orderedSame
+        if string.compare(str, case: caseSensitivity, range: nextIndex..<end) != .orderedSame {
+            return nil
+        }
+        return end
     }
     
     public func matches(minCount: String.IndexDistance, maxCount: String.IndexDistance = .max,
@@ -110,16 +119,14 @@ extension CharacterStream {
         return (nextIndex..<index, count)
     }
     
-    public func matches(_ regex: NSRegularExpression) -> NSTextCheckingResult? {
-        func utf16IntRange(in str: String, from: String.Index, to: String.Index) -> Range<Int> {
-            let utf16View = str.utf16
-            let start = utf16View.distance(from: str.startIndex, to: from)
-            let count = utf16View.distance(from: from, to: to)
-            return start..<(start+count)
-        }
+    public func matches(_ regex: NSRegularExpression) -> Section? {
+        let searchRange = NSRange(nextIndex.encodedOffset..<endIndex.encodedOffset)
+        guard let match = regex.firstMatch(in: string, options: [.anchored], range: searchRange)
+            else { return nil }
         
-        let range = NSRange(utf16IntRange(in: string, from: nextIndex, to: endIndex))
-        return regex.firstMatch(in: string, options: [], range: range)
+        let range = nextIndex..<String.Index(encodedOffset: match.range.upperBound)
+        let count = string.distance(from: range.lowerBound, to: range.upperBound)
+        return (range, count)
     }
 }
 
@@ -143,10 +150,7 @@ extension CharacterStream {
     
     @discardableResult
     public func skip(_ str: String, case caseSensitivity: StringSensitivity) -> Bool {
-        guard let end = index(from: nextIndex, offset: str.count) else {
-            return false
-        }
-        if string.compare(str, case: caseSensitivity, range: nextIndex..<end) != .orderedSame {
+        guard let end = indexAfterMatches(str, case: caseSensitivity) else {
             return false
         }
         nextIndex = end
@@ -166,6 +170,13 @@ extension CharacterStream {
     public func skip(maxCount: String.IndexDistance = .max,
                      while predicate: (Character) throws -> Bool) rethrows -> Section {
         let result = try matches(maxCount: maxCount, while: predicate)
+        nextIndex = result.range.upperBound
+        return result
+    }
+    
+    @discardableResult
+    public func skip(_ regex: NSRegularExpression) -> Section? {
+        guard let result = matches(regex) else { return nil }
         nextIndex = result.range.upperBound
         return result
     }
@@ -203,6 +214,11 @@ extension CharacterStream {
     public func read(maxCount: String.IndexDistance = .max,
                      while predicate: (Character) throws -> Bool) rethrows -> Substring {
         let section = try skip(maxCount: maxCount, while: predicate)
+        return string[section.range]
+    }
+    
+    public func read(_ regex: NSRegularExpression) -> Substring? {
+        guard let section = skip(regex) else { return nil }
         return string[section.range]
     }
 }
