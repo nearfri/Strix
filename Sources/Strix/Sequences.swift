@@ -187,7 +187,7 @@ public func skipMany<T1, T2>(
 
 public func many<T1, T2, Handler: ValueHandling & SeparatorHandling>(
     _ parser: Parser<T1>, separator: Parser<T2>, atLeastOne: Bool,
-    allowEndBySeparator: Bool, makeHandler: @escaping () -> Handler
+    allowEndBySeparator: Bool = false, makeHandler: @escaping () -> Handler
     ) -> Parser<Handler.Result> where Handler.Value == T1, Handler.Separator == T2 {
     
     return Parser { stream in

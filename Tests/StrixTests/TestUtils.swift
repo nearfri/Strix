@@ -114,6 +114,30 @@ func checkSuccess<T: Equatable, E: Error & Equatable> (
     }
 }
 
+func checkFailure<T>(
+    _ reply: Reply<T>,
+    _ message: @autoclosure () -> String = "",
+    file: StaticString = #file, line: UInt = #line) {
+    
+    if case .failure = reply {
+        
+    } else {
+        fail(expected: .failure, actual: reply, message: message, file: file, line: line)
+    }
+}
+
+func checkFatalFailure<T>(
+    _ reply: Reply<T>,
+    _ message: @autoclosure () -> String = "",
+    file: StaticString = #file, line: UInt = #line) {
+    
+    if case .fatalFailure = reply {
+        
+    } else {
+        fail(expected: .fatalFailure, actual: reply, message: message, file: file, line: line)
+    }
+}
+
 func checkFailure<T, E: Error & Equatable>(
     _ reply: Reply<T>, _ errors: [E],
     _ message: @autoclosure () -> String = "",
@@ -138,6 +162,18 @@ func checkFatalFailure<T, E: Error & Equatable>(
     }
 }
 
+func checkSuccess(
+    _ parseResult: ParseResult<Void>,
+    _ message: @autoclosure () -> String = "",
+    file: StaticString = #file, line: UInt = #line) {
+    
+    if case .success = parseResult {
+        
+    } else {
+        fail(expected: .success, actual: parseResult, message: message, file: file, line: line)
+    }
+}
+
 func checkSuccess<T: Equatable>(
     _ parseResult: ParseResult<T>, _ value: T,
     _ message: @autoclosure () -> String = "",
@@ -147,6 +183,18 @@ func checkSuccess<T: Equatable>(
         XCTAssertEqual(v, value, message, file: file, line: line)
     } else {
         fail(expected: .success, actual: parseResult, message: message, file: file, line: line)
+    }
+}
+
+func checkFailure<T>(
+    _ parseResult: ParseResult<T>,
+    _ message: @autoclosure () -> String = "",
+    file: StaticString = #file, line: UInt = #line) {
+    
+    if case .failure = parseResult {
+        
+    } else {
+        fail(expected: .failure, actual: parseResult, message: message, file: file, line: line)
     }
 }
 
