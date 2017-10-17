@@ -77,6 +77,8 @@
 		7576BE6E1F8E1249008DC09C /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
 		75969B401F8F426000167569 /* Characters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Characters.swift; sourceTree = "<group>"; };
 		75969B421F8F433700167569 /* CharactersTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharactersTests.swift; sourceTree = "<group>"; };
+		75969B4C1F95AD1B00167569 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
+		75969B4E1F95AD4100167569 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		75AC08871F10C48A00E5FCA2 /* Sequences.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sequences.swift; sourceTree = "<group>"; };
 		75B4C08E1ED44ADC00C93C1B /* PrimitivesChainTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrimitivesChainTests.swift; sourceTree = "<group>"; };
 		75B4C0901ED4562C00C93C1B /* PrimitivesAlternativeTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrimitivesAlternativeTests.swift; sourceTree = "<group>"; };
@@ -136,7 +138,8 @@
 		7556A28E1E7AE4B70094EF39 = {
 			isa = PBXGroup;
 			children = (
-				7576BE6E1F8E1249008DC09C /* Package.swift */,
+				75969B4B1F95ACCB00167569 /* Documentation */,
+				75969B491F95AC8D00167569 /* Deployment */,
 				7576BE211F8E04C6008DC09C /* Sources */,
 				7576BE231F8E04FC008DC09C /* Tests */,
 				7556A2991E7AE4B70094EF39 /* Products */,
@@ -205,6 +208,23 @@
 				7556A2A51E7AE4B70094EF39 /* StrixTests */,
 			);
 			path = Tests;
+			sourceTree = "<group>";
+		};
+		75969B491F95AC8D00167569 /* Deployment */ = {
+			isa = PBXGroup;
+			children = (
+				7576BE6E1F8E1249008DC09C /* Package.swift */,
+				75969B4C1F95AD1B00167569 /* LICENSE */,
+			);
+			name = Deployment;
+			sourceTree = "<group>";
+		};
+		75969B4B1F95ACCB00167569 /* Documentation */ = {
+			isa = PBXGroup;
+			children = (
+				75969B4E1F95AD4100167569 /* README.md */,
+			);
+			name = Documentation;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
