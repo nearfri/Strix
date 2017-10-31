@@ -11,19 +11,6 @@ class NumberComponentsTests: XCTestCase {
         super.tearDown()
     }
     
-    func test_signValue() {
-        var components = NumberComponents()
-        
-        components.sign = .minus
-        XCTAssertEqual(components.signValue, -1)
-        
-        components.sign = .plus
-        XCTAssertEqual(components.signValue, 1)
-        
-        components.sign = .none
-        XCTAssertEqual(components.signValue, 1)
-    }
-    
     func test_integerValue() {
         var components = NumberComponents()
         

@@ -61,7 +61,7 @@ public func floatingPoint(allowUnderscores: Bool = false) -> Parser<Double> {
                 return .success(value * Double.infinity, [])
             case .finite:
                 if let significand = components.significandValue {
-                    let signValue = Double(components.signValue)
+                    let signValue = components.sign == .minus ? -1.0 : 1.0
                     let exponent = components.exponentValue ?? 1.0
                     return .success(signValue * significand * exponent, [])
                 }
@@ -85,12 +85,14 @@ public func integer(allowExponent: Bool = false, allowUnderscores: Bool = false)
         return numberComponents(options: options).parse(stream).flatMap({ (components) in
             let overflowError: () -> Error = { makeOverflowError(from: components) }
             do {
+                let signValue = components.sign == .minus ? -1 : 1
+                
                 guard let integer = components.integerValue else {
                     throw overflowError()
                 }
                 
                 guard let exponent = components.exponentValue else {
-                    return .success(components.signValue * integer, [])
+                    return .success(signValue * integer, [])
                 }
                 
                 guard let multipliedValue = Double(exactly: integer)
@@ -98,7 +100,7 @@ public func integer(allowExponent: Bool = false, allowUnderscores: Bool = false)
                     .flatMap({ Int(exactly: $0) })
                     else { throw overflowError() }
                 
-                return .success(components.signValue * multipliedValue, [])
+                return .success(signValue * multipliedValue, [])
             } catch {
                 stream.backtrack(to: state)
                 return .fatalFailure([error])

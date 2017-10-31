@@ -49,10 +49,6 @@ extension NumberComponents {
 }
 
 extension NumberComponents {
-    public var signValue: Int {
-        return sign == .minus ? -1 : 1
-    }
-    
     public var integerValue: Int? {
         guard let text = integer else { return nil }
         return Int(text, radix: radix)
