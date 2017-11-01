@@ -31,7 +31,7 @@ public func |>> <T1, T2>(p: Parser<T1>, f: @escaping (T1) -> T2) -> Parser<T2> {
 }
 
 public func ^>> <T1, T2>(p: Parser<T1>, f: @escaping (T1) -> Reply<T2>) -> Parser<T2> {
-    return p >>- { a in pure(f(a)) }
+    return p.flatMap(f)
 }
 
 public func >>% <T1, T2>(p: Parser<T1>, x: T2) -> Parser<T2> {

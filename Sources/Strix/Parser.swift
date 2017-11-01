@@ -11,20 +11,26 @@ extension Parser {
     public func flatMap<U>(_ transform: @escaping (T) -> Parser<U>) -> Parser<U> {
         return Parser<U>({ (stream) -> Reply<U> in
             switch self.parse(stream) {
-            case let .failure(e):
-                return .failure(e)
-            case let .fatalFailure(e):
-                return .fatalFailure(e)
             case let .success(v, e):
                 let stateTag = stream.stateTag
                 let reply = transform(v).parse(stream)
                 return stateTag == stream.stateTag && !e.isEmpty ? reply.prepending(e) : reply
+            case let .failure(e):
+                return .failure(e)
+            case let .fatalFailure(e):
+                return .fatalFailure(e)
             }
         })
     }
     
+    public func flatMap<U>(_ transform: @escaping (T) -> Reply<U>) -> Parser<U> {
+        return flatMap({ (v) -> Parser<U> in
+            return Parser<U>({ _ in transform(v) })
+        })
+    }
+    
     public func map<U>(_ transform: @escaping (T) -> U) -> Parser<U> {
-        return flatMap { (v) in
+        return flatMap { (v) -> Parser<U> in
             return Parser<U>({ _ in .success(transform(v), []) })
         }
     }
