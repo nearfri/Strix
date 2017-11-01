@@ -20,6 +20,8 @@
 		754C4BB51FA46461006B5032 /* NumbersTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754C4BB41FA46461006B5032 /* NumbersTests.swift */; };
 		754C4BB71FA814FF006B5032 /* NumberComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754C4BB61FA814FF006B5032 /* NumberComponents.swift */; };
 		754C4BB91FA815E6006B5032 /* NumberComponentsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754C4BB81FA815E6006B5032 /* NumberComponentsTests.swift */; };
+		754C4BBB1FA8B7CB006B5032 /* PrattParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754C4BBA1FA8B7CB006B5032 /* PrattParser.swift */; };
+		754C4BBD1FA8B7E8006B5032 /* PrattParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754C4BBC1FA8B7E8006B5032 /* PrattParserTests.swift */; };
 		755083301EC9F700000417F9 /* ErrorOutputBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7550832F1EC9F700000417F9 /* ErrorOutputBuffer.swift */; };
 		755083321ECA10CB000417F9 /* ErrorOutputBufferTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755083311ECA10CB000417F9 /* ErrorOutputBufferTests.swift */; };
 		7551CBE81EC48D8D001911B0 /* ParseResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7551CBE71EC48D8D001911B0 /* ParseResult.swift */; };
@@ -71,6 +73,8 @@
 		754C4BB41FA46461006B5032 /* NumbersTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumbersTests.swift; sourceTree = "<group>"; };
 		754C4BB61FA814FF006B5032 /* NumberComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberComponents.swift; sourceTree = "<group>"; };
 		754C4BB81FA815E6006B5032 /* NumberComponentsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberComponentsTests.swift; sourceTree = "<group>"; };
+		754C4BBA1FA8B7CB006B5032 /* PrattParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrattParser.swift; sourceTree = "<group>"; };
+		754C4BBC1FA8B7E8006B5032 /* PrattParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrattParserTests.swift; sourceTree = "<group>"; };
 		7550832F1EC9F700000417F9 /* ErrorOutputBuffer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ErrorOutputBuffer.swift; sourceTree = "<group>"; };
 		755083311ECA10CB000417F9 /* ErrorOutputBufferTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ErrorOutputBufferTests.swift; sourceTree = "<group>"; };
 		7551CBE71EC48D8D001911B0 /* ParseResult.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ParseResult.swift; sourceTree = "<group>"; };
@@ -180,6 +184,7 @@
 				75969B401F8F426000167569 /* Characters.swift */,
 				754C4BB61FA814FF006B5032 /* NumberComponents.swift */,
 				754C4BB21FA4643A006B5032 /* Numbers.swift */,
+				754C4BBA1FA8B7CB006B5032 /* PrattParser.swift */,
 			);
 			path = Strix;
 			sourceTree = "<group>";
@@ -202,6 +207,7 @@
 				75969B421F8F433700167569 /* CharactersTests.swift */,
 				754C4BB81FA815E6006B5032 /* NumberComponentsTests.swift */,
 				754C4BB41FA46461006B5032 /* NumbersTests.swift */,
+				754C4BBC1FA8B7E8006B5032 /* PrattParserTests.swift */,
 			);
 			path = StrixTests;
 			sourceTree = "<group>";
@@ -371,6 +377,7 @@
 			files = (
 				7551CBE81EC48D8D001911B0 /* ParseResult.swift in Sources */,
 				75F91C3A1E9BD56700A9208F /* Reply.swift in Sources */,
+				754C4BBB1FA8B7CB006B5032 /* PrattParser.swift in Sources */,
 				75CA67EF1EC74B3000331EC0 /* ParseErrorGroup.swift in Sources */,
 				7556A2D71E7AE6A00094EF39 /* CharacterStream.swift in Sources */,
 				75AC08881F10C48A00E5FCA2 /* Sequences.swift in Sources */,
@@ -392,6 +399,7 @@
 			files = (
 				754C4BB51FA46461006B5032 /* NumbersTests.swift in Sources */,
 				7556A2D91E7AE7030094EF39 /* CharacterStreamTests.swift in Sources */,
+				754C4BBD1FA8B7E8006B5032 /* PrattParserTests.swift in Sources */,
 				750AADEB1E98D2C800BEB6C2 /* TextPositionTests.swift in Sources */,
 				75CB0CB61EE3D996002FD24F /* PrimitivesLookAheadTests.swift in Sources */,
 				75CA67F11EC757FD00331EC0 /* ParseErrorGroupTests.swift in Sources */,
