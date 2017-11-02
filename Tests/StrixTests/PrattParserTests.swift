@@ -95,16 +95,16 @@ func calculator() -> Parser<Double> {
 private func calculatorTokenizer() -> Parser<Token> {
     let ws = skipWhitespaces()
     
-    let end = endOfStream() |>> { Token(type: .end) }
+    let end = endOfStream() >>| { Token(type: .end) }
     
     let numberOptions: NumberComponents.ParseOptions = [
         .allowFraction, .allowExponent
     ]
     let number = numberComponents(options: numberOptions)
-        !>> ws |>> { Token(type: .number, value: $0.string!) }
+        !>> ws >>| { Token(type: .number, value: $0.string!) }
     
-    let singleOperator = any(of: "^*/%+-(),".characters)
-        |>> { Token(type: .operator, value: String($0)) }
+    let singleOperator = any(of: "^*/%+-(),")
+        >>| { Token(type: .operator, value: String($0)) }
     
     let name: Parser<Token> = {
         let firstIdentifierChar = { (c: Character) -> Bool in
@@ -114,10 +114,10 @@ private func calculatorTokenizer() -> Parser<Token> {
             return isASCIILetter(c) || isDecimalDigit(c) || c == "_"
         }
         return manyCharacters(minCount: 1, first: firstIdentifierChar, while: identifierChar)
-            |>> { Token(type: .name, value: String($0)) }
+            >>| { Token(type: .name, value: String($0)) }
     }()
     
-    let operatorForTest = any(of: "!:".characters) |>> { Token(type: .operator, value: String($0)) }
+    let operatorForTest = any(of: "!:") >>| { Token(type: .operator, value: String($0)) }
     let errorForTest: Parser<Token> = failFatally("invalid character")
     
     return ws >>! choice([number, name, singleOperator, end, operatorForTest, errorForTest])

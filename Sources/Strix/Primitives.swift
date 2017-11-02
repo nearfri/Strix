@@ -1,14 +1,14 @@
 
-infix operator >>- : AdditionPrecedence
-infix operator |>> : AdditionPrecedence
-infix operator ^>> : AdditionPrecedence
-infix operator >>% : AdditionPrecedence
-infix operator >>! : AdditionPrecedence
-infix operator !>> : AdditionPrecedence
-infix operator !>>! : AdditionPrecedence
-infix operator <|> : AdditionPrecedence
-infix operator <?> : AdditionPrecedence
-infix operator <??> : AdditionPrecedence
+infix operator >>- : AdditionPrecedence  // flatMap
+infix operator >>~ : AdditionPrecedence  // flatMap
+infix operator >>| : AdditionPrecedence  // map
+infix operator >>% : AdditionPrecedence  // return
+infix operator >>! : AdditionPrecedence  // right
+infix operator !>> : AdditionPrecedence  // left
+infix operator !>>! : AdditionPrecedence // both
+infix operator <|> : AdditionPrecedence  // alternative
+infix operator <?> : AdditionPrecedence  // label
+infix operator <??> : AdditionPrecedence // compound label
 
 // MARK: - Pure
 
@@ -26,12 +26,12 @@ public func >>- <T1, T2>(p: Parser<T1>, f: @escaping (T1) -> Parser<T2>) -> Pars
     return p.flatMap(f)
 }
 
-public func |>> <T1, T2>(p: Parser<T1>, f: @escaping (T1) -> T2) -> Parser<T2> {
-    return p.map(f)
+public func >>~ <T1, T2>(p: Parser<T1>, f: @escaping (T1) -> Reply<T2>) -> Parser<T2> {
+    return p.flatMap(f)
 }
 
-public func ^>> <T1, T2>(p: Parser<T1>, f: @escaping (T1) -> Reply<T2>) -> Parser<T2> {
-    return p.flatMap(f)
+public func >>| <T1, T2>(p: Parser<T1>, f: @escaping (T1) -> T2) -> Parser<T2> {
+    return p.map(f)
 }
 
 public func >>% <T1, T2>(p: Parser<T1>, x: T2) -> Parser<T2> {
@@ -110,7 +110,7 @@ public func choice<T, S: Sequence>(_ ps: S) -> Parser<T> where S.Iterator.Elemen
 }
 
 public func optional<T>(_ p: Parser<T>) -> Parser<T?> {
-    return p |>> Optional.init <|> pure(nil)
+    return p >>| Optional.init <|> pure(nil)
 }
 
 public func skipOptional<T>(_ p: Parser<T>) -> Parser<Void> {

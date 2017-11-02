@@ -299,8 +299,8 @@ public func manyStrings<S1: Sequence, S2: Sequence>(
     atLeastOne: Bool = false
     ) -> Parser<String> where S1.Element == Character, S2.Element == Character {
     
-    return many(first: firstParser |>> Substring.init,
-                repeating: repeatedParser |>> Substring.init,
+    return many(first: firstParser >>| Substring.init,
+                repeating: repeatedParser >>| Substring.init,
                 atLeastOne: atLeastOne,
                 makeHandler: StringCollector.init)
 }
@@ -318,8 +318,8 @@ public func manyStrings<S1: Sequence, S2: Sequence>(
     ) -> Parser<String> where S1.Element == Character, S2.Element == Character {
     
     let makeHandler = { StringSeparatorCollector.init(includeSeparator: includeSeparator) }
-    return many(parser |>> Substring.init,
-                separator: separator |>> Substring.init,
+    return many(parser >>| Substring.init,
+                separator: separator >>| Substring.init,
                 atLeastOne: false, allowEndBySeparator: allowEndBySeparator,
                 makeHandler: makeHandler)
 }

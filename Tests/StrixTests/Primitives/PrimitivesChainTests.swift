@@ -43,6 +43,29 @@ class PrimitivesChainTests: XCTestCase {
         checkFailure(p.parse(defaultStream), dummyErrors)
     }
     
+    func test_operator_another_flatMap_success() {
+        let numberString = Parser { (_) -> Reply<String> in
+            return .success("1", [])
+        }
+        let toInt = { (str: String) -> Reply<Int> in
+            return .success(Int(str)!, [])
+        }
+        let p = numberString >>~ toInt
+        checkSuccess(p.parse(defaultStream), 1)
+    }
+    
+    func test_operator_another_flatMap_failure() {
+        let numberString = Parser { (_) -> Reply<String> in
+            return .failure(dummyErrors)
+        }
+        let toInt = { (str: String) -> Reply<Int> in
+            shouldNotEnterHere()
+            return .success(Int(str)!, [])
+        }
+        let p = numberString >>~ toInt
+        checkFailure(p.parse(defaultStream), dummyErrors)
+    }
+    
     func test_operator_map_success() {
         let numberString = Parser { (_) -> Reply<String> in
             return .success("1", [])
@@ -50,7 +73,7 @@ class PrimitivesChainTests: XCTestCase {
         let toInt = { (str: String) -> Int in
             return Int(str)!
         }
-        let p = numberString |>> toInt
+        let p = numberString >>| toInt
         checkSuccess(p.parse(defaultStream), 1)
     }
     
@@ -62,30 +85,7 @@ class PrimitivesChainTests: XCTestCase {
             shouldNotEnterHere()
             return Int(str)!
         }
-        let p = numberString |>> toInt
-        checkFailure(p.parse(defaultStream), dummyErrors)
-    }
-    
-    func test_operator_another_map_success() {
-        let numberString = Parser { (_) -> Reply<String> in
-            return .success("1", [])
-        }
-        let toInt = { (str: String) -> Reply<Int> in
-            return .success(Int(str)!, [])
-        }
-        let p = numberString ^>> toInt
-        checkSuccess(p.parse(defaultStream), 1)
-    }
-    
-    func test_operator_another_map_failure() {
-        let numberString = Parser { (_) -> Reply<String> in
-            return .failure(dummyErrors)
-        }
-        let toInt = { (str: String) -> Reply<Int> in
-            shouldNotEnterHere()
-            return .success(Int(str)!, [])
-        }
-        let p = numberString ^>> toInt
+        let p = numberString >>| toInt
         checkFailure(p.parse(defaultStream), dummyErrors)
     }
     

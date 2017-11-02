@@ -357,8 +357,8 @@ class CharactersTests: XCTestCase {
     
     func test_manyCharactersParser() {
         let letter = asciiLetter()
-        let upper = letter |>> { String($0).uppercased().first! }
-        let lower = letter |>> { String($0).lowercased().first! }
+        let upper = letter >>| { String($0).uppercased().first! }
+        let lower = letter >>| { String($0).lowercased().first! }
         
         checkSuccess(manyCharacters(letter).run("AppleMango"), "AppleMango")
         checkSuccess(manyCharacters(upper).run("AppleMango"), "APPLEMANGO")
@@ -401,7 +401,7 @@ class CharactersTests: XCTestCase {
     }
     
     func test_skip() {
-        let number = manyCharacters(minCount: 1, while: isDecimalDigit) |>> { Int($0)! }
+        let number = manyCharacters(minCount: 1, while: isDecimalDigit) >>| { Int($0)! }
         
         checkSuccess(skip(number, apply: { (num, substr) in
             XCTAssertEqual(num, 123)
