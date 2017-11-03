@@ -3,7 +3,7 @@ Pod::Spec.new do |s|
 
   # ―――  Spec Metadata  ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
   s.name         = "Strix"
-  s.version      = "1.0.0"
+  s.version      = "1.0.1"
   s.summary      = "Parser combinator library"
   s.description  = <<-DESC
   Strix is a parser combinator library written in Swift.
