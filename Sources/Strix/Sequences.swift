@@ -160,7 +160,7 @@ public func many<T, Handler: ValueHandling>(
             if let reply = parse(with: repeatedParser) {
                 return reply
             }
-            precondition(stateTag != stream.stateTag, infiniteLoopErrorMessage)
+            precondition(stateTag != stream.stateTag, infiniteLoopErrorMessage(stream.position))
         }
     }
 }
@@ -200,9 +200,8 @@ public func many<T1, T2, Handler: ValueHandling & SeparatorHandling>(
             let stateTag = stream.stateTag
             switch parser.parse(stream) {
             case let .success(v, e):
-                precondition(stateTag != stream.stateTag, infiniteLoopErrorMessage)
                 handler.valueOccurred(v)
-                errors = e
+                errors = stateTag != stream.stateTag ? e : errors + e
                 valueCount += 1
             case let .failure(e) where stateTag == stream.stateTag:
                 if valueCount >= minValueCount && (allowEndBySeparator || valueCount == 0) {
@@ -218,9 +217,9 @@ public func many<T1, T2, Handler: ValueHandling & SeparatorHandling>(
             let sepStateTag = stream.stateTag
             switch separator.parse(stream) {
             case let .success(v, e):
-                precondition(sepStateTag != stream.stateTag, infiniteLoopErrorMessage)
+                precondition(stateTag != stream.stateTag, infiniteLoopErrorMessage(stream.position))
                 handler.separatorOccurred(v)
-                errors = e
+                errors = sepStateTag != stream.stateTag ? e : errors + e
             case let .failure(e) where sepStateTag == stream.stateTag:
                 return .success(handler.result, errors + e)
             case let .failure(e):
@@ -234,12 +233,15 @@ public func many<T1, T2, Handler: ValueHandling & SeparatorHandling>(
 
 // MARK: -
 
-private var infiniteLoopErrorMessage: String = """
-The combinator 'many' was applied to a parser that succeeds \
-without consuming input and without changing the parser state in any other way. \
-(If no exception had been raised, the combinator likely would have \
-entered an infinite loop.)
-"""
+private func infiniteLoopErrorMessage(_ position: TextPosition) -> String {
+    return """
+    \(position)
+    The combinator 'many' was applied to a parser that succeeds \
+    without consuming input and without changing the parser state in any other way. \
+    (If no exception had been raised, the combinator likely would have \
+    entered an infinite loop.)
+    """
+}
 
 
 

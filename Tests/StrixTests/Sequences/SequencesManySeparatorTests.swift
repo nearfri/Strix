@@ -87,6 +87,43 @@ class SequencesManySeparatorTests: XCTestCase {
         }
     }
     
+    func test_manySeparator_whenParserSuccessWithoutStateChange_returnSuccess() {
+        let maxCount = 3
+        var valueCount = 0
+        var errorCount = 0
+        let p1 = Parser { stream -> Reply<Int> in
+            valueCount += 1
+            errorCount += 1
+            if valueCount < maxCount {
+                return .success(valueCount, [DummyError(rawValue: errorCount)!])
+            }
+            return .failure([DummyError(rawValue: errorCount)!])
+        }
+        
+        let p2 = Parser { stream -> Reply<String> in
+            errorCount += 1
+            stream.stateTag += 1
+            return .success(", ", [DummyError(rawValue: errorCount)!])
+        }
+        
+        let errors = Array(Array(1..<maxCount * 2).map({ DummyError(rawValue: $0)! }).suffix(2))
+        
+        do {
+            let p: Parser<[Int]> = many(p1, separator: p2,
+                                        atLeastOne: true, allowEndBySeparator: true)
+            let values = Array(1..<maxCount)
+            checkSuccess(p.parse(makeEmptyStream()), values, errors)
+        }
+        
+        do {
+            valueCount = 0
+            errorCount = 0
+            let p: Parser<Void> = skipMany(p1, separator: p2,
+                                           atLeastOne: false, allowEndBySeparator: true)
+            checkSuccess(p.parse(makeEmptyStream()), errors)
+        }
+    }
+    
     func test_manySeparator_whenSeparatorFatalFailWithoutStateChange_returnFatalFailure() {
         let maxCount = 3
         var valueCount = 0
