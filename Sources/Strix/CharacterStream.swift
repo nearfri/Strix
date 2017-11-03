@@ -259,16 +259,16 @@ extension CharacterStream {
 extension CharacterStream: CustomStringConvertible {
     public var description: String {
         let pos = position
-        return "CharacterStream(\(pos.lineNumber):\(pos.columnNumber), "
-            + "substring: \"\(pos.substring)\", userInfo: \(userInfo))"
+        return "line: \(pos.lineNumber), column: \(pos.columnNumber), "
+            + "substring: \"\(pos.substring)\", userInfo: \(userInfo)"
     }
 }
 
 extension CharacterStream.State: CustomStringConvertible {
     public var description: String {
         let pos = TextPosition(string: stream.string, index: index)
-        return "CharacterStream.State(\(pos.lineNumber):\(pos.columnNumber), "
-            + "substring: \"\(pos.substring)\", tag: \(tag), userInfo: \(userInfo))"
+        return "line: \(pos.lineNumber), column: \(pos.columnNumber), "
+            + "substring: \"\(pos.substring)\", tag: \(tag), userInfo: \(userInfo)"
     }
 }
 

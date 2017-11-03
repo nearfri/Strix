@@ -28,7 +28,7 @@ public struct TextPosition {
 
 extension TextPosition: CustomStringConvertible {
     public var description: String {
-        return "TextPosition(\(lineNumber):\(columnNumber), substring: \"\(substring)\")"
+        return "line: \(lineNumber), column: \(columnNumber), substring: \"\(substring)\""
     }
 }
 

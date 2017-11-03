@@ -612,7 +612,7 @@ class CharacterStreamTests: XCTestCase {
         
         stream.seek(to: string.index(string.startIndex, offsetBy: 4))
         XCTAssertEqual(stream.description,
-                       "CharacterStream(2:1, substring: \"Bar\", userInfo: [:])")
+                       "line: 2, column: 1, substring: \"Bar\", userInfo: [:]")
     }
     
     func test_state_description() {
@@ -622,7 +622,7 @@ class CharacterStreamTests: XCTestCase {
         stream.seek(to: string.index(string.startIndex, offsetBy: 4))
         let state = stream.state
         XCTAssertEqual(state.description,
-                       "CharacterStream.State(2:1, substring: \"Bar\", tag: 1, userInfo: [:])")
+                       "line: 2, column: 1, substring: \"Bar\", tag: 1, userInfo: [:]")
     }
 }
 
