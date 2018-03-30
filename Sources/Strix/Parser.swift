@@ -23,7 +23,7 @@ extension Parser {
         })
     }
     
-    public func flatMap<U>(_ transform: @escaping (T) -> Reply<U>) -> Parser<U> {
+    public func compactMap<U>(_ transform: @escaping (T) -> Reply<U>) -> Parser<U> {
         return flatMap({ (v) -> Parser<U> in
             return Parser<U>({ _ in transform(v) })
         })

@@ -1,6 +1,6 @@
 
 infix operator >>- : AdditionPrecedence  // flatMap
-infix operator >>~ : AdditionPrecedence  // flatMap
+infix operator >>~ : AdditionPrecedence  // compactMap
 infix operator >>| : AdditionPrecedence  // map
 infix operator >>% : AdditionPrecedence  // return
 infix operator >>! : AdditionPrecedence  // right
@@ -27,7 +27,7 @@ public func >>- <T1, T2>(p: Parser<T1>, f: @escaping (T1) -> Parser<T2>) -> Pars
 }
 
 public func >>~ <T1, T2>(p: Parser<T1>, f: @escaping (T1) -> Reply<T2>) -> Parser<T2> {
-    return p.flatMap(f)
+    return p.compactMap(f)
 }
 
 public func >>| <T1, T2>(p: Parser<T1>, f: @escaping (T1) -> T2) -> Parser<T2> {
