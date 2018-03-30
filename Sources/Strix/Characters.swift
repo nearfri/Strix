@@ -185,7 +185,7 @@ public func restOfLine(strippingNewline: Bool = true) -> Parser<Substring> {
 
 public func string(
     until str: String, case caseSensitivity: StringSensitivity = .sensitive,
-    maxCount: String.IndexDistance = .max, thenSkipString skipString: Bool) -> Parser<Substring> {
+    maxCount: Int = .max, thenSkipString skipString: Bool) -> Parser<Substring> {
     
     precondition(!str.isEmpty, "str is empty")
     precondition(maxCount >= 0, "maxCount is negative")
@@ -212,21 +212,15 @@ public func string(
     }
 }
 
-public func manyCharacters(
-    minCount: String.IndexDistance = 0, maxCount: String.IndexDistance = .max,
-    errorLabel: String? = nil,
-    while predicate: @escaping (Character) -> Bool) -> Parser<Substring> {
-    
+public func manyCharacters(minCount: Int = 0, maxCount: Int = .max, errorLabel: String? = nil,
+                           while predicate: @escaping (Character) -> Bool) -> Parser<Substring> {
     return manyCharacters(minCount: minCount, maxCount: maxCount, errorLabel: errorLabel,
                           first: predicate, while: predicate)
 }
 
-public func manyCharacters(
-    minCount: String.IndexDistance = 0, maxCount: String.IndexDistance = .max,
-    errorLabel: String? = nil,
-    first firstPredicate: @escaping (Character) -> Bool,
-    while predicate: @escaping (Character) -> Bool) -> Parser<Substring> {
-    
+public func manyCharacters(minCount: Int = 0, maxCount: Int = .max, errorLabel: String? = nil,
+                           first firstPredicate: @escaping (Character) -> Bool,
+                           while predicate: @escaping (Character) -> Bool) -> Parser<Substring> {
     let errors = { errorLabel.map { [ParseError.Expected($0)] } ?? [] }
     return Parser { stream in
         let state = stream.state

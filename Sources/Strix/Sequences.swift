@@ -122,7 +122,8 @@ public func skipMany<T>(
 }
 
 public func many<T, Handler: ValueHandling>(
-    first firstParser: Parser<T>, repeating repeatedParser: Parser<T>, atLeastOne: Bool,
+    first firstParser: Parser<T>, repeating repeatedParser: Parser<T>,
+    atLeastOne: Bool = false,
     makeHandler: @escaping () -> Handler) -> Parser<Handler.Result> where Handler.Value == T {
     
     return Parser { stream in
@@ -186,7 +187,7 @@ public func skipMany<T1, T2>(
 }
 
 public func many<T1, T2, Handler: ValueHandling & SeparatorHandling>(
-    _ parser: Parser<T1>, separator: Parser<T2>, atLeastOne: Bool,
+    _ parser: Parser<T1>, separator: Parser<T2>, atLeastOne: Bool = false,
     allowEndBySeparator: Bool = false, makeHandler: @escaping () -> Handler
     ) -> Parser<Handler.Result> where Handler.Value == T1, Handler.Separator == T2 {
     

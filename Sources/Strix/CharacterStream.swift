@@ -60,21 +60,21 @@ extension CharacterStream {
         return isAtEnd ? nil : string[nextIndex]
     }
     
-    public func peek(offset: String.IndexDistance) -> Character? {
+    public func peek(offset: Int) -> Character? {
         if let i = index(from: nextIndex, offset: offset), i != endIndex {
             return string[i]
         }
         return nil
     }
     
-    private func index(from i: String.Index, offset: String.IndexDistance) -> String.Index? {
+    private func index(from i: String.Index, offset: Int) -> String.Index? {
         let limit = offset < 0 ? startIndex : endIndex
         return string.index(i, offsetBy: offset, limitedBy: limit)
     }
 }
 
 extension CharacterStream {
-    public typealias Section = (range: Range<String.Index>, count: String.IndexDistance)
+    public typealias Section = (range: Range<String.Index>, count: Int)
     
     public func matches(_ c: Character) -> Bool {
         return matches({ $0 == c })
@@ -100,13 +100,13 @@ extension CharacterStream {
         return end
     }
     
-    public func matches(minCount: String.IndexDistance, maxCount: String.IndexDistance = .max,
+    public func matches(minCount: Int, maxCount: Int = .max,
                         while predicate: (Character) throws -> Bool) rethrows -> Section? {
         let section = try matches(maxCount: maxCount, while: predicate)
         return section.count >= minCount ? section : nil
     }
     
-    public func matches(maxCount: String.IndexDistance = .max,
+    public func matches(maxCount: Int = .max,
                         while predicate: (Character) throws -> Bool) rethrows -> Section {
         var count = 0
         var index = nextIndex
@@ -158,7 +158,7 @@ extension CharacterStream {
     }
     
     @discardableResult
-    public func skip(minCount: String.IndexDistance, maxCount: String.IndexDistance = .max,
+    public func skip(minCount: Int, maxCount: Int = .max,
                      while predicate: (Character) throws -> Bool) rethrows -> Section? {
         guard let result = try matches(minCount: minCount, maxCount: maxCount, while: predicate)
             else { return nil }
@@ -167,7 +167,7 @@ extension CharacterStream {
     }
     
     @discardableResult
-    public func skip(maxCount: String.IndexDistance = .max,
+    public func skip(maxCount: Int = .max,
                      while predicate: (Character) throws -> Bool) rethrows -> Section {
         let result = try matches(maxCount: maxCount, while: predicate)
         nextIndex = result.range.upperBound
@@ -204,14 +204,14 @@ extension CharacterStream {
         return nil
     }
     
-    public func read(minCount: String.IndexDistance, maxCount: String.IndexDistance = .max,
+    public func read(minCount: Int, maxCount: Int = .max,
                      while predicate: (Character) throws -> Bool) rethrows -> Substring? {
         guard let section = try skip(minCount: minCount, maxCount: maxCount, while: predicate)
             else { return nil }
         return string[section.range]
     }
     
-    public func read(maxCount: String.IndexDistance = .max,
+    public func read(maxCount: Int = .max,
                      while predicate: (Character) throws -> Bool) rethrows -> Substring {
         let section = try skip(maxCount: maxCount, while: predicate)
         return string[section.range]
