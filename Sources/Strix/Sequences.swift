@@ -89,8 +89,6 @@ private func array<T, H: ValueHandling>(
             return .success(handler.result, errors)
         case .failure?:
             return .failure(errors)
-        case .fatalFailure?:
-            return .fatalFailure(errors)
         }
     }
 }
@@ -147,8 +145,6 @@ public func many<T, Handler: ValueHandling>(
                 return .failure(errors + e)
             case let .failure(e):
                 return .failure(e)
-            case let .fatalFailure(e):
-                return .fatalFailure(stateTag != stream.stateTag ? e : errors + e)
             }
         }
         
@@ -211,8 +207,6 @@ public func many<T1, T2, Handler: ValueHandling & SeparatorHandling>(
                 return .failure(errors + e)
             case let .failure(e):
                 return .failure(e)
-            case let .fatalFailure(e):
-                return .fatalFailure(stateTag != stream.stateTag ? e : errors + e)
             }
             
             let sepStateTag = stream.stateTag
@@ -225,8 +219,6 @@ public func many<T1, T2, Handler: ValueHandling & SeparatorHandling>(
                 return .success(handler.result, errors + e)
             case let .failure(e):
                 return .failure(e)
-            case let .fatalFailure(e):
-                return .fatalFailure(sepStateTag != stream.stateTag ? e : errors + e)
             }
         }
     }

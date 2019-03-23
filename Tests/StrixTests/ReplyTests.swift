@@ -14,7 +14,6 @@ class ReplyTests: XCTestCase {
     func test_getValue() {
         XCTAssertEqual(Reply.success(3, []).value, 3)
         XCTAssertNil(Reply<Int>.failure([]).value)
-        XCTAssertNil(Reply<Int>.fatalFailure([]).value)
     }
     
     func test_getErrors() {
@@ -26,7 +25,6 @@ class ReplyTests: XCTestCase {
         
         XCTAssertEqual(Reply.success(1, errors).errors as! [DummyError], errors)
         XCTAssertEqual(Reply<Void>.failure(errors).errors as! [DummyError], errors)
-        XCTAssertEqual(Reply<Void>.fatalFailure(errors).errors as! [DummyError], errors)
     }
     
     func test_setErrors() {
@@ -42,11 +40,6 @@ class ReplyTests: XCTestCase {
         checkSuccess(reply, 1, errors)
         
         reply = .failure([])
-        XCTAssertEqual(reply.errors as! [DummyError], [])
-        reply.errors = errors
-        XCTAssertEqual(reply.errors as! [DummyError], errors)
-        
-        reply = .fatalFailure([])
         XCTAssertEqual(reply.errors as! [DummyError], [])
         reply.errors = errors
         XCTAssertEqual(reply.errors as! [DummyError], errors)
@@ -68,10 +61,6 @@ class ReplyTests: XCTestCase {
         XCTAssertEqual(reply.errors as! [DummyError], allErrors)
         
         reply = .failure(errors2)
-        reply = reply.prepending(errors1)
-        XCTAssertEqual(reply.errors as! [DummyError], allErrors)
-        
-        reply = .fatalFailure(errors2)
         reply = reply.prepending(errors1)
         XCTAssertEqual(reply.errors as! [DummyError], allErrors)
     }
@@ -96,10 +85,6 @@ class ReplyTests: XCTestCase {
         reply = .failure(errors2)
         reply.prepend(errors1)
         XCTAssertEqual(reply.errors as! [DummyError], allErrors)
-        
-        reply = .fatalFailure(errors2)
-        reply.prepend(errors1)
-        XCTAssertEqual(reply.errors as! [DummyError], allErrors)
     }
     
     func test_appendingErrors() {
@@ -122,10 +107,6 @@ class ReplyTests: XCTestCase {
         reply = .failure(errors1)
         reply = reply.appending(errors2)
         XCTAssertEqual(reply.errors as! [DummyError], allErrors)
-        
-        reply = .fatalFailure(errors1)
-        reply = reply.appending(errors2)
-        XCTAssertEqual(reply.errors as! [DummyError], allErrors)
     }
     
     func test_appendErrors() {
@@ -146,10 +127,6 @@ class ReplyTests: XCTestCase {
         reply = .failure(errors1)
         reply.append(errors2)
         XCTAssertEqual(reply.errors as! [DummyError], allErrors)
-        
-        reply = .fatalFailure(errors1)
-        reply.append(errors2)
-        XCTAssertEqual(reply.errors as! [DummyError], allErrors)
     }
     
     func test_map() {
@@ -163,10 +140,6 @@ class ReplyTests: XCTestCase {
         reply = .failure(errors)
         XCTAssertEqual(reply.map({ _ in "a" }).value, nil)
         checkFailure(reply, errors)
-        
-        reply = .fatalFailure(errors)
-        XCTAssertEqual(reply.map({ _ in "a" }).value, nil)
-        checkFatalFailure(reply, errors)
     }
     
     func test_flatMap_whenSuccess() {
@@ -189,9 +162,6 @@ class ReplyTests: XCTestCase {
         
         mappedReply = reply.flatMap { _ in .failure(errors2) }
         checkFailure(mappedReply, allErrors)
-        
-        mappedReply = reply.flatMap { _ in .fatalFailure(errors2) }
-        checkFatalFailure(mappedReply, allErrors)
     }
     
     func test_flatMap_whenFailure() {
@@ -210,24 +180,6 @@ class ReplyTests: XCTestCase {
             return .success("a", errors2)
         }
         checkFailure(mappedReply, errors1)
-    }
-    
-    func test_flatMap_whenFatalFailure() {
-        let errors1: [DummyError] = [
-            DummyError.err0,
-            DummyError.err1
-        ]
-        let errors2: [DummyError] = [
-            DummyError.err2,
-            DummyError.err3
-        ]
-        
-        let reply: Reply<Int> = .fatalFailure(errors1)
-        let mappedReply: Reply<String> = reply.flatMap { _ in
-            shouldNotEnterHere()
-            return .success("a", errors2)
-        }
-        checkFatalFailure(mappedReply, errors1)
     }
 }
 

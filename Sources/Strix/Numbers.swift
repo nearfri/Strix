@@ -66,7 +66,7 @@ public func floatingPoint(allowUnderscores: Bool = false) -> Parser<Double> {
                     return .success(signValue * significand * exponent, [])
                 }
                 stream.backtrack(to: state)
-                return .fatalFailure([makeOverflowError(from: components)])
+                return .failure([makeOverflowError(from: components)])
             }
         })
     }
@@ -103,7 +103,7 @@ public func integer(allowExponent: Bool = false, allowUnderscores: Bool = false)
                 return .success(signValue * multipliedValue, [])
             } catch {
                 stream.backtrack(to: state)
-                return .fatalFailure([error])
+                return .failure([error])
             }
         })
     }

@@ -91,8 +91,6 @@ public final class PrattParser<T> {
                 self.nextToken = token
             case let .failure(e):
                 throw Error.tokenizerFailure(e)
-            case let .fatalFailure(e):
-                throw Error.tokenizerFatalFailure(e)
             }
         }
         
@@ -111,12 +109,10 @@ public final class PrattParser<T> {
             return .success(ret, [])
         } catch Error.tokenizerFailure(let e) {
             return .failure(e)
-        } catch Error.tokenizerFatalFailure(let e) {
-            return .fatalFailure(e)
         } catch Error.denotationNotFound(let e) {
-            return .fatalFailure([e])
+            return .failure([e])
         } catch {
-            return .fatalFailure([error])
+            return .failure([error])
         }
     }
     
@@ -230,7 +226,6 @@ extension PrattParser {
 extension PrattParser {
     private enum Error: Swift.Error {
         case tokenizerFailure([Swift.Error])
-        case tokenizerFatalFailure([Swift.Error])
         case denotationNotFound(Swift.Error)
     }
 }

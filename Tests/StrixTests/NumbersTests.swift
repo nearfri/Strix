@@ -292,7 +292,7 @@ class NumbersTests: XCTestCase {
         let p = floatingPoint()
         
         let stream = CharacterStream(string: "12345678901234567890")
-        checkFatalFailure(p.parse(stream))
+        checkFailure(p.parse(stream))
         XCTAssertEqual(stream.nextIndex, stream.startIndex)
     }
     
@@ -300,7 +300,7 @@ class NumbersTests: XCTestCase {
         let p = integer()
         
         let stream = CharacterStream(string: "12345678901234567890")
-        checkFatalFailure(p.parse(stream))
+        checkFailure(p.parse(stream))
         XCTAssertEqual(stream.nextIndex, stream.startIndex)
     }
 }

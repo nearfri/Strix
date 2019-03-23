@@ -126,18 +126,6 @@ func checkFailure<T>(
     }
 }
 
-func checkFatalFailure<T>(
-    _ reply: Reply<T>,
-    _ message: @autoclosure () -> String = "",
-    file: StaticString = #file, line: UInt = #line) {
-    
-    if case .fatalFailure = reply {
-        
-    } else {
-        fail(expected: .fatalFailure, actual: reply, message: message, file: file, line: line)
-    }
-}
-
 func checkFailure<T, E: Error & Equatable>(
     _ reply: Reply<T>, _ errors: [E],
     _ message: @autoclosure () -> String = "",
@@ -147,18 +135,6 @@ func checkFailure<T, E: Error & Equatable>(
         XCTAssertEqual(e as! [E], errors, message, file: file, line: line)
     } else {
         fail(expected: .failure, actual: reply, message: message, file: file, line: line)
-    }
-}
-
-func checkFatalFailure<T, E: Error & Equatable>(
-    _ reply: Reply<T>, _ errors: [E],
-    _ message: @autoclosure () -> String = "",
-    file: StaticString = #file, line: UInt = #line) {
-    
-    if case let .fatalFailure(e) = reply {
-        XCTAssertEqual(e as! [E], errors, message, file: file, line: line)
-    } else {
-        fail(expected: .fatalFailure, actual: reply, message: message, file: file, line: line)
     }
 }
 
@@ -245,8 +221,6 @@ private func label<T>(of reply: Reply<T>) -> String {
         return "success"
     case .failure:
         return "failure"
-    case .fatalFailure:
-        return "fatalFailure"
     }
 }
 

@@ -106,7 +106,7 @@ class PrimitivesCustomizingErrorTests: XCTestCase {
         let p: Parser<Int> = p1 <??> errLabel
         let reply = p.parse(defaultStream)
         XCTAssertEqual(defaultStream.stateTag, startStateTag)
-        if case let .fatalFailure(e) = reply, let err = e.first as? ParseError.Compound {
+        if case let .failure(e) = reply, let err = e.first as? ParseError.Compound {
             XCTAssertEqual(err.label, errLabel)
         } else {
             shouldNotEnterHere()
@@ -121,7 +121,7 @@ class PrimitivesCustomizingErrorTests: XCTestCase {
         let p: Parser<Int> = p1 <??> errLabel
         let reply = p.parse(defaultStream)
         XCTAssertEqual(defaultStream.stateTag, startStateTag)
-        if case let .fatalFailure(e) = reply, let err = e.first as? ParseError.Compound {
+        if case let .failure(e) = reply, let err = e.first as? ParseError.Compound {
             XCTAssertEqual(err.label, errLabel)
         } else {
             shouldNotEnterHere()
@@ -131,11 +131,6 @@ class PrimitivesCustomizingErrorTests: XCTestCase {
     func test_fail_returnFailure() {
         let p: Parser<Int> = fail(errLabel)
         checkFailure(p.parse(defaultStream), [ParseError.Generic(message: errLabel)])
-    }
-    
-    func test_fatalFailure_returnFatalFailure() {
-        let p: Parser<Int> = failFatally(errLabel)
-        checkFatalFailure(p.parse(defaultStream), [ParseError.Generic(message: errLabel)])
     }
 }
 

@@ -55,20 +55,6 @@ class ParserTests: XCTestCase {
         checkFailure(p.parse(defaultStream), [DummyError.err0])
     }
     
-    func test_flatMap_fatalFailure() {
-        let alwaysFail = Parser { (stream) -> Reply<String> in
-            return .fatalFailure([DummyError.err0])
-        }
-        let toInt = { (str: String) -> Parser<Int> in
-            return Parser { stream -> Reply<Int> in
-                shouldNotEnterHere()
-                return .success(Int(str)!, [DummyError.err1])
-            }
-        }
-        let p = alwaysFail.flatMap(toInt)
-        checkFatalFailure(p.parse(defaultStream), [DummyError.err0])
-    }
-    
     func test_map_success() {
         let numberString = Parser { (stream) -> Reply<String> in
             return .success("1", [DummyError.err0])
@@ -103,14 +89,6 @@ class ParserTests: XCTestCase {
         let underlyingErrors = [DummyError.err0]
         let parser = Parser { (_) -> Reply<Int> in
             return .failure(underlyingErrors)
-        }
-        checkFailure(parser.run(""), underlyingErrors)
-    }
-    
-    func test_run_whenFatalFailure_returnFailure() {
-        let underlyingErrors = [DummyError.err0]
-        let parser = Parser { (_) -> Reply<Int> in
-            return .fatalFailure(underlyingErrors)
         }
         checkFailure(parser.run(""), underlyingErrors)
     }

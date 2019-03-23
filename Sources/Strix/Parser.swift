@@ -17,8 +17,6 @@ extension Parser {
                 return stateTag == stream.stateTag && !e.isEmpty ? reply.prepending(e) : reply
             case let .failure(e):
                 return .failure(e)
-            case let .fatalFailure(e):
-                return .fatalFailure(e)
             }
         })
     }
@@ -42,7 +40,7 @@ extension Parser {
         switch parse(stream) {
         case let .success(v, _):
             return .success(v)
-        case let .failure(errors), let .fatalFailure(errors):
+        case let .failure(errors):
             let error = ParseResult<T>.Error(position: stream.position, underlyingErrors: errors)
             return .failure(error)
         }

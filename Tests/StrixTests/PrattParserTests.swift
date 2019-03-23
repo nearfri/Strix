@@ -70,16 +70,12 @@ class PrattParserTests: XCTestCase {
     func test_prattParser_whenTokenizerFailure_returnFailure() {
         let p = calculator()
         checkFailure(p.parse(CharacterStream(string: "12.0e")))
+        checkFailure(p.parse(CharacterStream(string: "#")))
     }
     
-    func test_prattParser_whenTokenizerFatalFailure_returnFatalFailure() {
+    func test_prattParser_whenExpressionThrowError_returnFailure() {
         let p = calculator()
-        checkFatalFailure(p.parse(CharacterStream(string: "#")))
-    }
-    
-    func test_prattParser_whenExpressionThrowError_returnFatalFailure() {
-        let p = calculator()
-        checkFatalFailure(p.parse(CharacterStream(string: "1 : 2")))
+        checkFailure(p.parse(CharacterStream(string: "1 : 2")))
     }
 }
 
@@ -118,7 +114,7 @@ private func calculatorTokenizer() -> Parser<Token> {
     }()
     
     let operatorForTest = any(of: "!:") >>| { Token(type: .operator, value: String($0)) }
-    let errorForTest: Parser<Token> = failFatally("invalid character")
+    let errorForTest: Parser<Token> = fail("invalid character")
     
     return ws >>! choice([number, name, singleOperator, end, operatorForTest, errorForTest])
 }

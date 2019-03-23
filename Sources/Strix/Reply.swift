@@ -2,7 +2,6 @@
 public enum Reply<T> {
     case success(T, [Error])
     case failure([Error])
-    case fatalFailure([Error])
 }
 
 extension Reply {
@@ -10,7 +9,7 @@ extension Reply {
         switch self {
         case .success(let v, _):
             return v
-        case .failure, .fatalFailure:
+        case .failure:
             return nil
         }
     }
@@ -20,14 +19,12 @@ extension Reply {
             switch self {
             case let .success(_, e):    return e
             case let .failure(e):       return e
-            case let .fatalFailure(e):  return e
             }
         }
         set {
             switch self {
             case .success(let v, _):    self = .success(v, newValue)
             case .failure(_):           self = .failure(newValue)
-            case .fatalFailure(_):      self = .fatalFailure(newValue)
             }
         }
     }
@@ -37,7 +34,6 @@ extension Reply {
         switch self {
         case let .success(v, e):    return .success(v, errors + e)
         case let .failure(e):       return .failure(errors + e)
-        case let .fatalFailure(e):  return .fatalFailure(errors + e)
         }
     }
     
@@ -46,7 +42,6 @@ extension Reply {
         switch self {
         case let .success(v, e):    return .success(v, e + errors)
         case let .failure(e):       return .failure(e + errors)
-        case let .fatalFailure(e):  return .fatalFailure(e + errors)
         }
     }
     
@@ -62,7 +57,6 @@ extension Reply {
         switch self {
         case let .success(v, e):    return try .success(transform(v), e)
         case let .failure(e):       return .failure(e)
-        case let .fatalFailure(e):  return .fatalFailure(e)
         }
     }
     
@@ -70,7 +64,6 @@ extension Reply {
         switch self {
         case let .success(v, e):    return try transform(v).prepending(e)
         case let .failure(e):       return .failure(e)
-        case let .fatalFailure(e):  return .fatalFailure(e)
         }
     }
 }

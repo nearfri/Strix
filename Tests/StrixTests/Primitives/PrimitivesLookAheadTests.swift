@@ -124,21 +124,6 @@ class PrimitivesLookAheadTests: XCTestCase {
         }
     }
     
-    func test_lookAhead_whenFatalFailure_backtrackAndReturnFailure() {
-        let p1 = Parser<Int> { (stream) in
-            stream.stateTag += 10
-            return .fatalFailure(dummyErrors)
-        }
-        let p: Parser<Int> = lookAhead(p1)
-        let reply = p.parse(defaultStream)
-        XCTAssertEqual(defaultStream.stateTag, startStateTag)
-        if case let .failure(e) = reply, let nestedError = e.first as? ParseError.Nested {
-            XCTAssertEqual(nestedError.errors as! [DummyError], dummyErrors)
-        } else {
-            shouldNotEnterHere()
-        }
-    }
-    
     func test_lookAhead_whenFailureWithoutStateChange_returnFailureWithOriginalErrors() {
         let p1 = Parser<Int> { (stream) in
             return .failure(dummyErrors)

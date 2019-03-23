@@ -72,14 +72,6 @@ class SequencesArrayTests: XCTestCase {
         checkFailure(p.parse(makeEmptyStream()), [DummyError.err0])
     }
     
-    func test_array_whenParserFatalFailure_returnFatalFailure() {
-        let p1 = Parser { stream -> Reply<Int> in
-            return .fatalFailure([DummyError.err0])
-        }
-        let p: Parser<[Int]> = array(p1, count: 3)
-        checkFatalFailure(p.parse(makeEmptyStream()), [DummyError.err0])
-    }
-    
     func test_skipArray_whenParserSuccess_returnSuccess() {
         for maxCount in 0..<3 {
             let message = "when maxCount is \(maxCount)"

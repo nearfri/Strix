@@ -215,32 +215,27 @@ public func <??> <T>(p: Parser<T>, errorLabel: String) -> Parser<T> {
         
         if state.tag == stream.stateTag {
             if let error = extractAndMakeCompoundError(from: reply.errors, label: errorLabel) {
-                reply.errors = [error]
+                return .failure([error])
             } else {
-                reply.errors = [ParseError.Expected(errorLabel)]
+                return .failure([ParseError.Expected(errorLabel)])
             }
-            return reply
         }
         
-        let compoundError: ParseError.Compound
+        defer { stream.backtrack(to: state) }
+        
         if let error = extractAndMakeCompoundError(from: reply.errors, label: errorLabel) {
-            compoundError = error
+            return .failure([error])
         } else {
-            compoundError = ParseError.Compound(label: errorLabel, position: stream.position,
-                                                userInfo: stream.userInfo, errors: reply.errors)
+            return .failure(
+                [ParseError.Compound(label: errorLabel, position: stream.position,
+                                     userInfo: stream.userInfo, errors: reply.errors)]
+            )
         }
-        stream.backtrack(to: state)
-        // state가 바뀌었던 걸 backtrack 한거라 fatalFailure를 리턴해서 일반적인 파싱은 더 이상 진행하지 않도록 한다
-        return .fatalFailure([compoundError])
     }
 }
 
 public func fail<T>(_ message: String) -> Parser<T> {
     return pure(.failure([ParseError.Generic(message: message)]))
-}
-
-public func failFatally<T>(_ message: String) -> Parser<T> {
-    return pure(.fatalFailure([ParseError.Generic(message: message)]))
 }
 
 // MARK: - Helper functions

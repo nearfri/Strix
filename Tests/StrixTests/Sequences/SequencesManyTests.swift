@@ -37,31 +37,6 @@ class SequencesManyTests: XCTestCase {
         }
     }
     
-    func test_many_whenFatalFailWithoutStateChange_returnFatalFailure() {
-        let maxCount = 3
-        var count = 0
-        let p1 = Parser { stream -> Reply<Int> in
-            count += 1
-            if count < maxCount {
-                stream.stateTag += 1
-                return .success(count, [DummyError(rawValue: count)!])
-            }
-            return .fatalFailure([DummyError(rawValue: count)!])
-        }
-        let errors = Array(Array(1..<maxCount+1).map({ DummyError(rawValue: $0)! }).suffix(2))
-        
-        do {
-            let p: Parser<[Int]> = many(p1)
-            checkFatalFailure(p.parse(makeEmptyStream()), errors)
-        }
-        
-        do {
-            count = 0
-            let p: Parser<Void> = skipMany(p1)
-            checkFatalFailure(p.parse(makeEmptyStream()), errors)
-        }
-    }
-    
     func test_many_whenFailWithStateChange_returnFailure() {
         let maxCount = 3
         var count = 0
@@ -84,31 +59,6 @@ class SequencesManyTests: XCTestCase {
             count = 0
             let p: Parser<Void> = skipMany(p1)
             checkFailure(p.parse(makeEmptyStream()), errors)
-        }
-    }
-    
-    func test_many_whenFatalFailWithStateChange_returnFatalFailure() {
-        let maxCount = 3
-        var count = 0
-        let p1 = Parser { stream -> Reply<Int> in
-            count += 1
-            stream.stateTag += 1
-            if count < maxCount {
-                return .success(count, [DummyError(rawValue: count)!])
-            }
-            return .fatalFailure([DummyError(rawValue: count)!])
-        }
-        let errors = [DummyError(rawValue: maxCount)!]
-        
-        do {
-            let p: Parser<[Int]> = many(p1)
-            checkFatalFailure(p.parse(makeEmptyStream()), errors)
-        }
-        
-        do {
-            count = 0
-            let p: Parser<Void> = skipMany(p1)
-            checkFatalFailure(p.parse(makeEmptyStream()), errors)
         }
     }
     
