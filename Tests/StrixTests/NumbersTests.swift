@@ -65,7 +65,7 @@ class NumbersTests: XCTestCase {
         
         let stream = CharacterStream(string: "12.3ea")
         checkFailure(p.parse(stream))
-        XCTAssertEqual(stream.nextIndex, stream.string.index(of: "a"))
+        XCTAssertEqual(stream.nextIndex, stream.string.firstIndex(of: "a"))
     }
     
     func test_floatingPoint_decimal() {
@@ -265,15 +265,15 @@ class NumbersTests: XCTestCase {
         
         var stream = CharacterStream(string: "9.7-inch tablet")
         checkSuccess(p.parse(stream), 9.7)
-        XCTAssertEqual(stream.nextIndex, stream.string.index(of: "-"))
+        XCTAssertEqual(stream.nextIndex, stream.string.firstIndex(of: "-"))
         
         stream = CharacterStream(string: "infinity loop")
         checkSuccess(p.parse(stream), Double.infinity)
-        XCTAssertEqual(stream.nextIndex, stream.string.index(of: " "))
+        XCTAssertEqual(stream.nextIndex, stream.string.firstIndex(of: " "))
         
         stream = CharacterStream(string: "nand memory")
         XCTAssertTrue(p.parse(stream).value?.isNaN ?? false)
-        XCTAssertEqual(stream.nextIndex, stream.string.index(of: "d"))
+        XCTAssertEqual(stream.nextIndex, stream.string.firstIndex(of: "d"))
     }
     
     func test_integer_whenSuccess_nextIndexIsAfterNumber() {
@@ -281,11 +281,11 @@ class NumbersTests: XCTestCase {
         
         var stream = CharacterStream(string: "13-inch notebook")
         checkSuccess(p.parse(stream), 13)
-        XCTAssertEqual(stream.nextIndex, stream.string.index(of: "-"))
+        XCTAssertEqual(stream.nextIndex, stream.string.firstIndex(of: "-"))
         
         stream = CharacterStream(string: "9.7-inch tablet")
         checkSuccess(p.parse(stream), 9)
-        XCTAssertEqual(stream.nextIndex, stream.string.index(of: "."))
+        XCTAssertEqual(stream.nextIndex, stream.string.firstIndex(of: "."))
     }
     
     func test_floatingPoint_whenOverflow_nextIndexIsAtStart() {

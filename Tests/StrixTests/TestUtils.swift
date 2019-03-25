@@ -31,9 +31,9 @@ func checkSuccess(
     file: StaticString = #file, line: UInt = #line) {
     
     if case let .success(_, e) = reply {
-        XCTAssertTrue(e.isEmpty, messageForNotEmptyError(e, message), file: file, line: line)
+        XCTAssertTrue(e.isEmpty, messageForNotEmptyError(e, message()), file: file, line: line)
     } else {
-        fail(expected: .success, actual: reply, message: message, file: file, line: line)
+        fail(expected: .success, actual: reply, message: message(), file: file, line: line)
     }
 }
 
@@ -43,9 +43,9 @@ func checkSuccess<E: Error & Equatable>(
     file: StaticString = #file, line: UInt = #line) {
     
     if case let .success(_, e) = reply {
-        XCTAssertEqual(e as! [E], errors, message, file: file, line: line)
+        XCTAssertEqual(e as! [E], errors, message(), file: file, line: line)
     } else {
-        fail(expected: .success, actual: reply, message: message, file: file, line: line)
+        fail(expected: .success, actual: reply, message: message(), file: file, line: line)
     }
 }
 
@@ -55,10 +55,10 @@ func checkSuccess<T: Equatable>(
     file: StaticString = #file, line: UInt = #line) {
     
     if case let .success(v, e) = reply {
-        XCTAssertEqual(v, value, message, file: file, line: line)
-        XCTAssertTrue(e.isEmpty, messageForNotEmptyError(e, message), file: file, line: line)
+        XCTAssertEqual(v, value, message(), file: file, line: line)
+        XCTAssertTrue(e.isEmpty, messageForNotEmptyError(e, message()), file: file, line: line)
     } else {
-        fail(expected: .success, actual: reply, message: message, file: file, line: line)
+        fail(expected: .success, actual: reply, message: message(), file: file, line: line)
     }
 }
 
@@ -68,10 +68,10 @@ func checkSuccess<T: Equatable>(
     file: StaticString = #file, line: UInt = #line) {
     
     if case let .success(v, e) = reply {
-        XCTAssertEqual(v, value, message, file: file, line: line)
-        XCTAssertTrue(e.isEmpty, messageForNotEmptyError(e, message), file: file, line: line)
+        XCTAssertEqual(v, value, message(), file: file, line: line)
+        XCTAssertTrue(e.isEmpty, messageForNotEmptyError(e, message()), file: file, line: line)
     } else {
-        fail(expected: .success, actual: reply, message: message, file: file, line: line)
+        fail(expected: .success, actual: reply, message: message(), file: file, line: line)
     }
 }
 
@@ -81,10 +81,10 @@ func checkSuccess<T: Equatable, E: Error & Equatable>(
     file: StaticString = #file, line: UInt = #line) {
     
     if case let .success(v, e) = reply {
-        XCTAssertEqual(v, value, message, file: file, line: line)
-        XCTAssertEqual(e as! [E], errors, message, file: file, line: line)
+        XCTAssertEqual(v, value, message(), file: file, line: line)
+        XCTAssertEqual(e as! [E], errors, message(), file: file, line: line)
     } else {
-        fail(expected: .success, actual: reply, message: message, file: file, line: line)
+        fail(expected: .success, actual: reply, message: message(), file: file, line: line)
     }
 }
 
@@ -94,10 +94,10 @@ func checkSuccess<T: Equatable, E: Error & Equatable>(
     file: StaticString = #file, line: UInt = #line) {
     
     if case let .success(v, e) = reply {
-        XCTAssertEqual(v, value, message, file: file, line: line)
-        XCTAssertEqual(e as! [E], errors, message, file: file, line: line)
+        XCTAssertEqual(v, value, message(), file: file, line: line)
+        XCTAssertEqual(e as! [E], errors, message(), file: file, line: line)
     } else {
-        fail(expected: .success, actual: reply, message: message, file: file, line: line)
+        fail(expected: .success, actual: reply, message: message(), file: file, line: line)
     }
 }
 
@@ -107,10 +107,10 @@ func checkSuccess<T: Equatable, E: Error & Equatable> (
     file: StaticString = #file, line: UInt = #line) {
     
     if case let .success(v, e) = reply {
-        XCTAssertEqual(v, value, message, file: file, line: line)
-        XCTAssertEqual(e as! [E], errors, message, file: file, line: line)
+        XCTAssertEqual(v, value, message(), file: file, line: line)
+        XCTAssertEqual(e as! [E], errors, message(), file: file, line: line)
     } else {
-        fail(expected: .success, actual: reply, message: message, file: file, line: line)
+        fail(expected: .success, actual: reply, message: message(), file: file, line: line)
     }
 }
 
@@ -122,7 +122,7 @@ func checkFailure<T>(
     if case .failure = reply {
         
     } else {
-        fail(expected: .failure, actual: reply, message: message, file: file, line: line)
+        fail(expected: .failure, actual: reply, message: message(), file: file, line: line)
     }
 }
 
@@ -132,9 +132,9 @@ func checkFailure<T, E: Error & Equatable>(
     file: StaticString = #file, line: UInt = #line) {
     
     if case let .failure(e) = reply {
-        XCTAssertEqual(e as! [E], errors, message, file: file, line: line)
+        XCTAssertEqual(e as! [E], errors, message(), file: file, line: line)
     } else {
-        fail(expected: .failure, actual: reply, message: message, file: file, line: line)
+        fail(expected: .failure, actual: reply, message: message(), file: file, line: line)
     }
 }
 
@@ -146,7 +146,7 @@ func checkSuccess(
     if case .success = parseResult {
         
     } else {
-        fail(expected: .success, actual: parseResult, message: message, file: file, line: line)
+        fail(expected: .success, actual: parseResult, message: message(), file: file, line: line)
     }
 }
 
@@ -156,9 +156,9 @@ func checkSuccess<T: Equatable>(
     file: StaticString = #file, line: UInt = #line) {
     
     if case let .success(v) = parseResult {
-        XCTAssertEqual(v, value, message, file: file, line: line)
+        XCTAssertEqual(v, value, message(), file: file, line: line)
     } else {
-        fail(expected: .success, actual: parseResult, message: message, file: file, line: line)
+        fail(expected: .success, actual: parseResult, message: message(), file: file, line: line)
     }
 }
 
@@ -170,7 +170,7 @@ func checkFailure<T>(
     if case .failure = parseResult {
         
     } else {
-        fail(expected: .failure, actual: parseResult, message: message, file: file, line: line)
+        fail(expected: .failure, actual: parseResult, message: message(), file: file, line: line)
     }
 }
 
@@ -180,10 +180,10 @@ func checkFailure<T, E: Error & Equatable>(
     file: StaticString = #file, line: UInt = #line) {
     
     if case let .failure(e) = parseResult {
-        XCTAssertEqual(e.underlyingErrors as! [E], underlyingErrors, message,
+        XCTAssertEqual(e.underlyingErrors as! [E], underlyingErrors, message(),
                        file: file, line: line)
     } else {
-        fail(expected: .failure, actual: parseResult, message: message, file: file, line: line)
+        fail(expected: .failure, actual: parseResult, message: message(), file: file, line: line)
     }
 }
 
