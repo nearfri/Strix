@@ -120,13 +120,13 @@ extension CharacterStream {
     }
     
     public func matches(_ regex: NSRegularExpression) -> Section? {
-        let searchRange = NSRange(nextIndex.encodedOffset..<endIndex.encodedOffset)
-        guard let match = regex.firstMatch(in: string, options: [.anchored], range: searchRange)
+        let searchRange = NSRange(nextIndex..<endIndex, in: string)
+        guard let match = regex.firstMatch(in: string, options: [.anchored], range: searchRange),
+            let matchRange = Range(match.range, in: string)
             else { return nil }
         
-        let range = nextIndex..<String.Index(encodedOffset: match.range.upperBound)
-        let count = string.distance(from: range.lowerBound, to: range.upperBound)
-        return (range, count)
+        let count = string.distance(from: matchRange.lowerBound, to: matchRange.upperBound)
+        return (matchRange, count)
     }
 }
 

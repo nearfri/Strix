@@ -16,14 +16,6 @@ public struct Token: Hashable {
         self.type = type
         self.value = value
     }
-    
-    public static func == (lhs: Token, rhs: Token) -> Bool {
-        return lhs.type == rhs.type && lhs.value == rhs.value
-    }
-    
-    public var hashValue: Int {
-        return type.hashValue ^ value.hashValue
-    }
 }
 
 public protocol TokenHandling {

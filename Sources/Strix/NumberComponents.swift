@@ -1,7 +1,7 @@
 
 import Foundation
 
-public struct NumberComponents {
+public struct NumberComponents: Equatable {
     public var string: String? = nil
     public var sign: Sign = .none
     public var classification: Classification = .finite
@@ -12,18 +12,6 @@ public struct NumberComponents {
     
     public var radix: Int {
         return notation.rawValue
-    }
-}
-
-extension NumberComponents: Equatable {
-    public static func == (lhs: NumberComponents, rhs: NumberComponents) -> Bool {
-        return lhs.string == rhs.string
-            && lhs.sign == rhs.sign
-            && lhs.classification == rhs.classification
-            && lhs.notation == rhs.notation
-            && lhs.integer == rhs.integer
-            && lhs.fraction == rhs.fraction
-            && lhs.exponent == rhs.exponent
     }
 }
 
