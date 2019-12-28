@@ -99,7 +99,7 @@ class NumberComponentsTests: XCTestCase {
         // octal
         components.notation = .octal
         components.fraction = "123"
-        let octal123 = (1.0 / 8) + (2.0 / (8*8)) + (3.0 / (8*8*8)) // 0.162109375
+        let octal123: Double = (1.0 / 8.0) + (2.0 / 64.0) + (3.0 / 512.0) // 0.162109375
         XCTAssertEqual(components.fractionValue, octal123)
         
         components.fraction = "1238"
@@ -108,7 +108,7 @@ class NumberComponentsTests: XCTestCase {
         // binary
         components.notation = .binary
         components.fraction = "101"
-        let binary101 = (1.0 / 2) + (0.0 / (2*2)) + (1.0 / (2*2*2)) // 0.625
+        let binary101: Double = (1.0 / 2.0) + (0.0 / 4.0) + (1.0 / 8.0) // 0.625
         XCTAssertEqual(components.fractionValue, binary101)
         
         components.fraction = "12"
