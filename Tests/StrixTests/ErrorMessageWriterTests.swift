@@ -7,14 +7,14 @@ class ErrorMessageWriterTests: XCTestCase {
     var outputBuffer: ErrorOutputBuffer = ErrorOutputBuffer()
     var positionString: String = ""
     
-    var expectedErrors: [ParseError.Expected]!
-    var expectedStringErrors: [ParseError.ExpectedString]!
-    var unexpectedErrors: [ParseError.Unexpected]!
-    var unexpectedStringErrors: [ParseError.UnexpectedString]!
-    var genericErrors: [ParseError.Generic]!
-    var nestedErrors: [ParseError.Nested]!
-    var compoundErrors: [ParseError.Compound]!
-    var unknownErrors: [Error]!
+    var expectedErrors: [ParseError.Expected] = []
+    var expectedStringErrors: [ParseError.ExpectedString] = []
+    var unexpectedErrors: [ParseError.Unexpected] = []
+    var unexpectedStringErrors: [ParseError.UnexpectedString] = []
+    var genericErrors: [ParseError.Generic] = []
+    var nestedErrors: [ParseError.Nested] = []
+    var compoundErrors: [ParseError.Compound] = []
+    var unknownErrors: [Error] = []
     
     override func setUp() {
         super.setUp()

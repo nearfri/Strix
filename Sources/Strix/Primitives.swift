@@ -208,7 +208,7 @@ public func <?> <T>(p: Parser<T>, errorLabel: String) -> Parser<T> {
 public func <??> <T>(p: Parser<T>, errorLabel: String) -> Parser<T> {
     return Parser { stream in
         let state = stream.state
-        var reply = p.parse(stream)
+        let reply = p.parse(stream)
         if case let .success(v, e) = reply {
             return .success(v, state.tag == stream.stateTag ? [ParseError.Expected(errorLabel)] : e)
         }
