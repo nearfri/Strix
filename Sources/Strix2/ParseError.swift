@@ -1,6 +1,6 @@
 import Foundation
 
-public enum ParseError: Error {
+public enum ParseError: Error, Equatable {
     case expected(label: String)
     case unexpected(label: String)
     case expectedString(string: String, caseSensitivity: CaseSensitivity)

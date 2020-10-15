@@ -7,6 +7,12 @@ public struct Parser<T> {
         self.parse = parse
     }
     
+    public func map<U>(_ transform: @escaping (T) -> U) -> Parser<U> {
+        return Parser<U> { state -> ParserReply<U> in
+            return parse(state).map(transform)
+        }
+    }
+    
     public func flatMap<U>(_ transform: @escaping (T) -> Parser<U>) -> Parser<U> {
         return Parser<U> { state -> ParserReply<U> in
             let reply = parse(state)
@@ -14,16 +20,10 @@ public struct Parser<T> {
             case .success(let v):
                 return transform(v)
                     .parse(reply.state)
-                    .prependingErrors(reply.errors, if: { $0.state == reply.state })
+                    .compareStateAndPrependingErrors(of: reply)
             case .failure:
                 return .failure(reply.state, reply.errors)
             }
-        }
-    }
-    
-    public func map<U>(_ transform: @escaping (T) -> U) -> Parser<U> {
-        return Parser<U> { state -> ParserReply<U> in
-            return parse(state).map(transform)
         }
     }
 }

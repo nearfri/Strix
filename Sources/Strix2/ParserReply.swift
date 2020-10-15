@@ -1,11 +1,20 @@
 import Foundation
 
-public struct ParserReply<T> {
+extension ParserReply {
     public enum Result {
         case success(T)
         case failure
+        
+        public var value: T? {
+            switch self {
+            case .success(let v):   return v
+            case .failure:          return nil
+            }
+        }
     }
-    
+}
+
+public struct ParserReply<T> {
     public var result: Result
     public var state: ParserState
     public var errors: [ParseError]
@@ -40,21 +49,15 @@ public struct ParserReply<T> {
         return .init(result: result, state: state, errors: self.errors + errors)
     }
     
-    public func appendingErrors(
-        _ errors: [ParseError],
-        if predicate: (ParserReply) throws -> Bool
-    ) rethrows -> ParserReply {
-        return try predicate(self) ? appendingErrors(errors) : self
-    }
-    
     public func prependingErrors(_ errors: [ParseError]) -> ParserReply {
         return .init(result: result, state: state, errors: errors + self.errors)
     }
     
-    public func prependingErrors(
-        _ errors: [ParseError],
-        if predicate: (ParserReply) throws -> Bool
-    ) rethrows -> ParserReply {
-        return try predicate(self) ? prependingErrors(errors) : self
+    public func compareStateAndAppendingErrors<U>(of reply: ParserReply<U>) -> ParserReply {
+        return state == reply.state ? appendingErrors(reply.errors) : self
+    }
+    
+    public func compareStateAndPrependingErrors<U>(of reply: ParserReply<U>) -> ParserReply {
+        return state == reply.state ? prependingErrors(reply.errors) : self
     }
 }
