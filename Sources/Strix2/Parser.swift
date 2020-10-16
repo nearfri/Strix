@@ -26,4 +26,19 @@ public struct Parser<T> {
             }
         }
     }
+    
+    public func run(_ input: String) throws -> T {
+        let initialState = ParserState(stream: input[...])
+        
+        let reply = parse(initialState)
+        
+        switch reply.result {
+        case .success(let value):
+            return value
+        case .failure:
+            throw RunError(input: input,
+                           position: reply.state.stream.startIndex,
+                           underlyingErrors: reply.errors)
+        }
+    }
 }
