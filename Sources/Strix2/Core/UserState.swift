@@ -1,16 +1,5 @@
 import Foundation
 
-//extension UserStateKey {
-//    static let isInLink: UserStateKey = "com.ukjeong.html.isInLink"
-//}
-//
-//extension UserState {
-//    var isInLink: Bool {
-//        get { self[.isInLink] as? Bool ?? false }
-//        set { self[.isInLink] = newValue }
-//    }
-//}
-
 public struct UserStateKey: Hashable, ExpressibleByStringLiteral {
     public var rawValue: String
     
