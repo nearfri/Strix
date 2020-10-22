@@ -12,7 +12,7 @@ struct ErrorMessageWriter<Target: ErrorOutputStream> {
     }
     
     func write(to target: inout Target) {
-        PositionWriter(input: input, position: position).write(to: &target)
+        writePosition(to: &target)
         
         writeExpectedErrors(to: &target)
         writeUnexpectedErrors(to: &target)
@@ -26,48 +26,31 @@ struct ErrorMessageWriter<Target: ErrorOutputStream> {
         }
     }
     
+    // MARK: - Position
+    
+    private func writePosition(to target: inout Target) {
+        PositionWriter(input: input, position: position).write(to: &target)
+    }
+    
     // MARK: - Expected, unexpected error
     
     private func writeExpectedErrors(to target: inout Target) {
-        let messages: [String] = errorSplitter.expectedErrors
-            + errorSplitter.expectedStringErrors.map({ makeMessage(stringError: $0) })
-            + errorSplitter.compoundErrors.map(\.label)
+        var writer = MessageListWriter(title: "Expecting: ", lastSeparator: " or ")
         
-        writeMessages(messages, title: "Expecting: ", lastSeparator: " or ", to: &target)
+        errorSplitter.expectedErrors.forEach({ writer.appendMessage($0) })
+        errorSplitter.expectedStringErrors.forEach({ writer.appendMessage(withStringError: $0) })
+        errorSplitter.compoundErrors.forEach({ writer.appendMessage($0.label) })
+        
+        writer.write(to: &target)
     }
     
     private func writeUnexpectedErrors(to target: inout Target) {
-        let messages: [String] = errorSplitter.unexpectedErrors
-            + errorSplitter.unexpectedStringErrors.map({ makeMessage(stringError: $0) })
+        var writer = MessageListWriter(title: "Unexpected: ", lastSeparator: " and ")
         
-        writeMessages(messages, title: "Unexpected: ", lastSeparator: " and ", to: &target)
-    }
-    
-    private func makeMessage(stringError: (string: String, caseSensitive: Bool)) -> String {
-        return "'\(stringError.string)'" + (stringError.caseSensitive ? "" : " (case-insensitive)")
-    }
-    
-    private func writeMessages(
-        _ messages: [String],
-        title: String,
-        lastSeparator: String,
-        to target: inout Target
-    ) {
-        if messages.isEmpty { return }
+        errorSplitter.unexpectedErrors.forEach({ writer.appendMessage($0) })
+        errorSplitter.unexpectedStringErrors.forEach({ writer.appendMessage(withStringError: $0) })
         
-        print(title, terminator: "", to: &target)
-        
-        for message in messages.dropLast(2) {
-            print(message, terminator: ", ", to: &target)
-        }
-        
-        if let secondToLast = messages.dropLast().last {
-            print("\(secondToLast)\(lastSeparator)", terminator: "", to: &target)
-        }
-        
-        if let last = messages.last {
-            print(last, to: &target)
-        }
+        writer.write(to: &target)
     }
     
     // MARK: - Generic error
@@ -186,6 +169,48 @@ extension ErrorMessageWriter {
             }
             
             return nil
+        }
+    }
+}
+
+// MARK: - Message list writer
+
+extension ErrorMessageWriter {
+    private struct MessageListWriter {
+        let title: String
+        let lastSeparator: String
+        private var messages: [String] = []
+        
+        init(title: String, lastSeparator: String) {
+            self.title = title
+            self.lastSeparator = lastSeparator
+        }
+        
+        mutating func appendMessage(_ message: String) {
+            messages.append(message)
+        }
+        
+        mutating func appendMessage(withStringError error: (string: String, caseSensitive: Bool)) {
+            let message = "'\(error.string)'" + (error.caseSensitive ? "" : " (case-insensitive)")
+            appendMessage(message)
+        }
+        
+        func write(to target: inout Target) {
+            if messages.isEmpty { return }
+            
+            print(title, terminator: "", to: &target)
+            
+            for message in messages.dropLast(2) {
+                print(message, terminator: ", ", to: &target)
+            }
+            
+            if let secondToLast = messages.dropLast().last {
+                print("\(secondToLast)\(lastSeparator)", terminator: "", to: &target)
+            }
+            
+            if let last = messages.last {
+                print(last, to: &target)
+            }
         }
     }
 }
