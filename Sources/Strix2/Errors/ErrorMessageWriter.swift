@@ -30,7 +30,7 @@ struct ErrorMessageWriter {
 // MARK: - Position writer
 
 extension ErrorMessageWriter {
-    struct PositionWriter {
+    private struct PositionWriter {
         let input: String
         let position: String.Index
         let line: Int
@@ -104,7 +104,7 @@ extension ErrorMessageWriter {
 // MARK: - Expected, unexpected error writer
 
 extension ErrorMessageWriter {
-    struct ExpectedErrorWriter {
+    private struct ExpectedErrorWriter {
         let errorSplitter: ParseErrorSplitter
         
         init(errorSplitter: ParseErrorSplitter) {
@@ -123,7 +123,7 @@ extension ErrorMessageWriter {
         }
     }
     
-    struct UnexpectedErrorWriter {
+    private struct UnexpectedErrorWriter {
         let errorSplitter: ParseErrorSplitter
         
         init(errorSplitter: ParseErrorSplitter) {
@@ -147,7 +147,7 @@ extension ErrorMessageWriter {
         return "'\(stringError.string)'" + (stringError.caseSensitive ? "" : " (case-insensitive)")
     }
     
-    struct MessageListWriter {
+    private struct MessageListWriter {
         let title: String
         let messages: [String]
         let lastSeparator: String
@@ -181,7 +181,7 @@ extension ErrorMessageWriter {
 // MARK: - Generic error writer
 
 extension ErrorMessageWriter {
-    struct GenericErrorWriter {
+    private struct GenericErrorWriter {
         let errorSplitter: ParseErrorSplitter
         
         init(errorSplitter: ParseErrorSplitter) {
@@ -212,7 +212,7 @@ extension ErrorMessageWriter {
 // MARK: - Compound, nested error writer
 
 extension ErrorMessageWriter {
-    struct CompoundErrorWriter {
+    private struct CompoundErrorWriter {
         let input: String
         let errorSplitter: ParseErrorSplitter
         
@@ -238,7 +238,7 @@ extension ErrorMessageWriter {
         }
     }
     
-    struct NestedErrorWriter {
+    private struct NestedErrorWriter {
         let input: String
         let errorSplitter: ParseErrorSplitter
         
