@@ -59,7 +59,6 @@ final class ErrorMessageWriterTests: BaseErrorMessageWriterTests {
         Expecting: '"'
         
         """)
-        print(errorStream.text)
         
         XCTAssert(errorStream.snapshots.contains(where: { snapshot in
             return snapshot.indent.level == 0
@@ -282,8 +281,8 @@ final class ErrorMessageWriterExpectedTests: BaseErrorMessageWriterTests {
         // Given
         let input = "wow"
         let errors: [ParseError] = [
-            .expectedString(string: "HELLO", caseSensitivity: .insensitive),
-            .expectedString(string: "WORLD", caseSensitivity: .sensitive),
+            .expectedString(string: "HELLO", caseSensitive: false),
+            .expectedString(string: "WORLD", caseSensitive: true),
         ]
         let sut = ErrorMessageWriter(input: input, position: input.startIndex, errors: errors)
         
@@ -335,8 +334,8 @@ final class ErrorMessageWriterUnexpectedTests: BaseErrorMessageWriterTests {
         // Given
         let input = "hello"
         let errors: [ParseError] = [
-            .unexpectedString(string: "HELLO", caseSensitivity: .insensitive),
-            .unexpectedString(string: "WORLD", caseSensitivity: .sensitive),
+            .unexpectedString(string: "HELLO", caseSensitive: false),
+            .unexpectedString(string: "WORLD", caseSensitive: true),
         ]
         let sut = ErrorMessageWriter(input: input, position: input.startIndex, errors: errors)
         
@@ -373,7 +372,7 @@ final class ErrorMessageWriterGenericTests: BaseErrorMessageWriterTests {
         // Given
         let input = "1) Write open source library 2) ??? 3) lot's of unpaid work"
         let errors: [ParseError] = [
-            .expectedString(string: "profit", caseSensitivity: .sensitive),
+            .expectedString(string: "profit", caseSensitive: true),
             .generic(message: "So much about that theory ..."),
         ]
         let position = input.index(input.firstIndex(of: "3")!, offsetBy: 3)
@@ -425,7 +424,6 @@ final class ErrorMessageWriterCompoundTests: BaseErrorMessageWriterTests {
         Note: The error occurred at the end of the input stream.
         Expecting: '"'
         """))
-        print(errorStream.text)
         
         XCTAssert(errorStream.snapshots.contains(where: { snapshot in
             return snapshot.indent.level == 0
@@ -447,7 +445,7 @@ final class ErrorMessageWriterCompoundTests: BaseErrorMessageWriterTests {
         let input = "ac"
         let errors: [ParseError] = [
             .nested(position: input.index(after: input.startIndex),
-                    errors: [.expectedString(string: "b", caseSensitivity: .sensitive)]),
+                    errors: [.expectedString(string: "b", caseSensitive: true)]),
         ]
         let sut = ErrorMessageWriter(input: input, position: input.startIndex, errors: errors)
         

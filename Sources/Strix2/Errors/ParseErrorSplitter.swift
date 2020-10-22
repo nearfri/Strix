@@ -3,8 +3,8 @@ import Foundation
 struct ParseErrorSplitter {
     var expectedErrors: [String] = []
     var unexpectedErrors: [String] = []
-    var expectedStringErrors: [(string: String, caseSensitivity: CaseSensitivity)] = []
-    var unexpectedStringErrors: [(string: String, caseSensitivity: CaseSensitivity)] = []
+    var expectedStringErrors: [(string: String, caseSensitive: Bool)] = []
+    var unexpectedStringErrors: [(string: String, caseSensitive: Bool)] = []
     var genericErrors: [String] = []
     var nestedErrors: [(position: String.Index, errors: [ParseError])] = []
     var compoundErrors: [(label: String, position: String.Index, errors: [ParseError])] = []
@@ -21,10 +21,10 @@ struct ParseErrorSplitter {
             expectedErrors.append(label)
         case let .unexpected(label):
             unexpectedErrors.append(label)
-        case let .expectedString(string, caseSensitivity):
-            expectedStringErrors.append((string, caseSensitivity))
-        case let .unexpectedString(string, caseSensitivity):
-            unexpectedStringErrors.append((string, caseSensitivity))
+        case let .expectedString(string, caseSensitive):
+            expectedStringErrors.append((string, caseSensitive))
+        case let .unexpectedString(string, caseSensitive):
+            unexpectedStringErrors.append((string, caseSensitive))
         case let .generic(message):
             genericErrors.append(message)
         case let .nested(position, errors):

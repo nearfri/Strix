@@ -142,12 +142,9 @@ extension ErrorMessageWriter {
     }
     
     private static func makeMessage(
-        stringError: (string: String, caseSensitivity: CaseSensitivity)
+        stringError: (string: String, caseSensitive: Bool)
     ) -> String {
-        switch stringError.caseSensitivity {
-        case .sensitive:    return "'\(stringError.string)'"
-        case .insensitive:  return "'\(stringError.string)' (case-insensitive)"
-        }
+        return "'\(stringError.string)'" + (stringError.caseSensitive ? "" : " (case-insensitive)")
     }
     
     struct MessageListWriter {
