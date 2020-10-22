@@ -1,6 +1,6 @@
 import Foundation
 
-struct ErrorMessageWriter {
+struct ErrorMessageWriter<Target: ErrorOutputStream> {
     let input: String
     let position: String.Index
     let errorSplitter: ParseErrorSplitter
@@ -11,18 +11,107 @@ struct ErrorMessageWriter {
         self.errorSplitter = ParseErrorSplitter(errors)
     }
     
-    func write<Target: ErrorOutputStream>(to output: inout Target) {
-        PositionWriter(input: input, position: position).write(to: &output)
+    func write(to target: inout Target) {
+        PositionWriter(input: input, position: position).write(to: &target)
         
-        ExpectedErrorWriter(errorSplitter: errorSplitter).write(to: &output)
-        UnexpectedErrorWriter(errorSplitter: errorSplitter).write(to: &output)
-        GenericErrorWriter(errorSplitter: errorSplitter).write(to: &output)
+        writeExpectedErrors(to: &target)
+        writeUnexpectedErrors(to: &target)
+        writeGenericErrors(to: &target)
         
-        CompoundErrorWriter(input: input, errorSplitter: errorSplitter).write(to: &output)
-        NestedErrorWriter(input: input, errorSplitter: errorSplitter).write(to: &output)
+        writeCompoundErrors(to: &target)
+        writeNestedErrors(to: &target)
         
         if !errorSplitter.hasErrors {
-            print("Unknown Error(s)", to: &output)
+            print("Unknown Error(s)", to: &target)
+        }
+    }
+    
+    // MARK: - Expected, unexpected error
+    
+    private func writeExpectedErrors(to target: inout Target) {
+        let messages: [String] = errorSplitter.expectedErrors
+            + errorSplitter.expectedStringErrors.map({ makeMessage(stringError: $0) })
+            + errorSplitter.compoundErrors.map(\.label)
+        
+        writeMessages(messages, title: "Expecting: ", lastSeparator: " or ", to: &target)
+    }
+    
+    private func writeUnexpectedErrors(to target: inout Target) {
+        let messages: [String] = errorSplitter.unexpectedErrors
+            + errorSplitter.unexpectedStringErrors.map({ makeMessage(stringError: $0) })
+        
+        writeMessages(messages, title: "Unexpected: ", lastSeparator: " and ", to: &target)
+    }
+    
+    private func makeMessage(stringError: (string: String, caseSensitive: Bool)) -> String {
+        return "'\(stringError.string)'" + (stringError.caseSensitive ? "" : " (case-insensitive)")
+    }
+    
+    private func writeMessages(
+        _ messages: [String],
+        title: String,
+        lastSeparator: String,
+        to target: inout Target
+    ) {
+        if messages.isEmpty { return }
+        
+        print(title, terminator: "", to: &target)
+        
+        for message in messages.dropLast(2) {
+            print(message, terminator: ", ", to: &target)
+        }
+        
+        if let secondToLast = messages.dropLast().last {
+            print("\(secondToLast)\(lastSeparator)", terminator: "", to: &target)
+        }
+        
+        if let last = messages.last {
+            print(last, to: &target)
+        }
+    }
+    
+    // MARK: - Generic error
+    
+    private func writeGenericErrors(to target: inout Target) {
+        if errorSplitter.genericErrors.isEmpty { return }
+        
+        let shouldIndent = errorSplitter.hasExpectedErrors || errorSplitter.hasUnexpectedErrors
+        
+        if shouldIndent {
+            print("Other error messages:", to: &target)
+            target.indent.level += 1
+        }
+        
+        for message in errorSplitter.genericErrors {
+            print(message, to: &target)
+        }
+        
+        if shouldIndent {
+            target.indent.level -= 1
+        }
+    }
+    
+    // MARK: - Compound, nested error
+    
+    private func writeCompoundErrors(to target: inout Target) {
+        for error in errorSplitter.compoundErrors {
+            print("", to: &target)
+            print("\(error.label) could not be parsed because:", to: &target)
+            
+            target.indent.level += 1
+            Self(input: input, position: error.position, errors: error.errors).write(to: &target)
+            target.indent.level -= 1
+        }
+    }
+    
+    private func writeNestedErrors(to target: inout Target) {
+        for error in errorSplitter.nestedErrors {
+            print("", to: &target)
+            print("The parser backtracked after:", to: &target)
+            
+            target.indent.level += 1
+            Self(input: input, position: error.position, errors: error.errors).write(to: &target)
+            target.indent.level -= 1
         }
     }
 }
@@ -44,15 +133,15 @@ extension ErrorMessageWriter {
             self.column = textPosition.column
         }
         
-        func write<Target: ErrorOutputStream>(to output: inout Target) {
-            print("Error in \(line):\(column)", to: &output)
+        func write(to target: inout Target) {
+            print("Error in \(line):\(column)", to: &target)
             
             let substringTerminator = input[lineRange].last?.isNewline == true ? "" : "\n"
-            print(input[lineRange], terminator: substringTerminator, to: &output)
+            print(input[lineRange], terminator: substringTerminator, to: &target)
             
-            columnMarker.map({ print($0, to: &output) })
+            columnMarker.map({ print($0, to: &target) })
             
-            note.map({ print("Note: \($0)", to: &output) })
+            note.map({ print("Note: \($0)", to: &target) })
         }
         
         private var lineRange: Range<String.Index> {
@@ -97,170 +186,6 @@ extension ErrorMessageWriter {
             }
             
             return nil
-        }
-    }
-}
-
-// MARK: - Expected, unexpected error writer
-
-extension ErrorMessageWriter {
-    private struct ExpectedErrorWriter {
-        let errorSplitter: ParseErrorSplitter
-        
-        init(errorSplitter: ParseErrorSplitter) {
-            self.errorSplitter = errorSplitter
-        }
-        
-        func write<Target: ErrorOutputStream>(to output: inout Target) {
-            let messages: [String] = errorSplitter.expectedErrors
-                + errorSplitter.expectedStringErrors.map({ makeMessage(stringError: $0) })
-                + errorSplitter.compoundErrors.map(\.label)
-            
-            let messageListWriter = MessageListWriter(title: "Expecting: ",
-                                                      messages: messages,
-                                                      lastSeparator: " or ")
-            messageListWriter.write(to: &output)
-        }
-    }
-    
-    private struct UnexpectedErrorWriter {
-        let errorSplitter: ParseErrorSplitter
-        
-        init(errorSplitter: ParseErrorSplitter) {
-            self.errorSplitter = errorSplitter
-        }
-        
-        func write<Target: ErrorOutputStream>(to output: inout Target) {
-            let messages: [String] = errorSplitter.unexpectedErrors
-                + errorSplitter.unexpectedStringErrors.map({ makeMessage(stringError: $0) })
-            
-            let messageListWriter = MessageListWriter(title: "Unexpected: ",
-                                                      messages: messages,
-                                                      lastSeparator: " and ")
-            messageListWriter.write(to: &output)
-        }
-    }
-    
-    private static func makeMessage(
-        stringError: (string: String, caseSensitive: Bool)
-    ) -> String {
-        return "'\(stringError.string)'" + (stringError.caseSensitive ? "" : " (case-insensitive)")
-    }
-    
-    private struct MessageListWriter {
-        let title: String
-        let messages: [String]
-        let lastSeparator: String
-        
-        init(title: String, messages: [String], lastSeparator: String) {
-            self.title = title
-            self.messages = messages
-            self.lastSeparator = lastSeparator
-        }
-        
-        func write<Target: ErrorOutputStream>(to output: inout Target) {
-            if messages.isEmpty { return }
-            
-            print(title, terminator: "", to: &output)
-            
-            for message in messages.dropLast(2) {
-                print(message, terminator: ", ", to: &output)
-            }
-            
-            if let secondToLast = messages.dropLast().last {
-                print("\(secondToLast)\(lastSeparator)", terminator: "", to: &output)
-            }
-            
-            if let last = messages.last {
-                print(last, to: &output)
-            }
-        }
-    }
-}
-
-// MARK: - Generic error writer
-
-extension ErrorMessageWriter {
-    private struct GenericErrorWriter {
-        let errorSplitter: ParseErrorSplitter
-        
-        init(errorSplitter: ParseErrorSplitter) {
-            self.errorSplitter = errorSplitter
-        }
-        
-        func write<Target: ErrorOutputStream>(to output: inout Target) {
-            if errorSplitter.genericErrors.isEmpty { return }
-            
-            let shouldIndent = errorSplitter.hasExpectedErrors || errorSplitter.hasUnexpectedErrors
-            
-            if shouldIndent {
-                print("Other error messages:", to: &output)
-                output.indent.level += 1
-            }
-            
-            for message in errorSplitter.genericErrors {
-                print(message, to: &output)
-            }
-            
-            if shouldIndent {
-                output.indent.level -= 1
-            }
-        }
-    }
-}
-
-// MARK: - Compound, nested error writer
-
-extension ErrorMessageWriter {
-    private struct CompoundErrorWriter {
-        let input: String
-        let errorSplitter: ParseErrorSplitter
-        
-        init(input: String, errorSplitter: ParseErrorSplitter) {
-            self.input = input
-            self.errorSplitter = errorSplitter
-        }
-        
-        func write<Target: ErrorOutputStream>(to output: inout Target) {
-            for error in errorSplitter.compoundErrors {
-                print("", to: &output)
-                print("\(error.label) could not be parsed because:", to: &output)
-                
-                output.indent.level += 1
-                
-                let innerWriter = ErrorMessageWriter(input: input,
-                                                     position: error.position,
-                                                     errors: error.errors)
-                innerWriter.write(to: &output)
-                
-                output.indent.level -= 1
-            }
-        }
-    }
-    
-    private struct NestedErrorWriter {
-        let input: String
-        let errorSplitter: ParseErrorSplitter
-        
-        init(input: String, errorSplitter: ParseErrorSplitter) {
-            self.input = input
-            self.errorSplitter = errorSplitter
-        }
-        
-        func write<Target: ErrorOutputStream>(to output: inout Target) {
-            for error in errorSplitter.nestedErrors {
-                print("", to: &output)
-                print("The parser backtracked after:", to: &output)
-                
-                output.indent.level += 1
-                
-                let innerWriter = ErrorMessageWriter(input: input,
-                                                     position: error.position,
-                                                     errors: error.errors)
-                innerWriter.write(to: &output)
-                
-                output.indent.level -= 1
-            }
         }
     }
 }

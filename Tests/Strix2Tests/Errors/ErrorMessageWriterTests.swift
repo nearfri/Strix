@@ -18,6 +18,8 @@ private struct FakeErrorOutputStream: ErrorOutputStream {
     }
 }
 
+private typealias ErrorMessageWriter = Strix2.ErrorMessageWriter<FakeErrorOutputStream>
+
 class BaseErrorMessageWriterTests: XCTestCase {
     fileprivate var errorStream = FakeErrorOutputStream()
     
