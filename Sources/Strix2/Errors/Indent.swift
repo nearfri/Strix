@@ -5,6 +5,10 @@ struct Indent: CustomStringConvertible {
     var width: Int = 2
     
     var description: String {
+        return toString()
+    }
+    
+    func toString() -> String {
         return String(repeating: " " as Character, count: level * width)
     }
 }
