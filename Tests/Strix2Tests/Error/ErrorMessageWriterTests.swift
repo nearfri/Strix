@@ -48,13 +48,13 @@ final class ErrorMessageWriterTests: BaseErrorMessageWriterTests {
         
         // Then
         XCTAssertEqual(errorStream.text, """
-        Error in 1:1
+        Error at line 1, column 1
         "abc def
         ^
         Expecting: string literal in double quotes
         
         string literal in double quotes could not be parsed because:
-        Error in 1:9
+        Error at line 1, column 9
         "abc def
                 ^
         Note: The error occurred at the end of the input stream.
@@ -70,7 +70,7 @@ final class ErrorMessageWriterTests: BaseErrorMessageWriterTests {
         
         XCTAssert(errorStream.snapshots.contains(where: { snapshot in
             return snapshot.indent.level == 1
-                && snapshot.text.contains("Error in 1:9")
+                && snapshot.text.contains("Error at line 1, column 9")
                 && snapshot.text.contains("Expecting: '\"'")
         }))
         
@@ -99,7 +99,7 @@ final class ErrorMessageWriterPositionTests: BaseErrorMessageWriterTests {
         sut.write(to: &errorStream)
         
         // Then
-        XCTAssert(errorStream.text.contains("Error in 2:3"))
+        XCTAssert(errorStream.text.contains("Error at line 2, column 3"))
     }
     
     func test_write_substringAtPosition() throws {
@@ -220,7 +220,7 @@ final class ErrorMessageWriterPositionTests: BaseErrorMessageWriterTests {
         
         // Then
         XCTAssert(errorStream.text.contains("""
-        Error in 2:3
+        Error at line 2, column 3
         abcde
           ^
         
@@ -420,7 +420,7 @@ final class ErrorMessageWriterCompoundTests: BaseErrorMessageWriterTests {
         Expecting: string literal in double quotes
         
         string literal in double quotes could not be parsed because:
-        Error in 1:9
+        Error at line 1, column 9
         "abc def
                 ^
         Note: The error occurred at the end of the input stream.
@@ -435,7 +435,7 @@ final class ErrorMessageWriterCompoundTests: BaseErrorMessageWriterTests {
         
         XCTAssert(errorStream.snapshots.contains(where: { snapshot in
             return snapshot.indent.level == 1
-                && snapshot.text.contains("Error in 1:9")
+                && snapshot.text.contains("Error at line 1, column 9")
                 && snapshot.text.contains("Expecting: '\"'")
         }))
         
@@ -457,7 +457,7 @@ final class ErrorMessageWriterCompoundTests: BaseErrorMessageWriterTests {
         // Then
         XCTAssert(errorStream.text.contains("""
         The parser backtracked after:
-        Error in 1:2
+        Error at line 1, column 2
         ac
          ^
         Expecting: 'b'
@@ -465,7 +465,7 @@ final class ErrorMessageWriterCompoundTests: BaseErrorMessageWriterTests {
         
         XCTAssert(errorStream.snapshots.contains(where: { snapshot in
             return snapshot.indent.level == 1
-                && snapshot.text.contains("Error in 1:2")
+                && snapshot.text.contains("Error at line 1, column 2")
                 && snapshot.text.contains("Expecting: 'b'")
         }))
         

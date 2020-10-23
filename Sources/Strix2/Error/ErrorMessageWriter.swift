@@ -117,7 +117,7 @@ extension ErrorMessageWriter {
         }
         
         func write(to target: inout Target) {
-            print("Error in \(line):\(column)", to: &target)
+            print("Error at line \(line), column \(column)", to: &target)
             
             let substringTerminator = input[lineRange].last?.isNewline == true ? "" : "\n"
             print(input[lineRange], terminator: substringTerminator, to: &target)
