@@ -75,4 +75,34 @@ final class ParserTests: XCTestCase {
         // Then
         XCTAssertNil(reply.result.value)
     }
+    
+    func test_run_success() throws {
+        // Given
+        let parser = Seed.intSuccessParser
+        
+        // When, then
+        XCTAssertNoThrow(try parser.run("123456"))
+    }
+    
+    func test_run_failure() {
+        // Given
+        let input = "hello"
+        let errors: [ParseError] = [.expected(label: "integer")]
+        let parser: Parser<Int> = .init { state in
+            return .failure(state.withStream(state.stream.dropFirst()), errors)
+        }
+        
+        // When
+        XCTAssertThrowsError(try parser.run(input)) { error in
+            guard let runError = error as? RunError else {
+                XCTFail("Invalid error type: \(type(of: error))")
+                return
+            }
+            
+            // Then
+            XCTAssertEqual(runError.input, input)
+            XCTAssertEqual(runError.position, input.index(after: input.startIndex))
+            XCTAssertEqual(runError.underlyingErrors, errors)
+        }
+    }
 }

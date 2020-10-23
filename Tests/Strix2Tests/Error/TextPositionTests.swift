@@ -55,10 +55,34 @@ final class TextPositionTests: XCTestCase {
         XCTAssertEqual(position.line, 2)
     }
     
-    func test_init_lineAtEmptyString() throws {
+    func test_init_lineAtEmptyString_startIndex() {
         // Given
         let input = ""
         let index = input.startIndex
+        
+        // When
+        let position = TextPosition(string: input, index: index)
+        
+        // Then
+        XCTAssertEqual(position.line, 1)
+    }
+    
+    func test_init_lineAtEmptyString_endIndex() {
+        // Given
+        let input = ""
+        let index = input.endIndex
+        
+        // When
+        let position = TextPosition(string: input, index: index)
+        
+        // Then
+        XCTAssertEqual(position.line, 1)
+    }
+    
+    func test_init_lineAtSingleLineString() {
+        // Given
+        let input = "hello world\n"
+        let index = input.endIndex
         
         // When
         let position = TextPosition(string: input, index: index)

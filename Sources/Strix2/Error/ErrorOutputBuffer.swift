@@ -9,7 +9,7 @@ struct ErrorOutputBuffer: ErrorOutputStream {
         
         string.enumerateSubstrings(in: string.startIndex..<string.endIndex,
                                    options: [.byLines, .substringNotRequired])
-        { [self] (substr, subRange, enclosingRange, stop) in
+        { [self] substr, subRange, enclosingRange, stop in
             if enclosingRange.lowerBound == string.startIndex {
                 if text.isEmpty || text.last?.isNewline == true {
                     indentedString += indent.toString()

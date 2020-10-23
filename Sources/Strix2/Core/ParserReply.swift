@@ -31,8 +31,7 @@ public struct ParserReply<T> {
         return .init(result: .success(value), state: state, errors: errors)
     }
     
-    public static func failure(_ state: ParserState,
-                               _ errors: [ParseError] = []) -> ParserReply {
+    public static func failure(_ state: ParserState, _ errors: [ParseError]) -> ParserReply {
         return .init(result: .failure, state: state, errors: errors)
     }
     
