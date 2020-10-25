@@ -40,6 +40,19 @@ final class ParserTests: XCTestCase {
         XCTAssertNil(reply.result.value)
     }
     
+    func test_map_successAndFailure_failure() {
+        // Given
+        let parser = Seed.intSuccessParser
+        
+        // When
+        let mappedParser: Parser<String> = parser.map({ _ in throw Seed.strErrors.first! })
+        let reply = mappedParser.parse(Seed.state1)
+        
+        // Then
+        XCTAssertNil(reply.result.value)
+        XCTAssertEqual(reply.errors, Seed.intErrors + Seed.strErrors)
+    }
+    
     func test_flatMap_successAndSuccess_success() {
         // Given
         let parser = Seed.intSuccessParser
