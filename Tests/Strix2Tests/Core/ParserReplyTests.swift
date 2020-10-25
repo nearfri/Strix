@@ -11,7 +11,7 @@ private enum Seed {
 }
 
 final class ParserReplyTests: XCTestCase {
-    func test_map_success_returnSuccess() {
+    func test_map_successAndSuccess_returnSuccess() {
         // Given
         let sut = ParserReply(result: .success("hello"), state: Seed.state)
         
@@ -20,6 +20,18 @@ final class ParserReplyTests: XCTestCase {
         
         // Then
         XCTAssertEqual(mapped.result.value, 123)
+    }
+    
+    func test_map_successAndThrow_returnFailure() {
+        // Given
+        let sut = ParserReply(result: .success("hello"), state: Seed.state)
+        
+        // When
+        let mapped: ParserReply<Int> = sut.map({ _ in throw Seed.errors1[0] })
+        
+        // Then
+        XCTAssertNil(mapped.result.value)
+        XCTAssertEqual(mapped.errors, Seed.errors1)
     }
     
     func test_map_failure_returnFailure() {

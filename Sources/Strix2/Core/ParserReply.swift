@@ -11,6 +11,17 @@ extension ParserReply {
             case .failure:          return nil
             }
         }
+        
+        public var isSuccess: Bool {
+            switch self {
+            case .success:  return true
+            case .failure:  return false
+            }
+        }
+        
+        public var isFailure: Bool {
+            return !isSuccess
+        }
     }
 }
 
@@ -35,12 +46,19 @@ public struct ParserReply<T> {
         return .init(result: .failure, state: state, errors: errors)
     }
     
-    public func map<U>(_ transform: (T) throws -> U) rethrows -> ParserReply<U> {
-        switch result {
-        case .success(let value):
-            return .success(try transform(value), state, errors)
-        case .failure:
-            return .failure(state, errors)
+    public func map<U>(_ transform: (T) throws -> U) -> ParserReply<U> {
+        do {
+            switch result {
+            case .success(let value):
+                return .success(try transform(value), state, errors)
+            case .failure:
+                return .failure(state, errors)
+            }
+        } catch let parseError as ParseError {
+            return .failure(state, errors + [parseError])
+        } catch {
+            let parseError = ParseError.generic(message: error.localizedDescription)
+            return .failure(state, errors + [parseError])
         }
     }
     

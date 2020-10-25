@@ -9,15 +9,7 @@ public struct Parser<T> {
     
     public func map<U>(_ transform: @escaping (T) throws -> U) -> Parser<U> {
         return Parser<U> { state -> ParserReply<U> in
-            let reply = parse(state)
-            do {
-                return try reply.map(transform)
-            } catch let parseError as ParseError {
-                return .failure(reply.state, reply.errors + [parseError])
-            } catch {
-                let parseError = ParseError.generic(message: error.localizedDescription)
-                return .failure(reply.state, reply.errors + [parseError])
-            }
+            return parse(state).map(transform)
         }
     }
     
