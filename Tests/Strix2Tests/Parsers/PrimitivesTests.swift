@@ -2,11 +2,15 @@ import XCTest
 @testable import Strix2
 
 final class PrimitivesTests: XCTestCase {
+    // MARK: - just
+    
     func test_just() throws {
         let p: Parser<String> = .just("hello")
         let text = try p.run("Input")
         XCTAssertEqual(text, "hello")
     }
+    
+    // MARK: - fail
     
     func test_fail() {
         let p: Parser<String> = .fail(message: "Invalid input")
@@ -14,6 +18,8 @@ final class PrimitivesTests: XCTestCase {
         XCTAssertFalse(reply.result.isSuccess)
         XCTAssertEqual(reply.errors, [.generic(message: "Invalid input")])
     }
+    
+    // MARK: - discard
     
     func test_discardFirst() throws {
         // Given
@@ -40,6 +46,8 @@ final class PrimitivesTests: XCTestCase {
         // Then
         XCTAssertEqual(number, 1)
     }
+    
+    // MARK: - tuple
     
     func test_tuple2() throws {
         // Given
@@ -124,6 +132,8 @@ final class PrimitivesTests: XCTestCase {
         XCTAssertFalse(reply.errors.isEmpty)
     }
     
+    // MARK: - alternative
+    
     func test_alternative_leftSuccess_returnLeftReply() {
         // Given
         let p1: Parser<Int> = .just(1)
@@ -167,7 +177,9 @@ final class PrimitivesTests: XCTestCase {
         XCTAssertEqual(reply.errors, [.generic(message: "Invalid input")])
     }
     
-    func test_any_returnFirstSuccess() {
+    // MARK: - anyOf
+    
+    func test_anyOf_returnFirstSuccess() {
         // Given
         let p1: Parser<Int> = .fail(message: "Fail 1")
         let p2: Parser<Int> = .just(2)
@@ -181,7 +193,7 @@ final class PrimitivesTests: XCTestCase {
         XCTAssertEqual(reply.result.value, 2)
     }
     
-    func test_any_failWithChange_returnFailure() {
+    func test_anyOf_failWithChange_returnFailure() {
         // Given
         let p1: Parser<Int> = .fail(message: "Fail 1")
         let p2: Parser<Int> = Parser { state in
@@ -198,7 +210,7 @@ final class PrimitivesTests: XCTestCase {
         XCTAssertFalse(reply.result.isSuccess)
     }
     
-    func test_any_failWithoutChange_mergeErrors() {
+    func test_anyOf_failWithoutChange_mergeErrors() {
         // Given
         let p1: Parser<Int> = .fail(message: "Fail 1")
         let p2: Parser<Int> = .fail(message: "Fail 2")
@@ -212,5 +224,50 @@ final class PrimitivesTests: XCTestCase {
         XCTAssertEqual(reply.errors, [.generic(message: "Fail 1"),
                                       .generic(message: "Fail 2"),
                                       .generic(message: "Fail 3")])
+    }
+    
+    // MARK: - optional
+    
+    func test_optional_success_returnValue() throws {
+        // Given
+        let p1: Parser<String> = .just("hello")
+        
+        // When
+        let p: Parser<String?> = .optional(p1)
+        let reply = p.parse(ParserState(stream: "Input"))
+        let value: String? = try XCTUnwrap(reply.result.value)
+        
+        // Then
+        XCTAssert(reply.result.isSuccess)
+        
+        XCTAssertEqual(value, "hello")
+    }
+    
+    func test_optional_failure_returnNil() throws {
+        // Given
+        let p1: Parser<String> = .fail(message: "Fail")
+        
+        // When
+        let p: Parser<String?> = .optional(p1)
+        let reply = p.parse(ParserState(stream: "Input"))
+        let value: String? = try XCTUnwrap(reply.result.value)
+        
+        // Then
+        XCTAssert(reply.result.isSuccess)
+        XCTAssertNil(value)
+    }
+    
+    // MARK: - one
+    
+    func test_one() {
+        // Given
+        let p1: Parser<String> = .fail(message: "Fail")
+        
+        // When
+        let p: Parser<String> = .one(p1, label: "Greeting")
+        let reply = p.parse(ParserState(stream: "Input"))
+        
+        // Then
+        XCTAssertEqual(reply.errors, [.expected(label: "Greeting")])
     }
 }
