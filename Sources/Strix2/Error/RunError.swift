@@ -1,0 +1,23 @@
+import Foundation
+
+public struct RunError: Error, CustomStringConvertible {
+    public var input: String
+    public var position: String.Index
+    public var underlyingErrors: [ParseError]
+    
+    public var localizedDescription: String {
+        var buffer = ErrorOutputBuffer()
+        
+        ErrorMessageWriter(input: input, position: position, errors: underlyingErrors)
+            .write(to: &buffer)
+        
+        return buffer.text
+    }
+    
+    public var description: String {
+        let textPosition = TextPosition(string: input, index: position)
+        
+        return "line: \(textPosition.line), column: \(textPosition.column), "
+            + "underlyingErrors: \(underlyingErrors)"
+    }
+}
