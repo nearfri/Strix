@@ -77,4 +77,8 @@ public struct ParserReply<T> {
     public func compareStateAndPrependingErrors<U>(of reply: ParserReply<U>) -> ParserReply {
         return state == reply.state ? prependingErrors(reply.errors) : self
     }
+    
+    public func withErrors(_ errors: [ParseError]) -> ParserReply {
+        return .init(result: result, state: state, errors: errors)
+    }
 }
