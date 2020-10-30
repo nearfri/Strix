@@ -15,26 +15,26 @@ final class PrimitivesTests: XCTestCase {
         XCTAssertEqual(reply.errors, [.generic(message: "Invalid input")])
     }
     
-    func test_discardLeft() throws {
+    func test_discardFirst() throws {
         // Given
         let p1: Parser<Int> = .just(1)
         let p2: Parser<String> = .just("hello")
         
         // When
-        let p: Parser<String> = .discardLeft(p1, p2)
+        let p: Parser<String> = .discardFirst(p1, p2)
         let text = try p.run("Input")
         
         // Then
         XCTAssertEqual(text, "hello")
     }
     
-    func test_discardRight() throws {
+    func test_discardSecond() throws {
         // Given
         let p1: Parser<Int> = .just(1)
         let p2: Parser<String> = .just("hello")
         
         // When
-        let p: Parser<Int> = .discardRight(p1, p2)
+        let p: Parser<Int> = .discardSecond(p1, p2)
         let number = try p.run("Input")
         
         // Then
