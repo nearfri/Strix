@@ -9,11 +9,11 @@ extension Parser {
         return Parser { state in .failure(state, [.generic(message: message)]) }
     }
     
-    public static func discardLeft<U>(_ lhs: Parser<U>, _ rhs: Parser<T>) -> Parser<T> {
+    public static func discardFirst<U>(_ lhs: Parser<U>, _ rhs: Parser<T>) -> Parser<T> {
         return tuple(lhs, rhs).map({ $0.1 })
     }
     
-    public static func discardRight<U>(_ lhs: Parser<T>, _ rhs: Parser<U>) -> Parser<T> {
+    public static func discardSecond<U>(_ lhs: Parser<T>, _ rhs: Parser<U>) -> Parser<T> {
         return tuple(lhs, rhs).map({ $0.0 })
     }
     
