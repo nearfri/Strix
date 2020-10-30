@@ -108,7 +108,7 @@ extension Parser {
     
     /// The parser `one(p, label: label)` applies the parser `p`.
     /// If `p` does not change the parser state (usually because `p` failed),
-    /// the errors are replaced with `.expected(label: label)`.
+    /// the errors are replaced with a `.expected(label: label)`.
     public static func one(_ p: Parser<T>, label: String) -> Parser<T> {
         return Parser { state in
             let reply = p.parse(state)
@@ -116,6 +116,8 @@ extension Parser {
         }
     }
     
+    /// The parser `attempt(p)` applies the parser `p`. If `p` fails after changing the parser state,
+    /// `attempt(p)` will backtrack to the original parser state and report a error.
     public static func attempt(_ p: Parser<T>) -> Parser<T> {
         fatalError()
     }
@@ -124,14 +126,21 @@ extension Parser {
         fatalError()
     }
     
+    /// The parser `followed(by: p)` succeeds if the parser `p` succeeds at the current position.
+    /// Otherwise it fails with a `.expected(label: label)`. This parser never changes the parser state.
     public static func followed(by p: Parser<T>, label: String) -> Parser<Void> {
         fatalError()
     }
     
+    /// The parser `notFollowed(by: p)` succeeds if the parser `p` fails to parse at the current position.
+    /// Otherwise it fails with a `.unexpected(label: label)`. This parser never changes the parser state.
     public static func notFollowed(by p: Parser<T>, label: String) -> Parser<Void> {
         fatalError()
     }
     
+    /// The parser` lookAhead(p)` parses `p` and restores the original parser state afterwards.
+    /// If `p` fails after changing the parser state, the errors are wrapped in a `.nested(position:errors:)`.
+    /// If it succeeds, any errors are discarded.
     public static func lookAhead(_ p: Parser<T>) -> Parser<T> {
         fatalError()
     }
