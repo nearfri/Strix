@@ -228,7 +228,7 @@ final class PrimitivesTests: XCTestCase {
     
     // MARK: - optional
     
-    func test_optional_success_returnValue() throws {
+    func test_optional_succeed_returnValue() throws {
         // Given
         let p1: Parser<String> = .just("hello")
         
@@ -243,7 +243,7 @@ final class PrimitivesTests: XCTestCase {
         XCTAssertEqual(value, "hello")
     }
     
-    func test_optional_failure_returnNil() throws {
+    func test_optional_fail_returnNil() throws {
         // Given
         let p1: Parser<String> = .fail(message: "Fail")
         
@@ -269,5 +269,199 @@ final class PrimitivesTests: XCTestCase {
         
         // Then
         XCTAssertEqual(reply.errors, [.expected(label: "Greeting")])
+    }
+    
+    // MARK: - attempt
+    
+    func test_attempt_succeed_consumeInput() {
+        // Given
+        let p1: Parser<String> = Parser { state in
+            return .success("hello", state.withStream(state.stream.dropFirst()))
+        }
+        
+        // When
+        let p: Parser<String> = .attempt(p1)
+        let reply = p.parse(ParserState(stream: "Input"))
+        
+        // Then
+        XCTAssertEqual(reply.result.value, "hello")
+        XCTAssertEqual(reply.state.stream, "nput")
+    }
+    
+    func test_attempt_fail_backtrack() {
+        // Given
+        let p1: Parser<String> = Parser { state in
+            return .failure(state.withStream(state.stream.dropFirst()), [])
+        }
+        
+        // When
+        let p: Parser<String> = .attempt(p1)
+        let reply = p.parse(ParserState(stream: "Input"))
+        
+        // Then
+        XCTAssertEqual(reply.state.stream, "Input")
+    }
+    
+    func test_attemptWithLabel_succeed_consumeInput() {
+        // Given
+        let p1: Parser<String> = Parser { state in
+            return .success("hello", state.withStream(state.stream.dropFirst()))
+        }
+        
+        // When
+        let p: Parser<String> = .attempt(p1, label: "greeting")
+        let reply = p.parse(ParserState(stream: "Input"))
+        
+        // Then
+        XCTAssertEqual(reply.result.value, "hello")
+        XCTAssertEqual(reply.state.stream, "nput")
+    }
+    
+    func test_attemptWithLabel_failWithoutChange_returnExpectedError() {
+        // Given
+        let p1: Parser<String> = .fail(message: "invalid input")
+        
+        // When
+        let p: Parser<String> = .attempt(p1, label: "greeting")
+        let reply = p.parse(ParserState(stream: "Input"))
+        
+        // Then
+        XCTAssertEqual(reply.errors, [.expected(label: "greeting")])
+    }
+    
+    func test_attemptWithLabel_failWithChange_backtrackAndReturnCompoundError() {
+        // Given
+        let input: Substring = "Input"
+        let secondIndex = input.index(after: input.startIndex)
+        let p1Errors = [ParseError.generic(message: "invalid input")]
+        let p1: Parser<String> = Parser { state in
+            return .failure(state.withStream(input[secondIndex...]), p1Errors)
+        }
+        
+        // When
+        let p: Parser<String> = .attempt(p1, label: "greeting")
+        let reply = p.parse(ParserState(stream: input))
+        
+        // Then
+        XCTAssertEqual(reply.state.stream, input)
+        XCTAssertEqual(reply.errors,
+                       [.compound(label: "greeting", position: secondIndex, errors: p1Errors)])
+    }
+    
+    // MARK: - lookAhead
+    
+    func test_lookAhead_succeed_backtrackAndReturnValue() {
+        // Given
+        let p1: Parser<String> = Parser { state in
+            return .success("hello", state.withStream(state.stream.dropFirst()))
+        }
+        
+        // When
+        let p: Parser<String> = .lookAhead(p1)
+        let reply = p.parse(ParserState(stream: "Input"))
+        
+        // Then
+        XCTAssertEqual(reply.result.value, "hello")
+        XCTAssertEqual(reply.state.stream, "Input")
+    }
+    
+    func test_lookAhead_failWithoutChange_backtrack() {
+        // Given
+        let p1Errors = [ParseError.generic(message: "invalid input")]
+        let p1: Parser<String> = Parser { state in
+            return .failure(state, p1Errors)
+        }
+        
+        // When
+        let p: Parser<String> = .lookAhead(p1)
+        let reply = p.parse(ParserState(stream: "Input"))
+        
+        // Then
+        XCTAssertEqual(reply.state.stream, "Input")
+        XCTAssertEqual(reply.errors, p1Errors)
+    }
+    
+    func test_lookAhead_failWithChange_backtrackAndReturnNestedError() {
+        // Given
+        let input: Substring = "Input"
+        let secondIndex = input.index(after: input.startIndex)
+        let p1Errors = [ParseError.generic(message: "invalid input")]
+        let p1: Parser<String> = Parser { state in
+            return .failure(state.withStream(input[secondIndex...]), p1Errors)
+        }
+        
+        // When
+        let p: Parser<String> = .lookAhead(p1)
+        let reply = p.parse(ParserState(stream: input))
+        
+        // Then
+        XCTAssertEqual(reply.state.stream, input)
+        XCTAssertEqual(reply.errors, [.nested(position: secondIndex, errors: p1Errors)])
+    }
+    
+    // MARK: - followedBy
+    
+    func test_followedBy_succeed_backtrackAndSucceed() {
+        // Given
+        let p1: Parser<String> = Parser { state in
+            return .success("hello", state.withStream(state.stream.dropFirst()))
+        }
+        
+        // When
+        let p: Parser<Void> = .followed(by: p1, label: "greeting")
+        let reply = p.parse(ParserState(stream: "Input"))
+        
+        // Then
+        XCTAssert(reply.result.isSuccess)
+        XCTAssertEqual(reply.state.stream, "Input")
+    }
+    
+    func test_followedBy_fail_backtrackAndReturnExpectedError() {
+        // Given
+        let p1: Parser<String> = Parser { state in
+            return .failure(state.withStream(state.stream.dropFirst()), [])
+        }
+        
+        // When
+        let p: Parser<Void> = .followed(by: p1, label: "greeting")
+        let reply = p.parse(ParserState(stream: "Input"))
+        
+        // Then
+        XCTAssert(reply.result.isFailure)
+        XCTAssertEqual(reply.state.stream, "Input")
+        XCTAssertEqual(reply.errors, [.expected(label: "greeting")])
+    }
+    
+    // MARK: - notFollowedBy
+    
+    func test_notFollowedBy_succeed_backtrackAndReturnUnexpectedError() {
+        // Given
+        let p1: Parser<String> = Parser { state in
+            return .success("hello", state.withStream(state.stream.dropFirst()))
+        }
+        
+        // When
+        let p: Parser<Void> = .notFollowed(by: p1, label: "greeting")
+        let reply = p.parse(ParserState(stream: "Input"))
+        
+        // Then
+        XCTAssert(reply.result.isFailure)
+        XCTAssertEqual(reply.state.stream, "Input")
+        XCTAssertEqual(reply.errors, [.unexpected(label: "greeting")])
+    }
+    
+    func test_notFollowedBy_fail_backtrackAndSucceed() {
+        // Given
+        let p1: Parser<String> = Parser { state in
+            return .failure(state.withStream(state.stream.dropFirst()), [])
+        }
+        
+        // When
+        let p: Parser<Void> = .notFollowed(by: p1, label: "greeting")
+        let reply = p.parse(ParserState(stream: "Input"))
+        
+        // Then
+        XCTAssert(reply.result.isSuccess)
+        XCTAssertEqual(reply.state.stream, "Input")
     }
 }
