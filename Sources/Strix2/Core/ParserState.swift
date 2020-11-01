@@ -10,6 +10,10 @@ public struct ParserState: Equatable {
         self.userState = userState
     }
     
+    public var position: Substring.Index {
+        return stream.startIndex
+    }
+    
     public func withStream(_ newStream: Substring) -> ParserState {
         return .init(stream: newStream, userState: userState)
     }
