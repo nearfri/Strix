@@ -276,7 +276,7 @@ final class ErrorMessageWriterExpectedTests: BaseErrorMessageWriterTests {
         sut.write(to: &errorStream)
         
         // Then
-        XCTAssert(errorStream.text.contains("Expecting: number, boolean or string"))
+        XCTAssert(errorStream.text.contains("Expecting: number, boolean, or string"))
     }
     
     func test_write_expectedStringErrors() {

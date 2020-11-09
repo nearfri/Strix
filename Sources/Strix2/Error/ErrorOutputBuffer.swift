@@ -7,9 +7,10 @@ struct ErrorOutputBuffer: ErrorOutputStream {
     mutating func write(_ string: String) {
         var indentedString = ""
         
-        string.enumerateSubstrings(in: string.startIndex..<string.endIndex,
-                                   options: [.byLines, .substringNotRequired])
-        { [self] substr, subRange, enclosingRange, stop in
+        string.enumerateSubstrings(
+            in: string.startIndex..<string.endIndex,
+            options: [.byLines, .substringNotRequired]
+        ) { [self] _, _, enclosingRange, _ in
             if enclosingRange.lowerBound == string.startIndex {
                 if text.isEmpty || text.last?.isNewline == true {
                     indentedString += indent.toString()

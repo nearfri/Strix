@@ -16,7 +16,7 @@ public struct TextPosition {
         string.enumerateSubstrings(
             in: string.startIndex..<string.endIndex,
             options: [.byLines, .substringNotRequired]
-        ) { substr, subRange, enclosingRange, stop in
+        ) { _, _, enclosingRange, stop in
             line += 1
             if enclosingRange.contains(index) || enclosingRange.upperBound == string.endIndex {
                 column = string[enclosingRange.lowerBound..<index].count + 1
