@@ -106,6 +106,17 @@ extension Parser {
         return p.map({ Optional($0) }) <|> .just(nil)
     }
     
+    /// The parser `notEmpty(p)` behaves like `p`, except that it fails when `p` succeeds without changing the parser state.
+    public static func notEmpty(_ p: Parser<T>) -> Parser<T> {
+        return Parser { state in
+            let reply = p.parse(state)
+            if reply.result.isSuccess && reply.state == state {
+                return .failure(state, reply.errors)
+            }
+            return reply
+        }
+    }
+    
     /// The parser `one(p, label: label)` applies the parser `p`.
     /// If `p` does not change the parser state (usually because `p` failed),
     /// the errors are replaced with a `.expected(label:)`.
@@ -188,27 +199,42 @@ extension Parser {
 }
 
 extension Parser where T == Void {
-    /// The parser `followed(by: p)` succeeds if the parser `p` succeeds at the current position.
-    /// Otherwise it fails with a `.expected(label: label)`. This parser never changes the parser state.
-    public static func followed<U>(by p: Parser<U>, label: String) -> Parser<Void> {
+    /// The parser `follow(p)` succeeds if the parser `p` succeeds. Otherwise it fails with a `.expected(label: label)`.
+    /// This parser never changes the parser state.
+    public static func follow<U>(_ p: Parser<U>, label: String) -> Parser<Void> {
+        return follow(p, error: .expected(label: label))
+    }
+    
+    /// The parser `follow(p)` succeeds if the parser `p` succeeds. Otherwise it fails with a `error`.
+    /// This parser never changes the parser state.
+    public static func follow<U>(_ p: Parser<U>, error: ParseError) -> Parser<Void> {
         return Parser { state in
-            let reply = p.parse(state)
-            if reply.result.isSuccess {
+            if p.parse(state).result.isSuccess {
                 return .success((), state)
             }
-            return .failure(state, [.expected(label: label)])
+            return .failure(state, [error])
         }
     }
     
-    /// The parser `notFollowed(by: p)` succeeds if the parser `p` fails to parse at the current position.
-    /// Otherwise it fails with a `.unexpected(label: label)`. This parser never changes the parser state.
-    public static func notFollowed<U>(by p: Parser<U>, label: String) -> Parser<Void> {
+    /// The parser `not(p)` succeeds if the parser `p` fails to parse. Otherwise it fails with a `.unexpected(label: label)`.
+    /// This parser never changes the parser state.
+    public static func not<U>(_ p: Parser<U>, label: String) -> Parser<Void> {
+        return not(p, error: .unexpected(label: label))
+    }
+    
+    /// The parser `not(p)` succeeds if the parser `p` fails to parse. Otherwise it fails with a `error`.
+    /// This parser never changes the parser state.
+    public static func not<U>(_ p: Parser<U>, error: ParseError) -> Parser<Void> {
         return Parser { state in
-            let reply = p.parse(state)
-            if reply.result.isFailure {
+            if p.parse(state).result.isFailure {
                 return .success((), state)
             }
-            return .failure(state, [.unexpected(label: label)])
+            return .failure(state, [error])
         }
+    }
+    
+    /// The parser `skip(p)` skips over the result of `p`.
+    public static func skip<U>(_ p: Parser<U>) -> Parser<Void> {
+        return p.map({ _ in () })
     }
 }

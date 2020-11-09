@@ -41,4 +41,8 @@ public struct Parser<T> {
                            underlyingErrors: reply.errors)
         }
     }
+    
+    public func callAsFunction(_ input: String) throws -> T {
+        return try run(input)
+    }
 }

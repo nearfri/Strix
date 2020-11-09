@@ -35,7 +35,7 @@ struct ErrorMessageWriter<Target: ErrorOutputStream> {
     // MARK: - Expected, unexpected error
     
     private func writeExpectedErrors(to target: inout Target) {
-        var writer = MessageListWriter(title: "Expecting: ", lastSeparator: " or ")
+        var writer = MessageListWriter(title: "Expecting: ", lastSeparator: "or")
         
         errorSplitter.expectedErrors.forEach({ writer.appendMessage($0) })
         errorSplitter.expectedStringErrors.forEach({ writer.appendMessage(withStringError: $0) })
@@ -45,7 +45,7 @@ struct ErrorMessageWriter<Target: ErrorOutputStream> {
     }
     
     private func writeUnexpectedErrors(to target: inout Target) {
-        var writer = MessageListWriter(title: "Unexpected: ", lastSeparator: " and ")
+        var writer = MessageListWriter(title: "Unexpected: ", lastSeparator: "and")
         
         errorSplitter.unexpectedErrors.forEach({ writer.appendMessage($0) })
         errorSplitter.unexpectedStringErrors.forEach({ writer.appendMessage(withStringError: $0) })
@@ -205,7 +205,11 @@ extension ErrorMessageWriter {
             }
             
             if let secondToLast = messages.dropLast().last {
-                print("\(secondToLast)\(lastSeparator)", terminator: "", to: &target)
+                if messages.count > 2 {
+                    print("\(secondToLast), \(lastSeparator) ", terminator: "", to: &target)
+                } else {
+                    print("\(secondToLast) \(lastSeparator) ", terminator: "", to: &target)
+                }
             }
             
             if let last = messages.last {
