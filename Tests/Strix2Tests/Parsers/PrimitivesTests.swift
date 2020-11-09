@@ -15,7 +15,7 @@ final class PrimitivesTests: XCTestCase {
     func test_fail() {
         let p: Parser<String> = .fail(message: "Invalid input")
         let reply = p.parse(ParserState(stream: "Input string"))
-        XCTAssertFalse(reply.result.isSuccess)
+        XCTAssert(reply.result.isFailure)
         XCTAssertEqual(reply.errors, [.generic(message: "Invalid input")])
     }
     
@@ -173,7 +173,7 @@ final class PrimitivesTests: XCTestCase {
         let reply = p.parse(ParserState(stream: "Input"))
         
         // Then
-        XCTAssertFalse(reply.result.isSuccess)
+        XCTAssert(reply.result.isFailure)
         XCTAssertEqual(reply.errors, [.generic(message: "Invalid input")])
     }
     
@@ -207,7 +207,7 @@ final class PrimitivesTests: XCTestCase {
         let reply = p.parse(ParserState(stream: "Input"))
         
         // Then
-        XCTAssertFalse(reply.result.isSuccess)
+        XCTAssert(reply.result.isFailure)
     }
     
     func test_anyOf_failWithoutChange_mergeErrors() {
@@ -255,6 +255,34 @@ final class PrimitivesTests: XCTestCase {
         // Then
         XCTAssert(reply.result.isSuccess)
         XCTAssertNil(value)
+    }
+    
+    // MARK: - notEmpty
+    
+    func test_notEmpty_succeedWithChange_succeed() {
+        // Given
+        let p1: Parser<String> = Parser { state in
+            return .success("hello", state.withStream(state.stream.dropFirst()))
+        }
+        
+        // When
+        let p: Parser<String> = .notEmpty(p1)
+        let reply = p.parse(ParserState(stream: "Input"))
+        
+        // Then
+        XCTAssertEqual(reply.result.value, "hello")
+    }
+    
+    func test_notEmpty_succeedWithoutChange_fail() {
+        // Given
+        let p1: Parser<String> = .just("hello")
+        
+        // When
+        let p: Parser<String> = .notEmpty(p1)
+        let reply = p.parse(ParserState(stream: "Input"))
+        
+        // Then
+        XCTAssert(reply.result.isFailure)
     }
     
     // MARK: - one
@@ -399,16 +427,16 @@ final class PrimitivesTests: XCTestCase {
         XCTAssertEqual(reply.errors, [.nested(position: secondIndex, errors: p1Errors)])
     }
     
-    // MARK: - followedBy
+    // MARK: - follow
     
-    func test_followedBy_succeed_backtrackAndSucceed() {
+    func test_follow_succeed_backtrackAndSucceed() {
         // Given
         let p1: Parser<String> = Parser { state in
             return .success("hello", state.withStream(state.stream.dropFirst()))
         }
         
         // When
-        let p: Parser<Void> = .followed(by: p1, label: "greeting")
+        let p: Parser<Void> = .follow(p1, label: "greeting")
         let reply = p.parse(ParserState(stream: "Input"))
         
         // Then
@@ -416,14 +444,14 @@ final class PrimitivesTests: XCTestCase {
         XCTAssertEqual(reply.state.stream, "Input")
     }
     
-    func test_followedBy_fail_backtrackAndReturnExpectedError() {
+    func test_follow_fail_backtrackAndReturnExpectedError() {
         // Given
         let p1: Parser<String> = Parser { state in
             return .failure(state.withStream(state.stream.dropFirst()), [])
         }
         
         // When
-        let p: Parser<Void> = .followed(by: p1, label: "greeting")
+        let p: Parser<Void> = .follow(p1, label: "greeting")
         let reply = p.parse(ParserState(stream: "Input"))
         
         // Then
@@ -432,16 +460,16 @@ final class PrimitivesTests: XCTestCase {
         XCTAssertEqual(reply.errors, [.expected(label: "greeting")])
     }
     
-    // MARK: - notFollowedBy
+    // MARK: - not
     
-    func test_notFollowedBy_succeed_backtrackAndReturnUnexpectedError() {
+    func test_not_succeed_backtrackAndReturnUnexpectedError() {
         // Given
         let p1: Parser<String> = Parser { state in
             return .success("hello", state.withStream(state.stream.dropFirst()))
         }
         
         // When
-        let p: Parser<Void> = .notFollowed(by: p1, label: "greeting")
+        let p: Parser<Void> = .not(p1, label: "greeting")
         let reply = p.parse(ParserState(stream: "Input"))
         
         // Then
@@ -450,14 +478,14 @@ final class PrimitivesTests: XCTestCase {
         XCTAssertEqual(reply.errors, [.unexpected(label: "greeting")])
     }
     
-    func test_notFollowedBy_fail_backtrackAndSucceed() {
+    func test_not_fail_backtrackAndSucceed() {
         // Given
         let p1: Parser<String> = Parser { state in
             return .failure(state.withStream(state.stream.dropFirst()), [])
         }
         
         // When
-        let p: Parser<Void> = .notFollowed(by: p1, label: "greeting")
+        let p: Parser<Void> = .not(p1, label: "greeting")
         let reply = p.parse(ParserState(stream: "Input"))
         
         // Then
