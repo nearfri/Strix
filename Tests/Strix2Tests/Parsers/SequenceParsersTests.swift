@@ -1,7 +1,7 @@
 import XCTest
 @testable import Strix2
 
-final class SequencesTests: XCTestCase {
+final class SequenceParsersTests: XCTestCase {
     func test_repeat_enoughSuccess_succeed() {
         // Given
         var count = 0

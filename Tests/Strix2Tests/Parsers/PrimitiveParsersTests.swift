@@ -1,7 +1,7 @@
 import XCTest
 @testable import Strix2
 
-final class PrimitivesTests: XCTestCase {
+final class PrimitiveParsersTests: XCTestCase {
     // MARK: - just
     
     func test_just() throws {
