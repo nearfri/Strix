@@ -196,9 +196,33 @@ extension Parser {
             return .failure(state, [.nested(position: reply.state.position, errors: reply.errors)])
         }
     }
+    
+    /// `skip(p, apply: f)` applies the parser `p` and returns the result `f(x, str)`,
+    /// where `x` is the result returned by `p` and `str` is the substring skipped over by `p`.
+    public static func skip<U>(
+        _ p: Parser<U>,
+        apply transform: @escaping (U, Substring) -> T
+    ) -> Parser<T> {
+        return Parser { state in
+            let stream = state.stream
+            let reply = p.parse(state)
+            let newStream = reply.state.stream
+            return reply.map({ transform($0, stream[stream.startIndex..<newStream.startIndex]) })
+        }
+    }
 }
 
 extension Parser where T == Void {
+    /// The parser `endOfStream` only succeeds at the end of the input. It never consumes input.
+    public static var endOfStream: Parser<Void> {
+        return Parser { state in
+            if state.stream.startIndex == state.stream.endIndex {
+                return .success((), state)
+            }
+            return .failure(state, [.expected(label: "end of stream")])
+        }
+    }
+    
     /// The parser `follow(p)` succeeds if the parser `p` succeeds. Otherwise it fails with a `.expected(label: label)`.
     /// This parser never changes the parser state.
     public static func follow<U>(_ p: Parser<U>, label: String) -> Parser<Void> {
