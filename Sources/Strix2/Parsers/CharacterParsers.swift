@@ -1,7 +1,7 @@
 import Foundation
 
 extension Parser where T == Character {
-    /// `satisfy(predicate)` parses any one character for which the predicate function returns `true`.
+    /// `satisfy(predicate, label: label)` parses any one character for which the predicate function returns `true`.
     /// It returns the parsed character.
     public static func satisfy(
         _ predicate: @escaping (Character) -> Bool,
@@ -15,7 +15,8 @@ extension Parser where T == Character {
         }
     }
     
-    /// `any(of: characterSet)` parses any character contained in the character set. It returns the parsed character.
+    /// `any(of: characterSet, label: label)` parses any character contained in the character set.
+    /// It returns the parsed character.
     public static func any(of characterSet: CharacterSet, label: String) -> Parser<Character> {
         let predicate: (Character) -> Bool = { c in
             let scalars = String(c).precomposedStringWithCanonicalMapping.unicodeScalars

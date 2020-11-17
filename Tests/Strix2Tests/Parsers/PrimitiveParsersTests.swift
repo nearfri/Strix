@@ -427,6 +427,52 @@ final class PrimitiveParsersTests: XCTestCase {
         XCTAssertEqual(reply.errors, [.nested(position: secondIndex, errors: p1Errors)])
     }
     
+    // MARK: - with skipped string
+    
+    func test_skipApply() {
+        // Given
+        let p1: Parser<Void> = Parser { state in
+            let stream = state.stream
+            return .success((), state.withStream(stream.dropFirst(3)))
+        }
+        
+        // When
+        let p: Parser<String> = .skip(p1, apply: { _, substr in String(substr) })
+        let reply = p.parse(ParserState(stream: "123456"))
+        
+        // Then
+        XCTAssertEqual(reply.result.value, "123")
+        XCTAssertEqual(reply.state.stream, "456")
+    }
+    
+    // MARK: - endOfStream
+    
+    func test_endOfStream_atEOS_returnSuccess() {
+        // Given
+        let input = "Input"
+        let endState = ParserState(stream: input[input.endIndex...])
+        
+        // When
+        let p: Parser<Void> = .endOfStream
+        let reply = p.parse(endState)
+        
+        // Then
+        XCTAssert(reply.result.isSuccess)
+    }
+    
+    func test_endOfStream_beforeEOS_returnFailure() {
+        // Given
+        let input = "Input"
+        let endState = ParserState(stream: input[input.index(before: input.endIndex)...])
+        
+        // When
+        let p: Parser<Void> = .endOfStream
+        let reply = p.parse(endState)
+        
+        // Then
+        XCTAssert(reply.result.isFailure)
+    }
+    
     // MARK: - follow
     
     func test_follow_succeed_backtrackAndSucceed() {
