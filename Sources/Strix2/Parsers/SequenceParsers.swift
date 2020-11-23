@@ -2,7 +2,7 @@ import Foundation
 
 extension Parser {
     /// The parser `repeat(p, count: count)` parses `count` occurrences of `p` and returns the results in an array.
-    public static func `repeat`<U>(_ p: Parser<U>, count: Int) -> Parser<[U]> where T == [U] {
+    public static func `repeat`<U>(_ p: Parser<U>, count: Int) -> Parser<T> where T == [U] {
         return Parser { state in
             var state = state
             var values: [U] = []
@@ -25,7 +25,7 @@ extension Parser {
     /// At the end of the sequence `p` must fail without changing the parser state,
     /// otherwise `many(p)` will fail with the error reported by `p`.
     /// If `p` succeeds without changing the parser state, it stops program execution to avoid an infinite loop.
-    public static func many<U>(_ p: Parser<U>, minCount: Int = 0) -> Parser<[U]> where T == [U] {
+    public static func many<U>(_ p: Parser<U>, minCount: Int = 0) -> Parser<T> where T == [U] {
         return many(first: p, repeating: p, minCount: minCount)
     }
     
@@ -56,7 +56,7 @@ extension Parser {
         separatedBy separator: Parser<V>,
         allowEndBySeparator: Bool = false,
         minCount: Int = 0
-    ) -> Parser<[U]> where T == [U] {
+    ) -> Parser<T> where T == [U] {
         if !allowEndBySeparator {
             let repeatedParser: Parser<U> = separator *> p
             return many(first: p, repeating: repeatedParser, minCount: minCount)

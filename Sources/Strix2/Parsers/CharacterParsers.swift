@@ -101,7 +101,7 @@ extension Parser where T == Character {
     
     /// Parses the space character.
     public static var space: Parser<Character> {
-        return satisfy({ $0 == " " }, label: "tab")
+        return satisfy({ $0 == " " }, label: "space")
     }
     
     /// Parses the tab character.

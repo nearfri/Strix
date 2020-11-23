@@ -55,7 +55,7 @@ final class PrimitiveParsersTests: XCTestCase {
         let p2: Parser<String> = .just("2")
         
         // When
-        let p: Parser<(Int, String)> = .tuple(p1, p2)
+        let p = Parser.tuple(p1, p2)
         let value = try p.run("Input")
         
         // Then
@@ -70,7 +70,7 @@ final class PrimitiveParsersTests: XCTestCase {
         let p3: Parser<Double> = .just(3.0)
         
         // When
-        let p = Parser<()>.tuple(p1, p2, p3)
+        let p = Parser.tuple(p1, p2, p3)
         let value = try p.run("Input")
         
         // Then
@@ -87,7 +87,7 @@ final class PrimitiveParsersTests: XCTestCase {
         let p4: Parser<Bool> = .just(true)
         
         // When
-        let p = Parser<()>.tuple(p1, p2, p3, p4)
+        let p = Parser.tuple(p1, p2, p3, p4)
         let value = try p.run("Input")
         
         // Then
@@ -106,7 +106,7 @@ final class PrimitiveParsersTests: XCTestCase {
         let p5: Parser<Character> = .just("c")
         
         // When
-        let p = Parser<()>.tuple(p1, p2, p3, p4, p5)
+        let p = Parser.tuple(p1, p2, p3, p4, p5)
         let value = try p.run("Input")
         
         // Then
@@ -124,7 +124,7 @@ final class PrimitiveParsersTests: XCTestCase {
         let p3: Parser<Double> = .just(3.0)
         
         // When
-        let p = Parser<()>.tuple(p1, p2, p3)
+        let p = Parser.tuple(p1, p2, p3)
         let reply = p.parse(ParserState(stream: "Input"))
         
         // Then

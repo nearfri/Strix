@@ -4,18 +4,19 @@ extension Parser where T == String {
     /// `string(str, caseSensitive: flag)` parses the string `str` and returns the parsed string.
     /// It is an atomic parser: either it succeeds or it fails without consuming any input.
     public static func string(_ str: String, caseSensitive: Bool = true) -> Parser<String> {
-        return Parser<Substring>.string(str, caseSensitive: caseSensitive).map({ String($0) })
+        return Parser<Substring>.substring(str, caseSensitive: caseSensitive).map({ String($0) })
     }
     
     /// `string(until: str, caseSensitive: caseFlag, skipString: skipString)` parses all characters
     /// before the first occurance of the string `str` and, if `skipString` is `true`, skips over `str`.
-    /// It returns the parsed characters before the string. It is an atomic parser: either it succeeds or it fails without consuming any input.
+    /// It returns the parsed characters before the string.
+    /// It is an atomic parser: either it succeeds or it fails without consuming any input.
     public static func string(
         until str: String,
         caseSensitive: Bool = true,
         skipString: Bool = false
     ) -> Parser<String> {
-        return Parser<Substring>.string(
+        return Parser<Substring>.substring(
             until: str,
             caseSensitive: caseSensitive,
             skipString: skipString
@@ -27,7 +28,7 @@ extension Parser where T == String {
     /// If the regular expression matches, the parser skips the matched characters and returns them as a string.
     /// If the regular expression does not match, the parser fails without consuming input.
     public static func string(matchingRegex pattern: String, label: String) -> Parser<String> {
-        return Parser<Substring>.string(matchingRegex: pattern, label: label).map({ String($0) })
+        return Parser<Substring>.substring(matchingRegex: pattern, label: label).map({ String($0) })
     }
     
     /// `skipped(by: p)` applies the parser `p` and returns the characters skipped over by `p` as a string.
@@ -43,9 +44,9 @@ extension Parser where T == String {
 }
 
 extension Parser where T == Substring {
-    /// `string(str, caseSensitive: flag)` parses the string `str` and returns the parsed string.
+    /// `substring(str, caseSensitive: flag)` parses the string `str` and returns the parsed string.
     /// It is an atomic parser: either it succeeds or it fails without consuming any input.
-    public static func string(_ str: String, caseSensitive: Bool = true) -> Parser<Substring> {
+    public static func substring(_ str: String, caseSensitive: Bool = true) -> Parser<Substring> {
         let equal: (Character, Character) -> Bool = {
             return caseSensitive
                 ? { lhs, rhs in lhs == rhs }
@@ -73,15 +74,16 @@ extension Parser where T == Substring {
         }
     }
     
-    /// `string(until: str, caseSensitive: caseFlag, skipString: skipString)` parses all characters
+    /// `substring(until: str, caseSensitive: caseFlag, skipString: skipString)` parses all characters
     /// before the first occurance of the string `str` and, if `skipString` is `true`, skips over `str`.
-    /// It returns the parsed characters before the string. It is an atomic parser: either it succeeds or it fails without consuming any input.
-    public static func string(
+    /// It returns the parsed characters before the string.
+    /// It is an atomic parser: either it succeeds or it fails without consuming any input.
+    public static func substring(
         until str: String,
         caseSensitive: Bool = true,
         skipString: Bool = false
     ) -> Parser<Substring> {
-        let stringParser: Parser<Substring> = .string(str, caseSensitive: caseSensitive)
+        let stringParser: Parser<Substring> = .substring(str, caseSensitive: caseSensitive)
         
         return Parser { state in
             var newState = state
@@ -100,10 +102,13 @@ extension Parser where T == Substring {
         }
     }
     
-    /// `string(matchingRegex: pattern, label: label)` matches the regular expression given by the `pattern`.
+    /// `substring(matchingRegex: pattern, label: label)` matches the regular expression given by the `pattern`.
     /// If the regular expression matches, the parser skips the matched characters and returns them as a string.
     /// If the regular expression does not match, the parser fails without consuming input.
-    public static func string(matchingRegex pattern: String, label: String) -> Parser<Substring> {
+    public static func substring(
+        matchingRegex pattern: String,
+        label: String
+    ) -> Parser<Substring> {
         do {
             let expression = try NSRegularExpression(pattern: pattern, options: [])
             
