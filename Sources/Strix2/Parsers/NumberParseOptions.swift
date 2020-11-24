@@ -26,8 +26,12 @@ public struct NumberParseOptions: OptionSet {
         .allowHexadecimal, .allowOctal, .allowBinary
     ]
     
-    public static let defaultInteger: NumberParseOptions = [
+    public static let defaultSignedInteger: NumberParseOptions = [
         .allowSign, .allowAllNotations
+    ]
+    
+    public static let defaultUnsignedInteger: NumberParseOptions = [
+        .allowPlusSign, .allowAllNotations
     ]
     
     public static let defaultFloatingPoint: NumberParseOptions = [

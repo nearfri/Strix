@@ -6,6 +6,111 @@ extension Parser {
     ) -> Parser<T> where T == NumberLiteral {
         return NumberLiteralParserGenerator(options: options).make()
     }
+    
+    public static func number(
+        options: NumberParseOptions,
+        transform: @escaping (NumberLiteral) throws -> T
+    ) -> Parser<T> {
+        return Parser { state in
+            let literalReply = Parser<NumberLiteral>.numberLiteral(options: options).parse(state)
+            switch literalReply.result {
+            case .success(let literal):
+                do {
+                    return .success(try transform(literal), literalReply.state)
+                } catch let e {
+                    let error = (e as? ParseError) ?? .generic(message: e.localizedDescription)
+                    return .failure(state, [error])
+                }
+            case .failure:
+                return .failure(literalReply.state, literalReply.errors)
+            }
+        }
+    }
+    
+    public static func signedInteger(
+        allowExponent: Bool = false,
+        allowUnderscore: Bool = false
+    ) -> Parser<T> where T: (FixedWidthInteger & SignedInteger) {
+        let options = NumberParseOptions.defaultSignedInteger
+            .union(allowExponent ? .allowExponent : [])
+            .union(allowUnderscore ? .allowUnderscore : [])
+        
+        return number(options: options) { literal in
+            guard let num = literal.toValue(type: T.self) else {
+                throw overflowError(literal: literal)
+            }
+            return num
+        }
+    }
+    
+    public static func unsignedInteger(
+        allowExponent: Bool = false,
+        allowUnderscore: Bool = false
+    ) -> Parser<T> where T: (FixedWidthInteger & UnsignedInteger) {
+        let options = NumberParseOptions.defaultUnsignedInteger
+            .union(allowExponent ? .allowExponent : [])
+            .union(allowUnderscore ? .allowUnderscore : [])
+        
+        return number(options: options) { literal in
+            guard let num = literal.toValue(type: T.self) else {
+                throw overflowError(literal: literal)
+            }
+            return num
+        }
+    }
+    
+    public static func floatingPoint(
+        allowUnderscore: Bool = false
+    ) -> Parser<T> where T: BinaryFloatingPoint {
+        let options = NumberParseOptions.defaultFloatingPoint
+            .union(allowUnderscore ? .allowUnderscore : [])
+        
+        return number(options: options) { literal in
+            guard let num = literal.toValue(type: T.self) else {
+                throw overflowError(literal: literal)
+            }
+            return num
+        }
+    }
+    
+    public static func number(allowUnderscore: Bool = false) -> Parser<T> where T == NSNumber {
+        let options = NumberParseOptions.defaultFloatingPoint
+            .union(allowUnderscore ? .allowUnderscore : [])
+        
+        return number(options: options) { literal in
+            guard let num = literal.toNumber() else {
+                throw overflowError(literal: literal)
+            }
+            return num
+        }
+    }
+    
+    private static func overflowError(literal: NumberLiteral) -> ParseError {
+        guard let string = literal.string else { preconditionFailure() }
+        return .generic(message: "\(string) is outside the allowable range")
+    }
+    
+    public static func int(
+        allowExponent: Bool = false,
+        allowUnderscore: Bool = false
+    ) -> Parser<T> where T == Int {
+        return signedInteger(allowExponent: allowExponent, allowUnderscore: allowUnderscore)
+    }
+    
+    public static func uint(
+        allowExponent: Bool = false,
+        allowUnderscore: Bool = false
+    ) -> Parser<T> where T == UInt {
+        return unsignedInteger(allowExponent: allowExponent, allowUnderscore: allowUnderscore)
+    }
+    
+    public static func double(allowUnderscore: Bool = false) -> Parser<T> where T == Double {
+        return floatingPoint(allowUnderscore: allowUnderscore)
+    }
+    
+    public static func float(allowUnderscore: Bool = false) -> Parser<T> where T == Float {
+        return floatingPoint(allowUnderscore: allowUnderscore)
+    }
 }
 
 private struct NumberLiteralParserGenerator {
@@ -31,7 +136,7 @@ private struct NumberLiteralParserGenerator {
         return Parser { state in
             var newState = state
             var numberLiteral = NumberLiteral()
-            let literalString = {
+            let literalString: () -> String = {
                 return String(state.stream[state.stream.startIndex..<newState.stream.startIndex])
             }
             

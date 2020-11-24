@@ -71,3 +71,60 @@ extension NumberLiteral {
         }
     }
 }
+
+extension NumberLiteral {
+    public func toValue<T>(type: T.Type) -> T? where T: FixedWidthInteger {
+        let signValue: T = sign == .minus ? -1 : 1
+        
+        guard let integerPartValue = integerPartValue.flatMap({ T(exactly: $0) }) else {
+            return nil
+        }
+        
+        guard let exponentPartValue = exponentPartValue else {
+            return signValue * integerPartValue
+        }
+        
+        guard let exp = T(exactly: exponentPartValue) else {
+            return nil
+        }
+        
+        let (multipliedValue, overflow) = integerPartValue.multipliedReportingOverflow(by: exp)
+        return overflow ? nil : signValue * multipliedValue
+    }
+    
+    public func toValue<T>(type: T.Type) -> T? where T: BinaryFloatingPoint {
+        switch classification {
+        case .nan:
+            return sign == .minus ? -T.nan : T.nan
+        case .infinity:
+            return sign == .minus ? -T.infinity : T.infinity
+        case .finite:
+            if integerPart == nil && fractionalPart == nil {
+                return nil
+            }
+            guard let integerPartValue = integerPart == nil ? 0 : integerPartValue else {
+                return nil
+            }
+            guard let fractionalPartValue = fractionalPart == nil ? 0 : fractionalPartValue else {
+                return nil
+            }
+            guard let exponentPartValue = exponentPart == nil ? 1 : exponentPartValue else {
+                return nil
+            }
+            let signValue: T = sign == .minus ? -1 : 1
+            let significandValue: T = T(integerPartValue) + T(fractionalPartValue)
+            return signValue * significandValue * T(exponentPartValue)
+        }
+    }
+    
+    public func toNumber() -> NSNumber? {
+        if classification != .finite || fractionalPart != nil {
+            return toValue(type: Double.self).map({ $0 as NSNumber })
+        }
+        
+        if sign != .minus {
+            return toValue(type: UInt.self).map({ $0 as NSNumber })
+        }
+        return toValue(type: Int.self).map({ $0 as NSNumber })
+    }
+}

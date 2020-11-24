@@ -108,4 +108,32 @@ final class NumberParsersTests: XCTestCase {
         
         XCTAssertEqual(actualLiteral, expectedLiteral)
     }
+    
+    func test_int() {
+        let p = Parser.int()
+        XCTAssertEqual(try p.run("12345"), 12345)
+        XCTAssertEqual(try p.run("+12345"), 12345)
+        XCTAssertEqual(try p.run("-12345"), -12345)
+    }
+    
+    func test_int_allowUnderscore() {
+        let p = Parser.int(allowUnderscore: true)
+        XCTAssertEqual(try p.run("12_345"), 12345)
+        XCTAssertEqual(try p.run("+12_345"), 12345)
+        XCTAssertEqual(try p.run("-12_345"), -12345)
+    }
+    
+    func test_uint() {
+        let p = Parser.uint()
+        XCTAssertEqual(try p.run("12345"), 12345)
+        XCTAssertEqual(try p.run("+12345"), 12345)
+        XCTAssertThrowsError(try p.run("-12345"))
+    }
+    
+    func test_double() {
+        let p = Parser.double()
+        XCTAssertEqual(try p.run("123456"), 123456)
+        XCTAssertEqual(try p.run("123.456"), 123.456)
+        XCTAssertEqual(try p.run("-123.456e5"), -12345600)
+    }
 }
