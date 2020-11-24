@@ -54,10 +54,8 @@ public struct ParserReply<T> {
             case .failure:
                 return .failure(state, errors)
             }
-        } catch let parseError as ParseError {
-            return .failure(state, errors + [parseError])
         } catch {
-            let parseError = ParseError.generic(message: error.localizedDescription)
+            let parseError = (error as? ParseError) ?? .generic(message: error.localizedDescription)
             return .failure(state, errors + [parseError])
         }
     }
