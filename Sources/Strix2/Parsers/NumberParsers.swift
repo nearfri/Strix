@@ -1,12 +1,20 @@
 import Foundation
 
 extension Parser {
+    /// `numberLiteral(options: options)` parses a number literal and
+    /// returns the result in form of a `NumberLiteral` value.
+    /// The given `NumberParseOptions` argument determines the kind of number literals accepted.
+    /// The parser fails without consuming input if not at least one digit can be parsed.
+    /// It fails after consuming input, if no decimal digit comes after an exponent marker.
     public static func numberLiteral(
         options: NumberParseOptions
     ) -> Parser<T> where T == NumberLiteral {
         return NumberLiteralParserGenerator(options: options).make()
     }
     
+    /// `number(options: options, transform: transform)` parses a number literal and
+    /// returns the result of the function application `transform(literal)`, where `literal` is the `NumberLiteral` value.
+    /// The given `NumberParseOptions` argument determines the kind of number literals accepted.
     public static func number(
         options: NumberParseOptions,
         transform: @escaping (NumberLiteral) throws -> T
@@ -27,6 +35,7 @@ extension Parser {
         }
     }
     
+    /// Parses a signed integer number in the decimal, hexadecimal (0[xX]), octal (0[oO]) and binary (0[bB]) formats.
     public static func signedInteger(
         allowExponent: Bool = false,
         allowUnderscore: Bool = false
@@ -43,6 +52,7 @@ extension Parser {
         }
     }
     
+    /// Parses an unsigned integer number in the decimal, hexadecimal (0[xX]), octal (0[oO]) and binary (0[bB]) formats.
     public static func unsignedInteger(
         allowExponent: Bool = false,
         allowUnderscore: Bool = false
@@ -59,6 +69,8 @@ extension Parser {
         }
     }
     
+    /// Parses a floating point number in the decimal, hexadecimal (0[xX]), octal (0[oO]) and binary (0[bB]) formats.
+    /// The special values `NaN` and `Inf(inity)?` (case‐insensitive) are also recognized.
     public static func floatingPoint(
         allowUnderscore: Bool = false
     ) -> Parser<T> where T: BinaryFloatingPoint {
@@ -73,6 +85,7 @@ extension Parser {
         }
     }
     
+    /// Parses a `NSNumber` in the decimal, hexadecimal (0[xX]), octal (0[oO]) and binary (0[bB]) formats.
     public static func number(allowUnderscore: Bool = false) -> Parser<T> where T == NSNumber {
         let options = NumberParseOptions.defaultFloatingPoint
             .union(allowUnderscore ? .allowUnderscore : [])
@@ -90,6 +103,7 @@ extension Parser {
         return .generic(message: "\(string) is outside the allowable range")
     }
     
+    /// Parses an `Int` in the decimal, hexadecimal (0[xX]), octal (0[oO]) and binary (0[bB]) formats.
     public static func int(
         allowExponent: Bool = false,
         allowUnderscore: Bool = false
@@ -97,6 +111,7 @@ extension Parser {
         return signedInteger(allowExponent: allowExponent, allowUnderscore: allowUnderscore)
     }
     
+    /// Parses a `UInt` in the decimal, hexadecimal (0[xX]), octal (0[oO]) and binary (0[bB]) formats.
     public static func uint(
         allowExponent: Bool = false,
         allowUnderscore: Bool = false
@@ -104,10 +119,14 @@ extension Parser {
         return unsignedInteger(allowExponent: allowExponent, allowUnderscore: allowUnderscore)
     }
     
+    /// Parses a `Double` in the decimal, hexadecimal (0[xX]), octal (0[oO]) and binary (0[bB]) formats.
+    /// The special values `NaN` and `Inf(inity)?` (case‐insensitive) are also recognized.
     public static func double(allowUnderscore: Bool = false) -> Parser<T> where T == Double {
         return floatingPoint(allowUnderscore: allowUnderscore)
     }
     
+    /// Parses a `Float` in the decimal, hexadecimal (0[xX]), octal (0[oO]) and binary (0[bB]) formats.
+    /// The special values `NaN` and `Inf(inity)?` (case‐insensitive) are also recognized.
     public static func float(allowUnderscore: Bool = false) -> Parser<T> where T == Float {
         return floatingPoint(allowUnderscore: allowUnderscore)
     }
