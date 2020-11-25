@@ -15,6 +15,14 @@ private enum Seed {
     static let strFailureParser: Parser<String> = .init({ _ in .failure(state2, strErrors) })
 }
 
+private class TextOutput: TextOutputStream {
+    var text: String = ""
+    
+    func write(_ string: String) {
+        text += string
+    }
+}
+
 final class ParserTests: XCTestCase {
     func test_map_success_success() {
         // Given
@@ -74,6 +82,23 @@ final class ParserTests: XCTestCase {
         
         // Then
         XCTAssertNil(reply.result.value)
+    }
+    
+    func test_print() {
+        // Given
+        let parser = Seed.intSuccessParser
+        let textOutput = TextOutput()
+        
+        // When
+        let printableParser = parser.print("integer", to: textOutput)
+        _ = printableParser.parse(Seed.state1)
+        
+        // Then
+        XCTAssertEqual(textOutput.text, """
+        (1:1): integer: enter
+        (1:2): integer: leave: success(1)
+        
+        """)
     }
     
     func test_run_success() throws {
