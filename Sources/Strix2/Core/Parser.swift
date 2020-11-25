@@ -32,6 +32,32 @@ public struct Parser<T> {
         }
     }
     
+    /// The parser `p.print(label)` prints log messages before and after applying the parser `p`.
+    public func print(_ label: String = "", to output: TextOutputStream? = nil) -> Parser<T> {
+        let write: (String) -> Void = {
+            if var output = output {
+                return { output.write($0) }
+            }
+            return { Swift.print($0, terminator: "") }
+        }()
+        
+        func print(state: ParserState, message: String) {
+            let position = TextPosition(string: state.stream.base, index: state.position)
+            write("(\(position.line):\(position.column)): ")
+            if !label.isEmpty {
+                write("\(label): ")
+            }
+            write(message + "\n")
+        }
+        
+        return Parser { state in
+            print(state: state, message: "enter")
+            let reply = parse(state)
+            print(state: reply.state, message: "leave: \(reply.result)")
+            return reply
+        }
+    }
+    
     /// `p.run(str)` runs the parser `p` on the content of the string `str`.
     public func run(_ input: String) throws -> T {
         let initialState = ParserState(stream: input[...])
