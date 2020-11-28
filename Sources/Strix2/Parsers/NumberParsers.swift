@@ -99,8 +99,7 @@ extension Parser {
     }
     
     private static func overflowError(literal: NumberLiteral) -> ParseError {
-        guard let string = literal.string else { preconditionFailure() }
-        return .generic(message: "\(string) is outside the allowable range")
+        return .generic(message: "\(literal.string) is outside the allowable range")
     }
     
     /// Parses an `Int` in the decimal, hexadecimal (0[xX]), octal (0[oO]) and binary (0[bB]) formats.
@@ -164,7 +163,7 @@ private struct NumberLiteralParserGenerator {
             fractionalPart(notation: numberLiteral.notation).parse(&newState)
                 .value.map({ numberLiteral.fractionalPart = $0 })
             
-            if numberLiteral.integerPart == nil && numberLiteral.fractionalPart == nil {
+            if numberLiteral.integerPart.isEmpty && numberLiteral.fractionalPart.isEmpty {
                 // 아무런 숫자도 없는 경우 처음으로 돌아간다
                 return .failure(state, [.expected(label: "number")])
             }
@@ -234,15 +233,15 @@ private struct NumberLiteralParserGenerator {
         return .any(of: parsers)
     }
     
-    private func integerPart(notation: NumberLiteral.Notation) -> Parser<String?> {
-        return .optional(digits(notation: notation))
+    private func integerPart(notation: NumberLiteral.Notation) -> Parser<String> {
+        return digits(notation: notation) <|> .just("")
     }
     
-    private func fractionalPart(notation: NumberLiteral.Notation) -> Parser<String?> {
+    private func fractionalPart(notation: NumberLiteral.Notation) -> Parser<String> {
         if !options.contains(.allowFraction) {
-            return .just(nil)
+            return .just("")
         }
-        return .optional(character(".") *> digits(notation: notation))
+        return (character(".") *> digits(notation: notation)) <|> .just("")
     }
     
     private func digits(notation: NumberLiteral.Notation) -> Parser<String> {
@@ -265,14 +264,14 @@ private struct NumberLiteralParserGenerator {
         }
     }
     
-    private func exponentPart(notation: NumberLiteral.Notation) -> Parser<String?> {
+    private func exponentPart(notation: NumberLiteral.Notation) -> Parser<String> {
         guard options.contains(.allowExponent),
               let separator = exponentSeparator(notation: notation)
-        else { return .just(nil) }
+        else { return .just("") }
         
         let sign = (character("+") <|> character("-")).map({ String($0) }) <|> .just("")
         let decimalDigits = digits(notation: .decimal)
-        return .optional(separator *> Parser.tuple(sign, decimalDigits).map({ $0 + $1 }))
+        return (separator *> Parser.tuple(sign, decimalDigits).map({ $0 + $1 })) <|> .just("")
     }
     
     private func exponentSeparator(notation: NumberLiteral.Notation) -> Parser<Character>? {

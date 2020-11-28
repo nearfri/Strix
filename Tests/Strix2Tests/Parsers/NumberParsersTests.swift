@@ -71,8 +71,8 @@ final class NumberParsersTests: XCTestCase {
         XCTAssertEqual(try p.run("12.34").fractionalPart, "34")
         XCTAssertEqual(try p.run("12.34z").fractionalPart, "34")
         XCTAssertEqual(try p.run(".34").fractionalPart, "34")
-        XCTAssertEqual(try p.run("34").fractionalPart, nil)
-        XCTAssertEqual(try p.run("12.").fractionalPart, nil)
+        XCTAssertEqual(try p.run("34").fractionalPart, "")
+        XCTAssertEqual(try p.run("12.").fractionalPart, "")
         XCTAssertEqual(try p.run("12.").string, "12.")
     }
     

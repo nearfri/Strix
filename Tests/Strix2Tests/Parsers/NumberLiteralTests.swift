@@ -5,7 +5,7 @@ final class NumberLiteralTests: XCTestCase {
     func test_integerPartValue() {
         var literal = NumberLiteral(
             string: "", sign: .plus, classification: .finite, notation: .decimal,
-            integerPart: "100", fractionalPart: nil, exponentPart: nil)
+            integerPart: "100", fractionalPart: "", exponentPart: "")
         
         literal.notation = .decimal
         XCTAssertEqual(literal.integerPartValue, 100)
@@ -23,7 +23,7 @@ final class NumberLiteralTests: XCTestCase {
     func test_fractionalPartValue() {
         var literal = NumberLiteral(
             string: "", sign: .plus, classification: .finite, notation: .decimal,
-            integerPart: nil, fractionalPart: "001", exponentPart: nil)
+            integerPart: "", fractionalPart: "001", exponentPart: "")
         
         literal.notation = .decimal
         XCTAssertEqual(literal.fractionalPartValue, 0.001)
@@ -42,7 +42,7 @@ final class NumberLiteralTests: XCTestCase {
     func test_exponentPartValue() {
         var literal = NumberLiteral(
             string: "", sign: .plus, classification: .finite, notation: .decimal,
-            integerPart: nil, fractionalPart: nil, exponentPart: "3")
+            integerPart: "", fractionalPart: "", exponentPart: "3")
         
         literal.notation = .decimal
         XCTAssertEqual(literal.exponentPartValue, 1000)
@@ -61,7 +61,7 @@ final class NumberLiteralTests: XCTestCase {
     func test_toValue_int() {
         var literal = NumberLiteral(
             string: "", sign: .none, classification: .finite, notation: .decimal,
-            integerPart: "123", fractionalPart: nil, exponentPart: nil)
+            integerPart: "123", fractionalPart: "", exponentPart: "")
         
         XCTAssertEqual(literal.toValue(type: Int.self), 123)
         
@@ -75,7 +75,7 @@ final class NumberLiteralTests: XCTestCase {
     func test_toValue_int_withExponent() {
         var literal = NumberLiteral(
             string: "", sign: .none, classification: .finite, notation: .decimal,
-            integerPart: "123", fractionalPart: nil, exponentPart: "3")
+            integerPart: "123", fractionalPart: "", exponentPart: "3")
         
         XCTAssertEqual(literal.toValue(type: Int.self), 123000)
         
@@ -92,7 +92,7 @@ final class NumberLiteralTests: XCTestCase {
     func test_toValue_intOverflow() {
         var literal = NumberLiteral(
             string: "", sign: .plus, classification: .finite, notation: .decimal,
-            integerPart: "255", fractionalPart: nil, exponentPart: nil)
+            integerPart: "255", fractionalPart: "", exponentPart: "")
         
         XCTAssertEqual(literal.toValue(type: UInt8.self), 255)
         
@@ -103,7 +103,7 @@ final class NumberLiteralTests: XCTestCase {
     func test_toValue_double() {
         var literal = NumberLiteral(
             string: "", sign: .none, classification: .finite, notation: .decimal,
-            integerPart: "123", fractionalPart: "456", exponentPart: nil)
+            integerPart: "123", fractionalPart: "456", exponentPart: "")
         
         XCTAssertEqual(literal.toValue(type: Double.self), 123.456)
         
