@@ -1,7 +1,7 @@
 import Foundation
 import Strix2
 
-public struct Calculator {
+public class Calculator {
     private let prattParser: PrattParser<Double>
     private let tokenizer: Parser<Token>
     
