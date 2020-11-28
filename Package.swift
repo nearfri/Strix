@@ -9,6 +9,7 @@ let package = Package(
         // Products define the executables and libraries produced by a package, and make them visible to other packages.
         .library(name: "Strix", targets: ["Strix"]),
         .library(name: "Strix2", targets: ["Strix2"]),
+        .library(name: "StrixParsers", targets: ["StrixParsers"]),
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
@@ -30,5 +31,12 @@ let package = Package(
         .testTarget(
             name: "Strix2Tests",
             dependencies: ["Strix2"]),
+        
+        .target(
+            name: "StrixParsers",
+            dependencies: ["Strix2"]),
+        .testTarget(
+            name: "StrixParsersTests",
+            dependencies: ["StrixParsers"]),
     ]
 )

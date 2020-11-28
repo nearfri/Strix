@@ -31,7 +31,7 @@ extension Parser where T == Character {
         of characters: S
     ) -> Parser<Character> where S.Element == Character {
         return satisfy(characters.contains,
-                       label: "any character in \(Array(characters))")
+                       label: "any character in [\(String(characters))]")
     }
     
     /// `none(of: sequence)` parses any character not contained in the character sequence. It returns the parsed character.
@@ -39,7 +39,7 @@ extension Parser where T == Character {
         of characters: S
     ) -> Parser<Character> where S.Element == Character {
         return satisfy({ !characters.contains($0) },
-                       label: "any character not in \(Array(characters))")
+                       label: "any character not in [\(String(characters))]")
     }
     
     /// `character(c)` parses the character `c` and returns `c`.
@@ -67,14 +67,20 @@ extension Parser where T == Character {
         return satisfy({ $0.isASCII }, label: "ASCII letter")
     }
     
-    /// Parses any character in the range `"A"` - `"Z"`.
-    public static var asciiUppercase: Parser<Character> {
-        return satisfy({ ("A"..."Z").contains($0) }, label: "ASCII uppercase letter")
+    /// Parses any char in the range `"a"` - `"z"` and `"A"` - `"Z"`.
+    public static var asciiLetter: Parser<Character> {
+        return satisfy({ ("a"..."z").contains($0) || ("A"..."Z").contains($0) },
+                       label: "ASCII letter")
     }
     
     /// Parses any character in the range `"a"` - `"z"`.
     public static var asciiLowercase: Parser<Character> {
         return satisfy({ ("a"..."z").contains($0) }, label: "ASCII lowercase letter")
+    }
+    
+    /// Parses any character in the range `"A"` - `"Z"`.
+    public static var asciiUppercase: Parser<Character> {
+        return satisfy({ ("A"..."Z").contains($0) }, label: "ASCII uppercase letter")
     }
     
     /// Parses any character in the range `"0"` - `"9"`.
