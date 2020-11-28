@@ -5,6 +5,12 @@ public struct RunError: Error, CustomStringConvertible {
     public var position: String.Index
     public var underlyingErrors: [ParseError]
     
+    public init(input: String, position: String.Index, underlyingErrors: [ParseError]) {
+        self.input = input
+        self.position = position
+        self.underlyingErrors = underlyingErrors
+    }
+    
     public var localizedDescription: String {
         var buffer = ErrorOutputBuffer()
         

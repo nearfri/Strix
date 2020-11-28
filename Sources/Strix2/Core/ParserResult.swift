@@ -60,12 +60,16 @@ public enum ParserResult<T> {
     }
     
     public func appendingErrors(_ errors: [ParseError]) -> ParserResult<T> {
+        if errors.isEmpty { return self }
+        
         var result = self
         result.errors = self.errors + errors
         return result
     }
     
     public func prependingErrors(_ errors: [ParseError]) -> ParserResult<T> {
+        if errors.isEmpty { return self }
+        
         var result = self
         result.errors = errors + self.errors
         return result

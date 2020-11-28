@@ -68,9 +68,7 @@ public struct Parser<T> {
         case .success(let value, _):
             return value
         case .failure(let errors):
-            throw RunError(input: input,
-                           position: reply.state.stream.startIndex,
-                           underlyingErrors: errors)
+            throw RunError(input: input, position: reply.state.position, underlyingErrors: errors)
         }
     }
     
