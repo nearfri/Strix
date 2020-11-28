@@ -22,13 +22,13 @@ extension NumberLiteral {
 }
 
 public struct NumberLiteral: Equatable {
-    public var string: String? = nil
+    public var string: String = ""
     public var sign: Sign = .none
     public var classification: Classification = .finite
     public var notation: Notation = .decimal
-    public var integerPart: String? = nil
-    public var fractionalPart: String? = nil
-    public var exponentPart: String? = nil
+    public var integerPart: String = ""
+    public var fractionalPart: String = ""
+    public var exponentPart: String = ""
 }
 
 extension NumberLiteral {
@@ -37,15 +37,15 @@ extension NumberLiteral {
     }
     
     public var integerPartNumber: UInt? {
-        return integerPart.flatMap({ UInt($0, radix: radix) })
+        return UInt(integerPart, radix: radix)
     }
     
     public var fractionalPartNumber: UInt? {
-        return fractionalPart.flatMap({ UInt($0, radix: radix) })
+        return UInt(fractionalPart, radix: radix)
     }
     
     public var exponentPartNumber: Int? {
-        return exponentPart.flatMap({ Int($0, radix: 10) })
+        return Int(exponentPart, radix: 10)
     }
     
     public var integerPartValue: UInt? {
@@ -53,8 +53,8 @@ extension NumberLiteral {
     }
     
     public var fractionalPartValue: Double? {
-        guard let text = fractionalPart, let number = fractionalPartNumber else { return nil }
-        return Double(number) / pow(Double(radix), Double(text.count))
+        guard let number = fractionalPartNumber else { return nil }
+        return Double(number) / pow(Double(radix), Double(fractionalPart.count))
     }
     
     public var exponentPartValue: Double? {
@@ -99,16 +99,16 @@ extension NumberLiteral {
         case .infinity:
             return sign == .minus ? -T.infinity : T.infinity
         case .finite:
-            if integerPart == nil && fractionalPart == nil {
+            if integerPart.isEmpty && fractionalPart.isEmpty {
                 return nil
             }
-            guard let integerPartValue = integerPart == nil ? 0 : integerPartValue else {
+            guard let integerPartValue = integerPart.isEmpty ? 0 : integerPartValue else {
                 return nil
             }
-            guard let fractionalPartValue = fractionalPart == nil ? 0 : fractionalPartValue else {
+            guard let fractionalPartValue = fractionalPart.isEmpty ? 0 : fractionalPartValue else {
                 return nil
             }
-            guard let exponentPartValue = exponentPart == nil ? 1 : exponentPartValue else {
+            guard let exponentPartValue = exponentPart.isEmpty ? 1 : exponentPartValue else {
                 return nil
             }
             let signValue: T = sign == .minus ? -1 : 1
@@ -118,7 +118,7 @@ extension NumberLiteral {
     }
     
     public func toNumber() -> NSNumber? {
-        if classification != .finite || fractionalPart != nil {
+        if classification != .finite || !fractionalPart.isEmpty {
             return toValue(type: Double.self).map({ $0 as NSNumber })
         }
         
