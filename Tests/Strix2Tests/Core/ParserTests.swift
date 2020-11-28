@@ -11,7 +11,7 @@ private enum Seed {
     static let intSuccessParser: Parser<Int> = .init({ _ in .success(1, state2, intErrors) })
     static let intFailureParser: Parser<Int> = .init({ _ in .failure(state2, intErrors) })
     
-    static let strSuccessParser: Parser<String> = .init({ _ in .success("wow", state2, strErrors)})
+    static let strSuccessParser: Parser<String> = .init({ _ in .success("wow", state2, strErrors) })
     static let strFailureParser: Parser<String> = .init({ _ in .failure(state2, strErrors) })
 }
 
@@ -90,13 +90,13 @@ final class ParserTests: XCTestCase {
         let textOutput = TextOutput()
         
         // When
-        let printableParser = parser.print("integer", to: textOutput)
+        let printableParser = parser.print("int number", to: textOutput)
         _ = printableParser.parse(Seed.state1)
         
         // Then
         XCTAssertEqual(textOutput.text, """
-        (1:1): integer: enter
-        (1:2): integer: leave: success(1)
+        (1:1): int number: enter
+        (1:2): int number: leave: success(1, [expected(label: "integer")])
         
         """)
     }
@@ -112,7 +112,7 @@ final class ParserTests: XCTestCase {
     func test_run_failure() {
         // Given
         let input = "hello"
-        let errors: [ParseError] = [.expected(label: "integer")]
+        let errors: [ParseError] = Seed.intErrors
         let parser: Parser<Int> = .init { state in
             return .failure(state.withStream(state.stream.dropFirst()), errors)
         }

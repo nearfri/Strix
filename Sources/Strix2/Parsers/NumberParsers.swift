@@ -22,7 +22,7 @@ extension Parser {
         return Parser { state in
             let literalReply = Parser<NumberLiteral>.numberLiteral(options: options).parse(state)
             switch literalReply.result {
-            case .success(let literal):
+            case .success(let literal, _):
                 do {
                     return .success(try transform(literal), literalReply.state)
                 } catch let e {
@@ -133,18 +133,6 @@ extension Parser {
 }
 
 private struct NumberLiteralParserGenerator {
-    private enum Result<T> {
-        case success(T)
-        case failure([ParseError])
-        
-        var value: T? {
-            switch self {
-            case .success(let v):   return v
-            case .failure:          return nil
-            }
-        }
-    }
-    
     private let options: NumberParseOptions
     
     init(options: NumberParseOptions) {
@@ -159,21 +147,21 @@ private struct NumberLiteralParserGenerator {
                 return String(state.stream[state.stream.startIndex..<newState.stream.startIndex])
             }
             
-            parse(&newState, using: sign).value.map({ numberLiteral.sign = $0 })
+            sign.parse(&newState).value.map({ numberLiteral.sign = $0 })
             
-            parse(&newState, using: classification).value.map({ numberLiteral.classification = $0 })
+            classification.parse(&newState).value.map({ numberLiteral.classification = $0 })
             
             if numberLiteral.classification == .nan || numberLiteral.classification == .infinity {
                 numberLiteral.string = literalString()
                 return .success(numberLiteral, newState)
             }
             
-            parse(&newState, using: notation).value.map({ numberLiteral.notation = $0 })
+            notation.parse(&newState).value.map({ numberLiteral.notation = $0 })
             
-            parse(&newState, using: integerPart(notation: numberLiteral.notation))
+            integerPart(notation: numberLiteral.notation).parse(&newState)
                 .value.map({ numberLiteral.integerPart = $0 })
             
-            parse(&newState, using: fractionalPart(notation: numberLiteral.notation))
+            fractionalPart(notation: numberLiteral.notation).parse(&newState)
                 .value.map({ numberLiteral.fractionalPart = $0 })
             
             if numberLiteral.integerPart == nil && numberLiteral.fractionalPart == nil {
@@ -181,8 +169,8 @@ private struct NumberLiteralParserGenerator {
                 return .failure(state, [.expected(label: "number")])
             }
             
-            switch parse(&newState, using: exponentPart(notation: numberLiteral.notation)) {
-            case .success(let exp):
+            switch exponentPart(notation: numberLiteral.notation).parse(&newState) {
+            case .success(let exp, _):
                 numberLiteral.exponentPart = exp
             case .failure(let errors):
                 return .failure(newState, errors)
@@ -190,22 +178,6 @@ private struct NumberLiteralParserGenerator {
             
             numberLiteral.string = literalString()
             return .success(numberLiteral, newState)
-        }
-    }
-    
-    private func parse<T>(
-        _ state: inout ParserState,
-        using parser: Parser<T>
-    ) -> Result<T> {
-        let reply = parser.parse(state)
-        
-        state = reply.state
-        
-        switch reply.result {
-        case .success(let value):
-            return .success(value)
-        case .failure:
-            return .failure(reply.errors)
         }
     }
     

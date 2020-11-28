@@ -22,12 +22,12 @@ public struct Parser<T> {
         return Parser<U> { state -> ParserReply<U> in
             let reply = parse(state)
             switch reply.result {
-            case .success(let v):
+            case .success(let v, _):
                 return transform(v)
                     .parse(reply.state)
                     .compareStateAndPrependingErrors(of: reply)
-            case .failure:
-                return .failure(reply.state, reply.errors)
+            case .failure(let errors):
+                return .failure(reply.state, errors)
             }
         }
     }
@@ -65,17 +65,24 @@ public struct Parser<T> {
         let reply = parse(initialState)
         
         switch reply.result {
-        case .success(let value):
+        case .success(let value, _):
             return value
-        case .failure:
+        case .failure(let errors):
             throw RunError(input: input,
                            position: reply.state.stream.startIndex,
-                           underlyingErrors: reply.errors)
+                           underlyingErrors: errors)
         }
     }
     
     /// `p(str)` runs the parser `p` on the content of the string `str`.
     public func callAsFunction(_ input: String) throws -> T {
         return try run(input)
+    }
+    
+    /// `p.parse(&state)` parses with changing the `state` and returns the result in type of a `ParserResult`.
+    public func parse(_ state: inout ParserState) -> ParserResult<T> {
+        let reply = parse(state)
+        state = reply.state
+        return reply.result
     }
 }
