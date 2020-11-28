@@ -11,13 +11,13 @@ extension Parser {
             for _ in 0..<count {
                 let reply = p.parse(state)
                 errors = reply.state != state ? reply.errors : errors + reply.errors
-                guard case let .success(v) = reply.result else {
+                guard case let .success(v, _) = reply.result else {
                     return .failure(state, errors)
                 }
                 values.append(v)
                 state = reply.state
             }
-            return .success(values, state, errors)
+            return .success(values, errors, state)
         }
     }
     
@@ -86,32 +86,34 @@ private struct ManyParser<U> {
     
     mutating func parse() -> ParserReply<[U]> {
         let firstReply = firstParser.parse(state)
-        if case let .success(v) = firstReply.result {
-            handleSuccess(value: v, newState: firstReply.state, newErrors: firstReply.errors)
-        } else {
-            return handleFailure(newState: firstReply.state, newErrors: firstReply.errors)
+        switch firstReply.result {
+        case let .success(value, errors):
+            handleSuccess(value: value, newErrors: errors, newState: firstReply.state)
+        case let .failure(errors):
+            return handleFailure(newErrors: errors, newState: firstReply.state)
         }
         
         while true {
             let reply = repeatedParser.parse(state)
-            if case let .success(v) = reply.result {
+            switch reply.result {
+            case let .success(value, errors):
                 precondition(reply.state != state, infiniteLoopErrorMessage(at: state.position))
-                handleSuccess(value: v, newState: reply.state, newErrors: reply.errors)
-            } else {
-                return handleFailure(newState: reply.state, newErrors: reply.errors)
+                handleSuccess(value: value, newErrors: errors, newState: reply.state)
+            case let .failure(errors):
+                return handleFailure(newErrors: errors, newState: reply.state)
             }
         }
     }
     
-    private mutating func handleSuccess(value: U, newState: ParserState, newErrors: [ParseError]) {
+    private mutating func handleSuccess(value: U, newErrors: [ParseError], newState: ParserState) {
         values.append(value)
-        state = newState
         errors = newErrors
+        state = newState
     }
     
-    private func handleFailure(newState: ParserState, newErrors: [ParseError]) -> ParserReply<[U]> {
+    private func handleFailure(newErrors: [ParseError], newState: ParserState) -> ParserReply<[U]> {
         if newState == state && values.count >= minCount {
-            return .success(values, newState, errors + newErrors)
+            return .success(values, errors + newErrors, newState)
         }
         return .failure(newState, newErrors)
     }

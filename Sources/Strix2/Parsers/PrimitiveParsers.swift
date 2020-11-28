@@ -187,7 +187,7 @@ extension Parser {
         return Parser { state in
             let reply = p.parse(state)
             
-            if case let .success(v) = reply.result {
+            if case let .success(v, _) = reply.result {
                 return .success(v, state)
             }
             
