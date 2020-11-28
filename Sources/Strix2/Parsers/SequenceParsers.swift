@@ -17,7 +17,7 @@ extension Parser {
                 values.append(v)
                 state = reply.state
             }
-            return .success(values, state, errors)
+            return .success(values, errors, state)
         }
     }
     
@@ -113,7 +113,7 @@ private struct ManyParser<U> {
     
     private func handleFailure(newErrors: [ParseError], newState: ParserState) -> ParserReply<[U]> {
         if newState == state && values.count >= minCount {
-            return .success(values, newState, errors + newErrors)
+            return .success(values, errors + newErrors, newState)
         }
         return .failure(newState, newErrors)
     }

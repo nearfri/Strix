@@ -14,9 +14,13 @@ public struct ParserReply<T> {
     }
     
     public static func success(_ value: T,
-                               _ state: ParserState,
-                               _ errors: [ParseError] = []) -> ParserReply {
+                               _ errors: [ParseError],
+                               _ state: ParserState) -> ParserReply {
         return .init(result: .success(value, errors), state: state)
+    }
+    
+    public static func success(_ value: T, _ state: ParserState) -> ParserReply {
+        return .init(result: .success(value, []), state: state)
     }
     
     public static func failure(_ state: ParserState, _ errors: [ParseError]) -> ParserReply {

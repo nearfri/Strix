@@ -8,10 +8,10 @@ private enum Seed {
     static let intErrors: [ParseError] = [.expected(label: "integer")]
     static let strErrors: [ParseError] = [.expected(label: "string")]
     
-    static let intSuccessParser: Parser<Int> = .init({ _ in .success(1, state2, intErrors) })
+    static let intSuccessParser: Parser<Int> = .init({ _ in .success(1, intErrors, state2) })
     static let intFailureParser: Parser<Int> = .init({ _ in .failure(state2, intErrors) })
     
-    static let strSuccessParser: Parser<String> = .init({ _ in .success("wow", state2, strErrors) })
+    static let strSuccessParser: Parser<String> = .init({ _ in .success("wow", strErrors, state2) })
     static let strFailureParser: Parser<String> = .init({ _ in .failure(state2, strErrors) })
 }
 
