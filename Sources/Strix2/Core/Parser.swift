@@ -27,7 +27,7 @@ public struct Parser<T> {
                     .parse(reply.state)
                     .compareStateAndPrependingErrors(of: reply)
             case .failure(let errors):
-                return .failure(reply.state, errors)
+                return .failure(errors, reply.state)
             }
         }
     }

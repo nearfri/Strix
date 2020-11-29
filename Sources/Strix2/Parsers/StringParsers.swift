@@ -65,7 +65,7 @@ extension Parser where T == Substring {
                 }
                 if streamIndex == stream.endIndex || !equal(stream[streamIndex], str[strIndex]) {
                     let error = ParseError.expectedString(string: str, caseSensitive: caseSensitive)
-                    return .failure(state, [error])
+                    return .failure([error], state)
                 }
                 
                 streamIndex = stream.index(after: streamIndex)
@@ -95,7 +95,7 @@ extension Parser where T == Substring {
                 }
                 if newState.stream.startIndex == newState.stream.endIndex {
                     let error = ParseError.generic(message: "could not find the string '\(str)'")
-                    return .failure(state, [error])
+                    return .failure([error], state)
                 }
                 newState = newState.withStream(newState.stream.dropFirst())
             }
@@ -123,7 +123,7 @@ extension Parser where T == Substring {
                     return .success(input[matchRange],
                                     state.withStream(input[matchRange.upperBound...]))
                 }
-                return .failure(state, [.expected(label: label)])
+                return .failure([.expected(label: label)], state)
             }
         } catch {
             preconditionFailure("regex pattern \(pattern) is invalid")

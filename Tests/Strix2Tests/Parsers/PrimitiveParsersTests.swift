@@ -163,8 +163,8 @@ final class PrimitiveParsersTests: XCTestCase {
     func test_alternative_leftFailWithChange_returnLeftReply() {
         // Given
         let p1: Parser<Int> = Parser { state in
-            return .failure(state.withStream(state.stream.dropFirst()),
-                            [.generic(message: "Invalid input")])
+            return .failure([.generic(message: "Invalid input")],
+                            state.withStream(state.stream.dropFirst()))
         }
         let p2: Parser<Int> = .just(2)
         
@@ -197,8 +197,8 @@ final class PrimitiveParsersTests: XCTestCase {
         // Given
         let p1: Parser<Int> = .fail(message: "Fail 1")
         let p2: Parser<Int> = Parser { state in
-            return .failure(state.withStream(state.stream.dropFirst()),
-                            [.generic(message: "Fail 3")])
+            return .failure([.generic(message: "Fail 3")],
+                            state.withStream(state.stream.dropFirst()))
         }
         let p3: Parser<Int> = .just(3)
         
@@ -319,7 +319,7 @@ final class PrimitiveParsersTests: XCTestCase {
     func test_attempt_fail_backtrack() {
         // Given
         let p1: Parser<String> = Parser { state in
-            return .failure(state.withStream(state.stream.dropFirst()), [])
+            return .failure([], state.withStream(state.stream.dropFirst()))
         }
         
         // When
@@ -363,7 +363,7 @@ final class PrimitiveParsersTests: XCTestCase {
         let secondIndex = input.index(after: input.startIndex)
         let p1Errors = [ParseError.generic(message: "invalid input")]
         let p1: Parser<String> = Parser { state in
-            return .failure(state.withStream(input[secondIndex...]), p1Errors)
+            return .failure(p1Errors, state.withStream(input[secondIndex...]))
         }
         
         // When
@@ -397,7 +397,7 @@ final class PrimitiveParsersTests: XCTestCase {
         // Given
         let p1Errors = [ParseError.generic(message: "invalid input")]
         let p1: Parser<String> = Parser { state in
-            return .failure(state, p1Errors)
+            return .failure(p1Errors, state)
         }
         
         // When
@@ -415,7 +415,7 @@ final class PrimitiveParsersTests: XCTestCase {
         let secondIndex = input.index(after: input.startIndex)
         let p1Errors = [ParseError.generic(message: "invalid input")]
         let p1: Parser<String> = Parser { state in
-            return .failure(state.withStream(input[secondIndex...]), p1Errors)
+            return .failure(p1Errors, state.withStream(input[secondIndex...]))
         }
         
         // When
@@ -443,6 +443,29 @@ final class PrimitiveParsersTests: XCTestCase {
         // Then
         XCTAssertEqual(reply.result.value, "123")
         XCTAssertEqual(reply.state.stream, "456")
+    }
+    
+    // MARK: - lazy
+    
+    func test_lazy() throws {
+        enum Container: Equatable {
+            indirect case wrapper(Container)
+            case value(Int)
+        }
+        
+        var containerParser: Parser<Container>!
+        
+        let wrapperParser: Parser<Container> =
+            (.character("(") *> .lazy(containerParser) <* .character(")")).map({ .wrapper($0) })
+        
+        let valueParser: Parser<Container> = Parser.int().map({ .value($0) })
+        
+        containerParser = wrapperParser <|> valueParser
+        
+        let parsedContainer: Container = try containerParser.run("((5))")
+        let expectedContainer: Container = .wrapper(.wrapper(.value(5)))
+        
+        XCTAssertEqual(parsedContainer, expectedContainer)
     }
     
     // MARK: - endOfStream
@@ -493,7 +516,7 @@ final class PrimitiveParsersTests: XCTestCase {
     func test_follow_fail_backtrackAndReturnExpectedError() {
         // Given
         let p1: Parser<String> = Parser { state in
-            return .failure(state.withStream(state.stream.dropFirst()), [])
+            return .failure([], state.withStream(state.stream.dropFirst()))
         }
         
         // When
@@ -527,7 +550,7 @@ final class PrimitiveParsersTests: XCTestCase {
     func test_not_fail_backtrackAndSucceed() {
         // Given
         let p1: Parser<String> = Parser { state in
-            return .failure(state.withStream(state.stream.dropFirst()), [])
+            return .failure([], state.withStream(state.stream.dropFirst()))
         }
         
         // When

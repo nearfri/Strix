@@ -11,7 +11,7 @@ extension Parser where T == Character {
             if let c = state.stream.first, predicate(c) {
                 return .success(c, state.withStream(state.stream.dropFirst()))
             }
-            return .failure(state, [.expected(label: label)])
+            return .failure([.expected(label: label)], state)
         }
     }
     
