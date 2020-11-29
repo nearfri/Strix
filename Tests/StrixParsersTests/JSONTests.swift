@@ -1,7 +1,7 @@
 import XCTest
 @testable import StrixParsers
 
-private enum Seed {
+enum JSONSeed {
     static let menuJSONString = """
     {
         "menu": {
@@ -53,32 +53,32 @@ private enum Seed {
 final class JSONTests: XCTestCase {
     func test_initWithData() throws {
         // Given
-        let data = Seed.menuJSONString.data(using: .utf8)!
+        let data = JSONSeed.menuJSONString.data(using: .utf8)!
         
         // When
         let json = try JSON(data: data)
         
         // Then
-        XCTAssertEqual(json, Seed.menuJSON)
+        XCTAssertEqual(json, JSONSeed.menuJSON)
     }
     
     func test_initWithJSONObject() throws {
         // Given
-        let data = Seed.menuJSONString.data(using: .utf8)!
+        let data = JSONSeed.menuJSONString.data(using: .utf8)!
         let jsonObj = try JSONSerialization.jsonObject(with: data)
         
         // When
         let json = try JSON(jsonObject: jsonObj)
         
         // Then
-        XCTAssertEqual(json, Seed.menuJSON)
+        XCTAssertEqual(json, JSONSeed.menuJSON)
     }
     
     func test_dynamicMemberLookup() {
-        XCTAssertEqual(Seed.menuJSON.menu?.id?.stringValue, "menu-file")
-        XCTAssertEqual(Seed.menuJSON.menu?.isEnabled?.boolValue, false)
-        XCTAssertEqual(Seed.menuJSON.menu?.hasItem?.boolValue, true)
-        XCTAssertEqual(Seed.menuJSON.menu?.itemCount?.intValue, 3)
+        XCTAssertEqual(JSONSeed.menuJSON.menu?.id?.stringValue, "menu-file")
+        XCTAssertEqual(JSONSeed.menuJSON.menu?.isEnabled?.boolValue, false)
+        XCTAssertEqual(JSONSeed.menuJSON.menu?.hasItem?.boolValue, true)
+        XCTAssertEqual(JSONSeed.menuJSON.menu?.itemCount?.intValue, 3)
     }
     
     func test_initWithBoolLiteral() {
@@ -136,12 +136,12 @@ final class JSONTests: XCTestCase {
     
     func test_description_complexType() {
         // Dictionary 타입은 순서 유지가 안되므로 재정렬 후 비교.
-        let actual = Seed.menuJSON.description
+        let actual = JSONSeed.menuJSON.description
             .replacingOccurrences(of: ",", with: "")
             .split(separator: "\n")
             .sorted()
         
-        let expected = Seed.menuJSONString
+        let expected = JSONSeed.menuJSONString
             .replacingOccurrences(of: ",", with: "")
             .split(separator: "\n")
             .sorted()

@@ -215,6 +215,12 @@ extension Parser {
             return reply.map({ transform($0, stream[stream.startIndex..<newStream.startIndex]) })
         }
     }
+    
+    /// `lazy(p)` creates a parser that forwards all calls to the parser `p`.
+    /// It can be used to parse nested expressions like JSON.
+    public static func lazy(_ parser: @autoclosure @escaping () -> Parser<T>) -> Parser<T> {
+        return Parser { parser().parse($0) }
+    }
 }
 
 extension Parser where T == Void {
