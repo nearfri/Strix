@@ -24,7 +24,7 @@ final class SequenceParsersTests: XCTestCase {
         let p1: Parser<Int> = Parser { state in
             count += 1
             if count > 2 {
-                return .failure(state, [.expected(label: "number")])
+                return .failure([.expected(label: "number")], state)
             }
             return .success(count, state)
         }
@@ -45,7 +45,7 @@ final class SequenceParsersTests: XCTestCase {
         let p2: Parser<Int> = Parser { state in
             count += 1
             if count > 5 {
-                return .failure(state, [.expected(label: "number")])
+                return .failure([.expected(label: "number")], state)
             }
             return .success(count, state.withStream(state.stream.dropFirst()))
         }
@@ -66,7 +66,7 @@ final class SequenceParsersTests: XCTestCase {
         let p2: Parser<Int> = Parser { state in
             count += 1
             if count > 4 {
-                return .failure(state, [.expected(label: "number")])
+                return .failure([.expected(label: "number")], state)
             }
             return .success(count, state.withStream(state.stream.dropFirst()))
         }
@@ -91,7 +91,7 @@ final class SequenceParsersTests: XCTestCase {
         let sep: Parser<String> = Parser { state in
             sepCount += 1
             if sepCount > 2 {
-                return .failure(state, [.expected(label: "comma")])
+                return .failure([.expected(label: "comma")], state)
             }
             return .success(",", state.withStream(state.stream.dropFirst()))
         }
@@ -110,7 +110,7 @@ final class SequenceParsersTests: XCTestCase {
         let p1: Parser<Int> = Parser { state in
             count += 1
             if count > 2 {
-                return .failure(state, [.expected(label: "number")])
+                return .failure([.expected(label: "number")], state)
             }
             return .success(count, state)
         }
@@ -135,7 +135,7 @@ final class SequenceParsersTests: XCTestCase {
         let p1: Parser<Int> = Parser { state in
             count += 1
             if count > 2 {
-                return .failure(state, [.expected(label: "number")])
+                return .failure([.expected(label: "number")], state)
             }
             return .success(count, state)
         }

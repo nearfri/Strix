@@ -9,10 +9,10 @@ private enum Seed {
     static let strErrors: [ParseError] = [.expected(label: "string")]
     
     static let intSuccessParser: Parser<Int> = .init({ _ in .success(1, intErrors, state2) })
-    static let intFailureParser: Parser<Int> = .init({ _ in .failure(state2, intErrors) })
+    static let intFailureParser: Parser<Int> = .init({ _ in .failure(intErrors, state2) })
     
     static let strSuccessParser: Parser<String> = .init({ _ in .success("wow", strErrors, state2) })
-    static let strFailureParser: Parser<String> = .init({ _ in .failure(state2, strErrors) })
+    static let strFailureParser: Parser<String> = .init({ _ in .failure(strErrors, state2) })
 }
 
 private class TextOutput: TextOutputStream {
@@ -114,7 +114,7 @@ final class ParserTests: XCTestCase {
         let input = "hello"
         let errors: [ParseError] = Seed.intErrors
         let parser: Parser<Int> = .init { state in
-            return .failure(state.withStream(state.stream.dropFirst()), errors)
+            return .failure(errors, state.withStream(state.stream.dropFirst()))
         }
         
         // When

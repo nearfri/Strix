@@ -11,7 +11,7 @@ extension Parser {
     /// The parser `fail(message: message)` always fails with a `.generic(message:)`.
     /// The string `message` will be displayed together with other error messages generated for the same input position.
     public static func fail(message: String) -> Parser<T> {
-        return Parser { state in .failure(state, [.generic(message: message)]) }
+        return Parser { state in .failure([.generic(message: message)], state) }
     }
     
     /// The parser `discardFirst(lhs, rhs)` applies the parsers `lhs` and `rhs` in sequence and returns the result of `rhs`.
@@ -102,7 +102,7 @@ extension Parser {
                 errors += reply.errors
             }
             
-            return .failure(state, errors)
+            return .failure(errors, state)
         }
     }
     
@@ -116,7 +116,7 @@ extension Parser {
         return Parser { state in
             let reply = p.parse(state)
             if reply.result.isSuccess && reply.state == state {
-                return .failure(state, reply.errors)
+                return .failure(reply.errors, state)
             }
             return reply
         }
@@ -143,9 +143,9 @@ extension Parser {
             }
             
             if reply.errors.count == 1, case .nested = reply.errors[0] {
-                return .failure(state, reply.errors)
+                return .failure(reply.errors, state)
             }
-            return .failure(state, [.nested(position: reply.state.position, errors: reply.errors)])
+            return .failure([.nested(position: reply.state.position, errors: reply.errors)], state)
         }
     }
     
@@ -164,17 +164,17 @@ extension Parser {
             if reply.state == state {
                 switch (reply.errors.count, reply.errors.first) {
                 case let (1, .nested(pos, errs)), let (1, .compound(_, pos, errs)):
-                    return .failure(state, [.compound(label: label, position: pos, errors: errs)])
+                    return .failure([.compound(label: label, position: pos, errors: errs)], state)
                 default:
-                    return .failure(state, [.expected(label: label)])
+                    return .failure([.expected(label: label)], state)
                 }
             } else {
                 switch (reply.errors.count, reply.errors.first) {
                 case let (1, .nested(pos, errs)):
-                    return .failure(state, [.compound(label: label, position: pos, errors: errs)])
+                    return .failure([.compound(label: label, position: pos, errors: errs)], state)
                 default:
                     let (pos, errs) = (reply.state.position, reply.errors)
-                    return .failure(state, [.compound(label: label, position: pos, errors: errs)])
+                    return .failure([.compound(label: label, position: pos, errors: errs)], state)
                 }
             }
         }
@@ -196,9 +196,9 @@ extension Parser {
             }
             
             if reply.errors.count == 1, case .nested = reply.errors[0] {
-                return .failure(state, reply.errors)
+                return .failure(reply.errors, state)
             }
-            return .failure(state, [.nested(position: reply.state.position, errors: reply.errors)])
+            return .failure([.nested(position: reply.state.position, errors: reply.errors)], state)
         }
     }
     
@@ -230,7 +230,7 @@ extension Parser where T == Void {
             if state.stream.startIndex == state.stream.endIndex {
                 return .success((), state)
             }
-            return .failure(state, [.expected(label: "end of stream")])
+            return .failure([.expected(label: "end of stream")], state)
         }
     }
     
@@ -247,7 +247,7 @@ extension Parser where T == Void {
             if p.parse(state).result.isSuccess {
                 return .success((), state)
             }
-            return .failure(state, [error])
+            return .failure([error], state)
         }
     }
     
@@ -264,7 +264,7 @@ extension Parser where T == Void {
             if p.parse(state).result.isFailure {
                 return .success((), state)
             }
-            return .failure(state, [error])
+            return .failure([error], state)
         }
     }
     

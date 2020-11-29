@@ -12,7 +12,7 @@ extension Parser {
                 let reply = p.parse(state)
                 errors = reply.state != state ? reply.errors : errors + reply.errors
                 guard case let .success(v, _) = reply.result else {
-                    return .failure(state, errors)
+                    return .failure(errors, state)
                 }
                 values.append(v)
                 state = reply.state
@@ -115,7 +115,7 @@ private struct ManyParser<U> {
         if newState == state && values.count >= minCount {
             return .success(values, errors + newErrors, newState)
         }
-        return .failure(newState, newErrors)
+        return .failure(newErrors, newState)
     }
     
     private func infiniteLoopErrorMessage(at position: Substring.Index) -> String {

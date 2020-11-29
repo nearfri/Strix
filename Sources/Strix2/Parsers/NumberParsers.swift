@@ -27,10 +27,10 @@ extension Parser {
                     return .success(try transform(literal), literalReply.state)
                 } catch let e {
                     let error = (e as? ParseError) ?? .generic(message: e.localizedDescription)
-                    return .failure(state, [error])
+                    return .failure([error], state)
                 }
             case .failure:
-                return .failure(literalReply.state, literalReply.errors)
+                return .failure(literalReply.errors, literalReply.state)
             }
         }
     }
@@ -165,14 +165,14 @@ private struct NumberLiteralParserGenerator {
             
             if numberLiteral.integerPart.isEmpty && numberLiteral.fractionalPart.isEmpty {
                 // 아무런 숫자도 없는 경우 처음으로 돌아간다
-                return .failure(state, [.expected(label: "number")])
+                return .failure([.expected(label: "number")], state)
             }
             
             switch exponentPart(notation: numberLiteral.notation).parse(&newState) {
             case .success(let exp, _):
                 numberLiteral.exponentPart = exp
             case .failure(let errors):
-                return .failure(newState, errors)
+                return .failure(errors, newState)
             }
             
             numberLiteral.string = literalString()

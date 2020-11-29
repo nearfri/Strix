@@ -13,8 +13,8 @@ private enum Seed {
 final class ParserReplyTests: XCTestCase {
     func test_compareStateAndAppendingErrors_equalState_appending() {
         // Given
-        let reply1: ParserReply<Int> = .failure(Seed.state, Seed.errors1)
-        let reply2: ParserReply<Int> = .failure(Seed.state, Seed.errors2)
+        let reply1: ParserReply<Int> = .failure(Seed.errors1, Seed.state)
+        let reply2: ParserReply<Int> = .failure(Seed.errors2, Seed.state)
         
         // When
         let newReply = reply1.compareStateAndAppendingErrors(of: reply2)
@@ -26,8 +26,8 @@ final class ParserReplyTests: XCTestCase {
     
     func test_compareStateAndAppendingErrors_notEqualState_noAppending() {
         // Given
-        let reply1: ParserReply<Int> = .failure(Seed.state1, Seed.errors1)
-        let reply2: ParserReply<Int> = .failure(Seed.state2, Seed.errors2)
+        let reply1: ParserReply<Int> = .failure(Seed.errors1, Seed.state1)
+        let reply2: ParserReply<Int> = .failure(Seed.errors2, Seed.state2)
         
         // When
         let newReply = reply1.compareStateAndAppendingErrors(of: reply2)
@@ -39,8 +39,8 @@ final class ParserReplyTests: XCTestCase {
     
     func test_compareStateAndPrependingErrors_equalState_prepending() {
         // Given
-        let reply1: ParserReply<Int> = .failure(Seed.state, Seed.errors1)
-        let reply2: ParserReply<Int> = .failure(Seed.state, Seed.errors2)
+        let reply1: ParserReply<Int> = .failure(Seed.errors1, Seed.state)
+        let reply2: ParserReply<Int> = .failure(Seed.errors2, Seed.state)
         
         // When
         let newReply = reply1.compareStateAndPrependingErrors(of: reply2)
@@ -52,8 +52,8 @@ final class ParserReplyTests: XCTestCase {
     
     func test_compareStateAndPrependingErrors_notEqualState_noPrepending() {
         // Given
-        let reply1: ParserReply<Int> = .failure(Seed.state1, Seed.errors1)
-        let reply2: ParserReply<Int> = .failure(Seed.state2, Seed.errors2)
+        let reply1: ParserReply<Int> = .failure(Seed.errors1, Seed.state1)
+        let reply2: ParserReply<Int> = .failure(Seed.errors2, Seed.state2)
         
         // When
         let newReply = reply1.compareStateAndPrependingErrors(of: reply2)
