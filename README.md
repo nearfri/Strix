@@ -11,12 +11,8 @@ Strix is a parser combinator library written in Swift.
 
 ### Swift Package Manager
 ```swift
-dependencies: [
-    .package(url: "https://github.com/nearfri/Strix.git", from: "2.0.0")
-],
-targets: [
-    .target(name: "<Your Target Name>", dependencies: ["Strix"])
-]
+dependencies: [.package(url: "https://github.com/nearfri/Strix.git", from: "2.0.0")],
+targets: [.target(name: "<Your Target Name>", dependencies: ["Strix"])]
 ```
 
 ## Example
