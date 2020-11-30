@@ -1,5 +1,5 @@
 import XCTest
-@testable import Strix2
+@testable import Strix
 
 private enum Seed {
     static let state: ParserState = .init(stream: "stream")

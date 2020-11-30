@@ -1,5 +1,5 @@
 import XCTest
-@testable import Strix2
+@testable import Strix
 
 final class ErrorOutputBufferTests: XCTestCase {
     var sut: ErrorOutputBuffer = .init()

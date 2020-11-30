@@ -1,5 +1,5 @@
 import Foundation
-import Strix2
+import Strix
 
 public struct JSONParser {
     private let parser: Parser<JSON>

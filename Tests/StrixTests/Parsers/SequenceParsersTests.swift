@@ -1,5 +1,5 @@
 import XCTest
-@testable import Strix2
+@testable import Strix
 
 final class SequenceParsersTests: XCTestCase {
     func test_repeat_enoughSuccess_succeed() {

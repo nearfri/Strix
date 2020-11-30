@@ -1,5 +1,5 @@
 import XCTest
-@testable import Strix2
+@testable import Strix
 
 private struct StreamSnapshot {
     var indent: Indent
@@ -18,7 +18,7 @@ private struct FakeErrorOutputStream: ErrorOutputStream {
     }
 }
 
-private typealias ErrorMessageWriter = Strix2.ErrorMessageWriter<FakeErrorOutputStream>
+private typealias ErrorMessageWriter = Strix.ErrorMessageWriter<FakeErrorOutputStream>
 
 class BaseErrorMessageWriterTests: XCTestCase {
     fileprivate var errorStream = FakeErrorOutputStream()

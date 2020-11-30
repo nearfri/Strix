@@ -1,5 +1,5 @@
 import XCTest
-@testable import Strix2
+@testable import Strix
 
 final class ParseErrorSplitterTests: XCTestCase {
     func test_hasErrors_noError_returnFalse() {

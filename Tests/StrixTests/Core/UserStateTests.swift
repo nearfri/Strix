@@ -1,5 +1,5 @@
 import XCTest
-@testable import Strix2
+@testable import Strix
 
 private extension UserStateKey {
     static let isInLink: UserStateKey = "com.ukjeong.html.isInLink"

@@ -1,5 +1,5 @@
 import Foundation
-import Strix2
+import Strix
 
 public class Calculator {
     private let prattParser: PrattParser<Double>
