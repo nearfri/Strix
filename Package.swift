@@ -1,4 +1,4 @@
-// swift-tools-version:5.1
+// swift-tools-version:5.3
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -7,9 +7,8 @@ let package = Package(
     name: "Strix",
     products: [
         // Products define the executables and libraries produced by a package, and make them visible to other packages.
-        .library(
-            name: "Strix",
-            targets: ["Strix"]),
+        .library(name: "Strix", targets: ["Strix"]),
+        .library(name: "StrixParsers", targets: ["StrixParsers"]),
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
@@ -24,5 +23,12 @@ let package = Package(
         .testTarget(
             name: "StrixTests",
             dependencies: ["Strix"]),
+        
+        .target(
+            name: "StrixParsers",
+            dependencies: ["Strix"]),
+        .testTarget(
+            name: "StrixParsersTests",
+            dependencies: ["StrixParsers"]),
     ]
 )
