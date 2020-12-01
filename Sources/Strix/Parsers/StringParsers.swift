@@ -33,13 +33,14 @@ extension Parser where T == String {
     
     /// `skipped(by: p)` applies the parser `p` and returns the characters skipped over by `p` as a string.
     public static func skipped<U>(by p: Parser<U>) -> Parser<String> {
-        return Parser<Substring>.skipped(by: p).map({ String($0) })
+        return Parser<Substring>.skippedSubstring(by: p).map({ String($0) })
     }
     
     /// `restOfLine(strippingNewline: flag)` parses any characters before the end of the line and
     /// skips to the beginning of the next line. It returns the parsed characters before the end of the line as a string.
     public static func restOfLine(strippingNewline: Bool = true) -> Parser<String> {
-        return Parser<Substring>.restOfLine(strippingNewline: strippingNewline).map({ String($0) })
+        return Parser<Substring>.restSubstringOfLine(strippingNewline: strippingNewline)
+            .map({ String($0) })
     }
 }
 
@@ -130,22 +131,22 @@ extension Parser where T == Substring {
         }
     }
     
-    /// `skipped(by: p)` applies the parser `p` and returns the characters skipped over by `p` as a string.
-    public static func skipped<U>(by p: Parser<U>) -> Parser<Substring> {
+    /// `skippedSubstring(by: p)` applies the parser `p` and returns the characters skipped over by `p` as a string.
+    public static func skippedSubstring<U>(by p: Parser<U>) -> Parser<Substring> {
         return skip(p, apply: { _, substr in substr })
     }
     
-    /// `restOfLine(strippingNewline: flag)` parses any characters before the end of the line and
+    /// `restSubstringOfLine(strippingNewline: flag)` parses any characters before the end of the line and
     /// skips to the beginning of the next line. It returns the parsed characters before the end of the line as a string.
-    public static func restOfLine(strippingNewline: Bool = true) -> Parser<Substring> {
+    public static func restSubstringOfLine(strippingNewline: Bool = true) -> Parser<Substring> {
         let notNewline: Parser<Character> = .satisfy({ !$0.isNewline }, label: "not newline")
         let letters: Parser<[Void]> = .many(.skip(notNewline))
         let newlineOrEOS: Parser<Void> = .skip(.newline) <|> .endOfStream
         
         if strippingNewline {
-            return skipped(by: letters) <* newlineOrEOS
+            return skippedSubstring(by: letters) <* newlineOrEOS
         } else {
-            return skipped(by: letters <* newlineOrEOS)
+            return skippedSubstring(by: letters <* newlineOrEOS)
         }
     }
 }

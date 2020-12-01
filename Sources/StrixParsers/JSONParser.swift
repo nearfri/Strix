@@ -55,7 +55,6 @@ private struct JSONParserGenerator {
     
     private let ws: Parser<[Character]> = .many(.whitespace)
     private let hex: Parser<Character> = .hexadecimalDigit
-    
     private let colon: Parser<Character> = .character(":")
     private let comma: Parser<Character> = .character(",")
     
