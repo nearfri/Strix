@@ -7,19 +7,19 @@ extension Parser where T == String {
         return Parser<Substring>.substring(str, caseSensitive: caseSensitive).map({ String($0) })
     }
     
-    /// `string(until: str, caseSensitive: caseFlag, skipString: skipString)` parses all characters
-    /// before the first occurance of the string `str` and, if `skipString` is `true`, skips over `str`.
-    /// It returns the parsed characters before the string.
+    /// `string(until: boundary, caseSensitive: caseFlag, skipBoundary: skipBoundary)`
+    /// parses all characters before the first occurance of the string `boundary` and,
+    /// if `skipBoundary` is `true`, skips over `boundary`. It returns the parsed characters before the string.
     /// It is an atomic parser: either it succeeds or it fails without consuming any input.
     public static func string(
-        until str: String,
+        until boundary: String,
         caseSensitive: Bool = true,
-        skipString: Bool = false
+        skipBoundary: Bool = false
     ) -> Parser<String> {
         return Parser<Substring>.substring(
-            until: str,
+            until: boundary,
             caseSensitive: caseSensitive,
-            skipString: skipString
+            skipBoundary: skipBoundary
         )
         .map({ String($0) })
     }
@@ -75,16 +75,16 @@ extension Parser where T == Substring {
         }
     }
     
-    /// `substring(until: str, caseSensitive: caseFlag, skipString: skipString)` parses all characters
-    /// before the first occurance of the string `str` and, if `skipString` is `true`, skips over `str`.
-    /// It returns the parsed characters before the string.
+    /// `substring(until: boundary, caseSensitive: caseFlag, skipBoundary: skipBoundary)`
+    /// parses all characters before the first occurance of the string `boundary` and,
+    /// if `skipBounday` is `true`, skips over `boundary`. It returns the parsed characters before the string.
     /// It is an atomic parser: either it succeeds or it fails without consuming any input.
     public static func substring(
-        until str: String,
+        until boundary: String,
         caseSensitive: Bool = true,
-        skipString: Bool = false
+        skipBoundary: Bool = false
     ) -> Parser<Substring> {
-        let stringParser: Parser<Substring> = .substring(str, caseSensitive: caseSensitive)
+        let stringParser: Parser<Substring> = .substring(boundary, caseSensitive: caseSensitive)
         
         return Parser { state in
             var newState = state
@@ -92,11 +92,11 @@ extension Parser where T == Substring {
                 let reply = stringParser.parse(newState)
                 if reply.result.isSuccess {
                     let value = state.stream[state.stream.startIndex..<newState.stream.startIndex]
-                    return .success(value, skipString ? reply.state : newState)
+                    return .success(value, skipBoundary ? reply.state : newState)
                 }
                 if newState.stream.startIndex == newState.stream.endIndex {
-                    let error = ParseError.generic(message: "could not find the string '\(str)'")
-                    return .failure([error], state)
+                    let message = "could not find the string '\(boundary)'"
+                    return .failure([.generic(message: message)], state)
                 }
                 newState = newState.withStream(newState.stream.dropFirst())
             }

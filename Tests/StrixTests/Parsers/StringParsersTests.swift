@@ -58,12 +58,12 @@ final class StringParsersTests: XCTestCase {
     
     // MARK: - stringUntil
     
-    func test_stringUntil_skipStringIsTrue_succeed() {
+    func test_stringUntil_skipBoundaryIsTrue_succeed() {
         // Given
         let state = ParserState(stream: "Hello Parser World")
         
         // When
-        let p: Parser<String> = .string(until: "Parser", caseSensitive: true, skipString: true)
+        let p: Parser<String> = .string(until: "Parser", caseSensitive: true, skipBoundary: true)
         let reply = p.parse(state)
         
         // Then
@@ -71,12 +71,12 @@ final class StringParsersTests: XCTestCase {
         XCTAssertEqual(reply.state.stream, " World")
     }
     
-    func test_stringUntil_skipStringIsTrue_fail() {
+    func test_stringUntil_skipBoundaryIsTrue_fail() {
         // Given
         let state = ParserState(stream: "Hello Parser World")
         
         // When
-        let p: Parser<String> = .string(until: "parser", caseSensitive: true, skipString: true)
+        let p: Parser<String> = .string(until: "parser", caseSensitive: true, skipBoundary: true)
         let reply = p.parse(state)
         
         // Then
@@ -84,12 +84,12 @@ final class StringParsersTests: XCTestCase {
         XCTAssertEqual(reply.state.stream, "Hello Parser World")
     }
     
-    func test_stringUntil_skipStringIsFalse() {
+    func test_stringUntil_skipBoundaryIsFalse() {
         // Given
         let state = ParserState(stream: "Hello Parser World")
         
         // When
-        let p: Parser<String> = .string(until: "Parser", caseSensitive: true, skipString: false)
+        let p: Parser<String> = .string(until: "Parser", caseSensitive: true, skipBoundary: false)
         let reply = p.parse(state)
         
         // Then
