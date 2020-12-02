@@ -2,7 +2,17 @@ import Foundation
 
 extension String {
     func addingBackslashEncoding() -> String {
-        return replacingOccurrences(of: "\n", with: "\\n")
-            .replacingOccurrences(of: "\t", with: "\\t")
+        let backslashMap: [Character: String] = [
+            "\"": #"\""#, "\\": #"\\"#, "\n": #"\n"#, "\r": #"\r"#, "\t": #"\t"#,
+            "\u{0008}": #"\b"#, "\u{000C}": #"\f"#
+        ]
+        
+        return reduce(into: "") { result, char in
+            if let mapped = backslashMap[char] {
+                result += mapped
+            } else {
+                result.append(char)
+            }
+        }
     }
 }
