@@ -43,7 +43,8 @@ public struct Parser<T> {
         
         func print(state: ParserState, message: String) {
             let position = TextPosition(string: state.stream.base, index: state.position)
-            write("(\(position.line):\(position.column)): ")
+            let character = state.stream.first.map({ "\"\($0)\"" }) ?? "EOS"
+            write("(\(position.line):\(position.column):\(character)): ")
             if !label.isEmpty {
                 write("\(label): ")
             }

@@ -95,8 +95,8 @@ final class ParserTests: XCTestCase {
         
         // Then
         XCTAssertEqual(textOutput.text, """
-        (1:1): int number: enter
-        (1:2): int number: leave: success(1, [expected(label: "integer")])
+        (1:1:"1"): int number: enter
+        (1:2:"2"): int number: leave: success(1, [expected(label: "integer")])
         
         """)
     }
