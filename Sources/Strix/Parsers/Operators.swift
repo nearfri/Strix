@@ -4,7 +4,6 @@ infix operator <|> : AdditionPrecedence     // alternative
 infix operator *> : AdditionPrecedence      // discard first
 infix operator <* : AdditionPrecedence      // discard second
 infix operator <?> : AdditionPrecedence     // one with label
-infix operator <??> : AdditionPrecedence    // attempt with label
 infix operator <!> : AdditionPrecedence     // print
 
 extension Parser {
@@ -26,11 +25,6 @@ extension Parser {
     /// `p <?> label` is equivalent to `one(p, label: label)`.
     public static func <?> (p: Parser<T>, label: String) -> Parser<T> {
         return one(p, label: label)
-    }
-    
-    /// `p <??> label` is equivalent to `attempt(p, label: label)`.
-    public static func <??> (p: Parser<T>, label: String) -> Parser<T> {
-        return attempt(p, label: label)
     }
     
     /// `p <!> label` is equivalent to `p.print(label)`.
