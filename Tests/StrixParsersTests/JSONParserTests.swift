@@ -4,10 +4,6 @@ import XCTest
 final class JSONParserTests: XCTestCase {
     let sut = JSONParser()
     
-    func test_parse() throws {
-        XCTAssertEqual(try sut.parse(JSONSeed.menuJSONString), JSONSeed.menuJSON)
-    }
-    
     func test_parse_null() {
         XCTAssertEqual(try sut.parse("null"), .null)
     }
@@ -23,7 +19,7 @@ final class JSONParserTests: XCTestCase {
     }
     
     func test_parse_string() throws {
-        XCTAssertEqual(try sut.parse(#""abcd""#), .string("abcd"))
+        XCTAssertEqual(try sut.parse(#""This is a string""#), .string("This is a string"))
         
         XCTAssertEqual(try sut.parse(#""ab\"cd""#), .string("ab\"cd"))
         XCTAssertEqual(try sut.parse(#""ab\\cd""#), .string("ab\\cd"))
@@ -89,5 +85,9 @@ final class JSONParserTests: XCTestCase {
         ])
         
         XCTAssertEqual(try sut.parse(jsonString), json)
+    }
+    
+    func test_parse_complex() throws {
+        XCTAssertEqual(try sut.parse(JSONSeed.menuJSONString), JSONSeed.menuJSON)
     }
 }

@@ -3,7 +3,7 @@ import Foundation
 // https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/PropertyLists/OldStylePlists/OldStylePLists.html
 // XML 같이 집합 타입으로 array만 있는 건 주석을 지원하기 쉽지만,
 // JSON 같이 dictionary를 포함하는 타입은 주석을 지원하는게 구조적으로 쉽지 않다.
-// 본래 ASCII property list에서 주석은 어디에도 있을 수 있지만, 여기선 key-value pair 앞에 있는 것만 저장하도록 한다.
+// 본래 ASCII property list에서 주석은 어디에도 있을 수 있지만, 여기선 dictionary key 앞에 있는 것만 저장하도록 한다.
 // Localizable.strings 파일을 다루는데는 이 정도면 충분하다.
 
 public enum ASCIIPlist: Equatable {
