@@ -46,11 +46,11 @@ extension JSON {
     }
     
     public var doubleValue: Double? {
-        return self.numberValue?.doubleValue
+        return numberValue?.doubleValue
     }
     
     public var intValue: Int? {
-        return self.numberValue?.intValue
+        return numberValue?.intValue
     }
     
     public var boolValue: Bool? {
@@ -152,71 +152,60 @@ private struct JSONFormatter {
         return formatter.text
     }
     
-    private init() {}
-    
     private mutating func write(_ json: JSON) {
         switch json {
         case .object(let obj):
-            self.write(obj)
+            write(obj)
         case .array(let arr):
-            self.write(arr)
+            write(arr)
         case .string(let str):
-            self.text.write("\"\(str)\"")
+            text.write("\"\(str.addingBackslashEncoding())\"")
         case .number(let num):
-            self.text.write(num.description)
+            text.write(num.description)
         case .bool(let boolean):
-            self.text.write(boolean.description)
+            text.write(boolean.description)
         case .null:
-            self.text.write("null")
+            text.write("null")
         }
     }
     
     private mutating func write(_ object: [String: JSON]) {
         if object.isEmpty {
-            self.text.write("{}")
+            text.write("{}")
             return
         }
         
-        self.text.write("{\n")
-        self.indent.level += 1
+        text.write("{\n")
+        indent.level += 1
         
         for (index, (key, json)) in object.enumerated() {
             let isLastElement = index + 1 == object.count
-            self.text.write("\(self.indent.string)\"\(key)\": ")
-            self.write(json)
-            self.text.write(isLastElement ? "\n" : ",\n")
+            text.write("\(indent.string)\"\(key)\": ")
+            write(json)
+            text.write(isLastElement ? "\n" : ",\n")
         }
         
-        self.indent.level -= 1
-        self.text.write("\(self.indent.string)}")
+        indent.level -= 1
+        text.write("\(indent.string)}")
     }
     
     private mutating func write(_ array: [JSON]) {
         if array.isEmpty {
-            self.text.write("[]")
+            text.write("[]")
             return
         }
         
-        self.text.write("[\n")
-        self.indent.level += 1
+        text.write("[\n")
+        indent.level += 1
         
         for (index, json) in array.enumerated() {
             let isLastElement = index + 1 == array.count
-            self.text.write(self.indent.string)
-            self.write(json)
-            self.text.write(isLastElement ? "\n" : ",\n")
+            text.write(indent.string)
+            write(json)
+            text.write(isLastElement ? "\n" : ",\n")
         }
         
-        self.indent.level -= 1
-        self.text.write("\(self.indent.string)]")
-    }
-}
-
-private struct Indent {
-    var level: Int = 0
-    var width: Int = 4
-    
-    var string: String {
-        return String(repeating: " ", count: level * width)
+        indent.level -= 1
+        text.write("\(indent.string)]")
     }
 }
