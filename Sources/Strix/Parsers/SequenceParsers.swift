@@ -38,7 +38,7 @@ extension Parser {
         first firstParser: Parser<U>,
         repeating repeatedParser: Parser<U>,
         minCount: Int = 0
-    ) -> Parser<[U]> where T == [U] {
+    ) -> Parser<T> where T == [U] {
         return Parser { state in
             var parser = ManyParser(firstParser: firstParser,
                                     repeatedParser: repeatedParser,

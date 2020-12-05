@@ -1,39 +1,36 @@
 import Foundation
 import Strix
 
-struct ASCIIPlistParser {
+public struct ASCIIPlistParser {
     private let parser: Parser<ASCIIPlist>
     
-    init() {
+    public init() {
         let ws = Parser.many(.whitespace)
-        parser =  ws *> Parser.plist <* ws <* .endOfStream
+        parser =  ws *> Parser.rootPlist <* ws <* .endOfStream
     }
     
-    func parse(_ plistString: String) throws -> ASCIIPlist {
+    public func parse(_ plistString: String) throws -> ASCIIPlist {
         return try parser.run(plistString)
     }
     
-    func callAsFunction(_ plistString: String) throws -> ASCIIPlist {
+    public func callAsFunction(_ plistString: String) throws -> ASCIIPlist {
         return try parse(plistString)
     }
 }
 
 extension Parser where T == ASCIIPlist {
-    static var plist: Parser<ASCIIPlist> { ASCIIPlistParserGenerator().make() }
+    public static var rootPlist: Parser<ASCIIPlist> { ASCIIPlistParserGenerator().rootPlist }
+    public static var plist: Parser<ASCIIPlist> { ASCIIPlistParserGenerator().plist }
 }
 
 struct ASCIIPlistParserGenerator {
     private typealias DictionaryEntry = ASCIIPlist.DictionaryEntry
     
-    func make() -> Parser<ASCIIPlist> {
-        return rootPlist
-    }
-    
-    private var rootPlist: Parser<ASCIIPlist> {
+    var rootPlist: Parser<ASCIIPlist> {
         return .attempt(dictionaryContent(minCount: 1)) <|> plist
     }
     
-    private var plist: Parser<ASCIIPlist> {
+    var plist: Parser<ASCIIPlist> {
         let anyNode = Parser.any(of: [dictionaryNode, arrayNode, stringNode, dataNode])
         return manyComment *> ws *> anyNode <* ws <* manyComment
     }

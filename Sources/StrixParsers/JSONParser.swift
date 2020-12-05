@@ -19,15 +19,11 @@ public struct JSONParser {
 }
 
 extension Parser where T == JSON {
-    public static var json: Parser<JSON> { JSONParserGenerator().make() }
+    public static var json: Parser<JSON> { JSONParserGenerator().json }
 }
 
 private struct JSONParserGenerator {
-    func make() -> Parser<JSON> {
-        return json
-    }
-    
-    private var json: Parser<JSON> {
+    var json: Parser<JSON> {
         return .any(of: [
             objectJSON, arrayJSON, stringJSON, numberJSON, trueJSON, falseJSON, nullJSON
         ])
