@@ -1,10 +1,12 @@
 import Foundation
 
 extension Parser where T == String {
+    private typealias SubParser = Parser<Substring>
+    
     /// `string(str, caseSensitive: flag)` parses the string `str` and returns the parsed string.
     /// It is an atomic parser: either it succeeds or it fails without consuming any input.
     public static func string(_ str: String, caseSensitive: Bool = true) -> Parser<String> {
-        return Parser<Substring>.substring(str, caseSensitive: caseSensitive).map({ String($0) })
+        return SubParser.substring(str, caseSensitive: caseSensitive).map({ String($0) })
     }
     
     /// `string(until: boundary, caseSensitive: caseFlag, skipBoundary: skipBoundary)`
@@ -16,7 +18,7 @@ extension Parser where T == String {
         caseSensitive: Bool = true,
         skipBoundary: Bool = false
     ) -> Parser<String> {
-        return Parser<Substring>.substring(
+        return SubParser.substring(
             until: boundary,
             caseSensitive: caseSensitive,
             skipBoundary: skipBoundary
@@ -28,19 +30,18 @@ extension Parser where T == String {
     /// If the regular expression matches, the parser skips the matched characters and returns them as a string.
     /// If the regular expression does not match, the parser fails without consuming input.
     public static func string(matchingRegex pattern: String, label: String) -> Parser<String> {
-        return Parser<Substring>.substring(matchingRegex: pattern, label: label).map({ String($0) })
+        return SubParser.substring(matchingRegex: pattern, label: label).map({ String($0) })
     }
     
     /// `skipped(by: p)` applies the parser `p` and returns the characters skipped over by `p` as a string.
     public static func skipped<U>(by p: Parser<U>) -> Parser<String> {
-        return Parser<Substring>.skippedSubstring(by: p).map({ String($0) })
+        return SubParser.skippedSubstring(by: p).map({ String($0) })
     }
     
     /// `restOfLine(strippingNewline: flag)` parses any characters before the end of the line and
     /// skips to the beginning of the next line. It returns the parsed characters before the end of the line as a string.
     public static func restOfLine(strippingNewline: Bool = true) -> Parser<String> {
-        return Parser<Substring>.restSubstringOfLine(strippingNewline: strippingNewline)
-            .map({ String($0) })
+        return SubParser.restSubstringOfLine(strippingNewline: strippingNewline).map({ String($0) })
     }
 }
 
@@ -140,7 +141,7 @@ extension Parser where T == Substring {
     /// skips to the beginning of the next line. It returns the parsed characters before the end of the line as a string.
     public static func restSubstringOfLine(strippingNewline: Bool = true) -> Parser<Substring> {
         let notNewline: Parser<Character> = .satisfy({ !$0.isNewline }, label: "not newline")
-        let letters: Parser<[Void]> = .many(.skip(notNewline))
+        let letters: Parser<[Character]> = .many(notNewline)
         let newlineOrEOS: Parser<Void> = .skip(.newline) <|> .endOfStream
         
         if strippingNewline {

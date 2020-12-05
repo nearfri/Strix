@@ -91,8 +91,7 @@ public final class PrattParser<T> {
                 nextToken = token
             case let .failure(errors):
                 throw Error.tokenizerFailure(
-                    RunError(input: string, position: state.position, underlyingErrors: errors)
-                )
+                    RunError(input: string, position: state.position, underlyingErrors: errors))
             }
         }
         
