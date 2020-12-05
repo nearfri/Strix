@@ -27,12 +27,13 @@ struct ASCIIPlistParserGenerator {
     private typealias DictionaryEntry = ASCIIPlist.DictionaryEntry
     
     var rootPlist: Parser<ASCIIPlist> {
-        return .attempt(dictionaryContent(minCount: 1)) <|> plist
+        let plistOrEmptyDict = plist <|> .just(.dictionary([]))
+        return .attempt(dictionaryContent(minCount: 1)) <|> (manyComment *> plistOrEmptyDict)
     }
     
     var plist: Parser<ASCIIPlist> {
         let anyNode = Parser.any(of: [dictionaryNode, arrayNode, stringNode, dataNode])
-        return manyComment *> ws *> anyNode <* ws <* manyComment
+        return manyComment *> anyNode <* ws <* manyComment
     }
     
     private var dictionaryNode: Parser<ASCIIPlist> {
@@ -75,7 +76,7 @@ struct ASCIIPlistParserGenerator {
     }
     
     private var arrayContent: Parser<ASCIIPlist> {
-        return Parser.many(
+        return manyComment *> Parser.many(
             .lazy(plist) <* ws,
             separatedBy: .character(",") *> ws,
             allowEndBySeparator: true

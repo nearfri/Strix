@@ -34,6 +34,10 @@ final class ASCIIPlistParserTests: XCTestCase {
         XCTAssertEqual(try sut.parse("<>"), .data(Data()))
     }
     
+    func test_data_countIsOdd_throwError() {
+        XCTAssertThrowsError(try sut.parse("<012>"))
+    }
+    
     func test_array() {
         let plistString = #"("San Francisco", "New York", "Seoul")"#
         
@@ -237,6 +241,19 @@ final class ASCIIPlistParserTests: XCTestCase {
         ]))
     }
     
+    func test_parse_slashComment_beforeDictionaryKey_take() {
+        let plistString = """
+        {
+            // comment
+            Animal = "pig";
+        }
+        """
+        
+        XCTAssertEqual(try sut.parse(plistString), .dictionary([
+            DictionaryEntry(comment: "comment", key: "Animal", value: .string("pig"))
+        ]))
+    }
+    
     func test_parse_comment_withoutCurlyBracesAtRoot_beforeDictionaryKey_take() {
         let plistString = """
         /* comment */
@@ -301,5 +318,21 @@ final class ASCIIPlistParserTests: XCTestCase {
         XCTAssertEqual(try sut.parse(plistString), .dictionary([
             DictionaryEntry(comment: nil, key: "Animal", value: .string("pig"))
         ]))
+    }
+    
+    func test_parse_comment_only() {
+        XCTAssertEqual(try sut.parse("( /* comment */ )"), .array([]))
+        XCTAssertEqual(try sut.parse("{ /* comment */ }"), .dictionary([]))
+        XCTAssertEqual(try sut.parse("/* comment */"), .dictionary([]))
+        XCTAssertEqual(try sut.parse("// comment"), .dictionary([]))
+    }
+    
+    func test_parse_comment_notCompleted_throwError() {
+        XCTAssertThrowsError(try sut.parse("/* comment "))
+    }
+    
+    func test_parse_empty() {
+        XCTAssertEqual(try sut.parse(" "), .dictionary([]))
+        XCTAssertEqual(try sut.parse(""), .dictionary([]))
     }
 }
