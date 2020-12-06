@@ -19,7 +19,7 @@ public struct TextPosition {
         ) { _, _, enclosingRange, stop in
             line += 1
             if enclosingRange.contains(index) || enclosingRange.upperBound == string.endIndex {
-                column = string[enclosingRange.lowerBound..<index].count + 1
+                column = string.distance(from: enclosingRange.lowerBound, to: index) + 1
                 stop = true
             }
         }
