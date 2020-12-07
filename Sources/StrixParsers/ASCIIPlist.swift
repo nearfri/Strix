@@ -66,13 +66,13 @@ private struct ASCIIPlistFormatter {
         
         for (index, plist) in array.enumerated() {
             let isLastElement = index + 1 == array.count
-            text.write(indent.string)
+            text.write(indent.toString())
             write(plist)
             text.write(isLastElement ? "\n" : ",\n")
         }
         
         indent.level -= 1
-        text.write("\(indent.string))")
+        text.write("\(indent))")
     }
     
     private mutating func write(_ dictionary: [ASCIIPlist.DictionaryEntry]) {
@@ -93,11 +93,11 @@ private struct ASCIIPlistFormatter {
         for (index, entry) in dictionary.enumerated() {
             if let comment = entry.comment {
                 if index != 0 {
-                    text.write("\(indent.string)\n")
+                    text.write("\(indent)\n")
                 }
-                text.write("\(indent.string)/* \(comment.addingBackslashEncoding()) */\n")
+                text.write("\(indent)/* \(comment.addingBackslashEncoding()) */\n")
             }
-            text.write("\(indent.string)\"\(entry.key)\" = ")
+            text.write("\(indent)\"\(entry.key)\" = ")
             write(entry.value)
             
             let isLastElement = index + 1 == dictionary.count
@@ -106,7 +106,7 @@ private struct ASCIIPlistFormatter {
         
         if needsBraces {
             indent.level -= 1
-            text.write("\(indent.string)}")
+            text.write("\(indent)}")
         }
     }
 }

@@ -180,13 +180,13 @@ private struct JSONFormatter {
         
         for (index, (key, json)) in object.enumerated() {
             let isLastElement = index + 1 == object.count
-            text.write("\(indent.string)\"\(key)\": ")
+            text.write("\(indent)\"\(key)\": ")
             write(json)
             text.write(isLastElement ? "\n" : ",\n")
         }
         
         indent.level -= 1
-        text.write("\(indent.string)}")
+        text.write("\(indent)}")
     }
     
     private mutating func write(_ array: [JSON]) {
@@ -200,12 +200,12 @@ private struct JSONFormatter {
         
         for (index, json) in array.enumerated() {
             let isLastElement = index + 1 == array.count
-            text.write(indent.string)
+            text.write(indent.toString())
             write(json)
             text.write(isLastElement ? "\n" : ",\n")
         }
         
         indent.level -= 1
-        text.write("\(indent.string)]")
+        text.write("\(indent)]")
     }
 }
