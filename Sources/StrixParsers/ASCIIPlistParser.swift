@@ -95,9 +95,9 @@ struct ASCIIPlistParserGenerator {
     }
     
     private var comment: Parser<String> {
-        let singleLine = .string("//") *> .restOfLine()
-        let multiline = .string("/*") *> .string(until: "*/", skipBoundary: true)
-        return (singleLine <|> multiline).map({ $0.trimmingCharacters(in: .whitespaces) })
+        let lineComment = .string("//") *> .restOfLine()
+        let blockComment = .string("/*") *> .string(until: "*/", skipBoundary: true)
+        return (lineComment <|> blockComment).map({ $0.trimmingCharacters(in: .whitespaces) })
     }
     
     private var stringOrWord: Parser<String> { stringLiteral <|> word }
