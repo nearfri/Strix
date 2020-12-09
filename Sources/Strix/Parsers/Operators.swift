@@ -7,7 +7,7 @@ infix operator <?> : AdditionPrecedence     // one with label
 infix operator <!> : AdditionPrecedence     // print
 
 extension Parser {
-    /// `lhs <|> rhs` is equivalent to `laternative(lhs, rhs)`.
+    /// `lhs <|> rhs` is equivalent to `alternative(lhs, rhs)`.
     public static func <|> (lhs: Parser<T>, rhs: Parser<T>) -> Parser<T> {
         return alternative(lhs, rhs)
     }
