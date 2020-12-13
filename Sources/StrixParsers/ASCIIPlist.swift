@@ -15,9 +15,15 @@ public enum ASCIIPlist: Equatable {
 
 extension ASCIIPlist {
     public struct DictionaryEntry: Equatable {
-        var comment: String?
-        var key: String
-        var value: ASCIIPlist
+        public var comment: String?
+        public var key: String
+        public var value: ASCIIPlist
+        
+        public init(comment: String? = nil, key: String, value: ASCIIPlist) {
+            self.comment = comment
+            self.key = key
+            self.value = value
+        }
     }
 }
 
