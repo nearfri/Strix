@@ -3,7 +3,7 @@ import Foundation
 extension String {
     func addingBackslashEncoding() -> String {
         let backslashMap: [Character: String] = [
-            "\"": #"\""#, "\\": #"\\"#, "\n": #"\n"#, "\r": #"\r"#, "\t": #"\t"#,
+            "\"": #"\""#, "\n": #"\n"#, "\r": #"\r"#, "\t": #"\t"#,
             "\u{0008}": #"\b"#, "\u{000C}": #"\f"#
         ]
         
