@@ -6,7 +6,7 @@ public struct JSONParser {
     
     public init() {
         let ws = Parser.many(.whitespace)
-        parser =  ws *> Parser.json <* ws <* .endOfStream
+        parser = ws *> Parser.json <* ws <* .endOfStream
     }
     
     public func parse(_ jsonString: String) throws -> JSON {
