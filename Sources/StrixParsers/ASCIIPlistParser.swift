@@ -6,7 +6,7 @@ public struct ASCIIPlistParser {
     
     public init() {
         let ws = Parser.many(.whitespace)
-        parser =  ws *> Parser.rootPlist <* ws <* .endOfStream
+        parser = ws *> Parser.rootPlist <* ws <* .endOfStream
     }
     
     public func parse(_ plistString: String) throws -> ASCIIPlist {

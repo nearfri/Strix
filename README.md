@@ -38,13 +38,13 @@ let quote: Parser<Character> = .character("\"")
 let doubleQuote: Parser<Character> = Parser.string("\"\"") *> .just("\"")
 let quotedString: Parser<String> = Parser.many((.none(of: "\"") <|> doubleQuote))
     .map({ String($0) })
-let quotedFiled: Parser<String> = quote *> quotedString <* quote
+let quotedField: Parser<String> = quote *> quotedString <* quote
 
 let nonSeparator: Parser<Character> = .satisfy({ $0 != "," && !$0.isNewline },
                                                label: "non-separator")
 let nonQuotedField: Parser<String> = .skipped(by: .many(nonSeparator))
 
-let field: Parser<String> = quotedFiled <|> nonQuotedField
+let field: Parser<String> = quotedField <|> nonQuotedField
 let record: Parser<[String]> = .many(field, separatedBy: .character(","))
 
 let csvParser: Parser<[[String]]> = .many(record, separatedBy: .newline)
