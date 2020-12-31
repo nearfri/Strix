@@ -28,7 +28,10 @@ Year,Make,Model,Description,Price
 air, moon roof, loaded",4799.00
 ```
 
-It consists of data records represented by lines which are made of one or more fields separated by commas. Sophisticated CSV implementations permit special characters such as newline, comma and double quotes. They are allowed by requiring " (double quote) characters around the fields containing them. Embedded double quote are represented by a pair of consecutive double quotes.
+It consists of data records represented by lines which are made of one or more fields separated by commas.
+Sophisticated CSV implementations permit special characters such as newline, comma and double quotes.
+They are allowed by requiring " (double quote) characters around the fields containing them.
+Embedded double quote are represented by a pair of consecutive double quotes.
 
 Following is an example of a CSV parser:
 ```swift
