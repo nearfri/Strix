@@ -37,17 +37,17 @@ Following is an example of a CSV parser:
 ```swift
 import Strix
 
-let quote: Parser<Character> = .character("\"")
-let doubleQuote: Parser<Character> = Parser.string("\"\"") *> .just("\"")
-let quotedString: Parser<String> = Parser.many((.none(of: "\"") <|> doubleQuote))
+let doubleQuote: Parser<Character> = .character("\"")
+let twoDoubleQuote: Parser<Character> = Parser.string("\"\"") *> .just("\"")
+let escapedText: Parser<String> = Parser.many((.none(of: "\"") <|> twoDoubleQuote))
     .map({ String($0) })
-let quotedField: Parser<String> = quote *> quotedString <* quote
+let escapedField: Parser<String> = doubleQuote *> escapedText <* doubleQuote
 
 let nonSeparator: Parser<Character> = .satisfy({ $0 != "," && !$0.isNewline },
                                                label: "non-separator")
-let nonQuotedField: Parser<String> = .skipped(by: .many(nonSeparator))
+let nonEscapedField: Parser<String> = .skipped(by: .many(nonSeparator))
 
-let field: Parser<String> = quotedField <|> nonQuotedField
+let field: Parser<String> = escapedField <|> nonEscapedField
 let record: Parser<[String]> = .many(field, separatedBy: .character(","))
 
 let csvParser: Parser<[[String]]> = .many(record, separatedBy: .newline)

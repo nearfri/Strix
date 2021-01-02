@@ -25,20 +25,35 @@ extension Parser where T == CSV {
 }
 
 private struct CSVParserGenerator {
-    var csv: Parser<CSV> { .many(record, separatedBy: .newline) }
+    var csv: Parser<CSV> { Parser.many(record, separatedBy: .newline).map({ fixCSV($0) }) }
     
     private var record: Parser<[String]> { .many(field, separatedBy: .character(",")) }
     
-    private var field: Parser<String> { quotedField <|> nonQuotedField }
+    private var field: Parser<String> { escapedField <|> nonEscapedField }
     
-    private var quotedField: Parser<String> { quote *> quotedString <* quote }
-    private var quotedString: Parser<String> {
-        return Parser.many((.none(of: "\"") <|> doubleQuote)).map({ String($0) })
+    private var escapedField: Parser<String> { doubleQuote *> escapedText <* doubleQuote }
+    private var escapedText: Parser<String> {
+        return Parser.many((.none(of: "\"") <|> twoDoubleQuote)).map({ String($0) })
     }
-    private let quote: Parser<Character> = .character("\"")
-    private let doubleQuote: Parser<Character> = Parser.string("\"\"") *> .just("\"")
+    private let doubleQuote: Parser<Character> = .character("\"")
+    private let twoDoubleQuote: Parser<Character> = Parser.string("\"\"") *> .just("\"")
     
-    private var nonQuotedField: Parser<String> { .skipped(by: .many(nonSeparator)) }
+    private var nonEscapedField: Parser<String> { .skipped(by: .many(nonSeparator)) }
     private let nonSeparator: Parser<Character> = .satisfy({ $0 != "," && !$0.isNewline },
                                                            label: "non-separator")
+}
+
+extension CSVParserGenerator {
+    private func fixCSV(_ csv: CSV) -> CSV {
+        var csv = csv
+        
+        if let lastValidRecordIndex = csv.lastIndex(where: { $0 != [""] }) {
+            let invalidRecordIndex = lastValidRecordIndex + 1
+            csv.removeSubrange(invalidRecordIndex...)
+        } else {
+            csv.removeAll()
+        }
+        
+        return csv
+    }
 }

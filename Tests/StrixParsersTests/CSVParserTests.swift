@@ -53,6 +53,27 @@ final class CSVParserTests: XCTestCase {
         XCTAssertEqual(try sut.parse(csvString), csv)
     }
     
+    func test_parse_empty() throws {
+        let csvString = ""
+        
+        let csv: CSV = []
+        
+        XCTAssertEqual(try sut.parse(csvString), csv)
+    }
+    
+    func test_parse_emptyLine() throws {
+        let csvString = """
+        Year,Make
+        
+        """
+        
+        let csv: CSV = [[
+            "Year", "Make"
+        ]]
+        
+        XCTAssertEqual(try sut.parse(csvString), csv)
+    }
+    
     func test_parse_complex() throws {
         let csvString = #"""
         Year,Make,Model,Description,Price
