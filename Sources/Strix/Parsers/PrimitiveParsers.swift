@@ -68,6 +68,21 @@ extension Parser {
         }
     }
     
+    /// The parser `tuple(p1, p2, p3, p4, p6)` applies the parsers `p1`, `p2`, `p3`, `p4`, `p5`, and `p6` in sequence
+    /// and returns the results in a tuple.
+    public static func tuple<T1, T2, T3, T4, T5, T6>(
+        _ p1: Parser<T1>,
+        _ p2: Parser<T2>,
+        _ p3: Parser<T3>,
+        _ p4: Parser<T4>,
+        _ p5: Parser<T5>,
+        _ p6: Parser<T6>
+    ) -> Parser<T> where T == (T1, T2, T3, T4, T5, T6) {
+        return P.tuple(p1, p2, p3, p4, p5).flatMap { vs in
+            p6.map { v6 in (vs.0, vs.1, vs.2, vs.3, vs.4, v6) }
+        }
+    }
+    
     /// The parser `alternative(lhs, rhs)` first applies the parser `lhs`. If `lhs` succeeds, the result of `lhs` is returned.
     /// If `lhs` fails *without changing the parser state*, the parser `rhs` is applied.
     /// Note: The stream position is part of the parser state, so if `lhs` fails after consuming input, `rhs` will not be applied.

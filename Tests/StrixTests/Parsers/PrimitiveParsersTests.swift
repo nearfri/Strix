@@ -117,6 +117,28 @@ final class PrimitiveParsersTests: XCTestCase {
         XCTAssertEqual(value.4, "c")
     }
     
+    func test_tuple6() throws {
+        // Given
+        let p1: Parser<Int> = .just(1)
+        let p2: Parser<String> = .just("2")
+        let p3: Parser<Double> = .just(3.0)
+        let p4: Parser<Bool> = .just(true)
+        let p5: Parser<Character> = .just("c")
+        let p6: Parser<Int> = .just(4)
+        
+        // When
+        let p = Parser.tuple(p1, p2, p3, p4, p5, p6)
+        let value = try p.run("Input")
+        
+        // Then
+        XCTAssertEqual(value.0, 1)
+        XCTAssertEqual(value.1, "2")
+        XCTAssertEqual(value.2, 3.0)
+        XCTAssertEqual(value.3, true)
+        XCTAssertEqual(value.4, "c")
+        XCTAssertEqual(value.5, 4)
+    }
+    
     func test_tuple3_failure() {
         // Given
         let p1: Parser<Int> = .just(1)
