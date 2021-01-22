@@ -1,6 +1,6 @@
 import Foundation
 
-public struct RunError: Error, CustomStringConvertible {
+public struct RunError: LocalizedError, CustomStringConvertible {
     public var input: String
     public var position: String.Index
     public var underlyingErrors: [ParseError]
@@ -11,7 +11,7 @@ public struct RunError: Error, CustomStringConvertible {
         self.underlyingErrors = underlyingErrors
     }
     
-    public var localizedDescription: String {
+    public var errorDescription: String? {
         var buffer = ErrorOutputBuffer()
         
         ErrorMessageWriter(input: input, position: position, errors: underlyingErrors)
