@@ -50,12 +50,7 @@ private struct FormatSpecifierParserGenerator {
     private var index: Parser<Index> { .attempt(positiveInteger <* .character("$")) }
     
     private var positiveInteger: Parser<Int> {
-        return decimalInteger.map { number in
-            guard number > 0 else {
-                throw ParseError.expected(label: "positive integer")
-            }
-            return number
-        }
+        return .one(decimalInteger, satisfying: { $0 > 0 }, label: "positive integer")
     }
     
     private let decimalInteger: Parser<Int> = {

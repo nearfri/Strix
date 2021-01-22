@@ -28,6 +28,8 @@ class BaseErrorMessageWriterTests: XCTestCase {
         
         errorStream = FakeErrorOutputStream()
     }
+    
+    func test() {}
 }
 
 // MARK: - ErrorMessageWriter

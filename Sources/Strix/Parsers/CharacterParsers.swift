@@ -1,8 +1,8 @@
 import Foundation
 
 extension Parser where T == Character {
-    /// `satisfy(predicate, label: label)` parses any one character for which the predicate function returns `true`.
-    /// It returns the parsed character.
+    /// `satisfy(predicate, label: label)` parses any one character for which
+    /// the function `predicate` returns `true`. It returns the parsed character.
     public static func satisfy(
         _ predicate: @escaping (Character) -> Bool,
         label: String
