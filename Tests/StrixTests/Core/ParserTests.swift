@@ -26,22 +26,51 @@ private class TextOutput: TextOutputStream {
 final class ParserTests: XCTestCase {
     func test_map_success_success() {
         // Given
-        let parser = Seed.intSuccessParser
+        let parser = Seed.strSuccessParser
         
         // When
-        let mappedParser = parser.map({ _ in "hello" })
+        let mappedParser = parser.map({ $0 })
         let reply = mappedParser.parse(Seed.state1)
         
         // Then
-        XCTAssertEqual(reply.result.value, "hello")
+        XCTAssertEqual(reply.result.value, "wow")
     }
     
     func test_map_failure_failure() {
         // Given
-        let parser = Seed.intFailureParser
+        let parser = Seed.strFailureParser
         
         // When
-        let mappedParser = parser.map({ _ in "hello" })
+        let mappedParser = parser.map({ $0 })
+        let reply = mappedParser.parse(Seed.state1)
+        
+        // Then
+        XCTAssertNil(reply.result.value)
+    }
+    
+    func test_mapWithSubstring_success_success() {
+        // Given
+        let parser = Seed.strSuccessParser
+        var substr: Substring = ""
+        
+        // When
+        let mappedParser = parser.map { v, str -> String in
+            substr = str
+            return v
+        }
+        let reply = mappedParser.parse(Seed.state1)
+        
+        // Then
+        XCTAssertEqual(reply.result.value, "wow")
+        XCTAssertEqual(substr, "1")
+    }
+    
+    func test_mapWithSubstring_failure_failure() {
+        // Given
+        let parser = Seed.strFailureParser
+        
+        // When
+        let mappedParser: Parser<Substring> = parser.map({ $1 })
         let reply = mappedParser.parse(Seed.state1)
         
         // Then
@@ -82,6 +111,23 @@ final class ParserTests: XCTestCase {
         
         // Then
         XCTAssertNil(reply.result.value)
+    }
+    
+    func test_flatMapWithSubstring_successAndSuccess_success() {
+        // Given
+        let parser = Seed.intSuccessParser
+        var substr: Substring = ""
+        
+        // When
+        let mappedParser = parser.flatMap { _, str -> Parser<String> in
+            substr = str
+            return Seed.strSuccessParser
+        }
+        let reply = mappedParser.parse(Seed.state1)
+        
+        // Then
+        XCTAssertEqual(reply.result.value, "wow")
+        XCTAssertEqual(substr, "1")
     }
     
     func test_print() {

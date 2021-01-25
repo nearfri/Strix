@@ -41,8 +41,8 @@ extension Parser {
         return p1.flatMap { v1 in p2.flatMap { v2 in p3.map { v3 in (v1, v2, v3) } } }
     }
     
-    /// The parser `tuple(p1, p2, p3, p4)` applies the parsers `p1`, `p2`, `p3`, and `p4` in sequence
-    /// and returns the results in a tuple.
+    /// The parser `tuple(p1, p2, p3, p4)` applies the parsers `p1`, `p2`, `p3`, and `p4`
+    /// in sequence and returns the results in a tuple.
     public static func tuple<T1, T2, T3, T4>(
         _ p1: Parser<T1>,
         _ p2: Parser<T2>,
@@ -54,8 +54,8 @@ extension Parser {
         }
     }
     
-    /// The parser `tuple(p1, p2, p3, p4, p5)` applies the parsers `p1`, `p2`, `p3`, `p4`, and `p5` in sequence
-    /// and returns the results in a tuple.
+    /// The parser `tuple(p1, p2, p3, p4, p5)` applies the parsers `p1`, `p2`, `p3`, `p4`, and `p5`
+    /// in sequence and returns the results in a tuple.
     public static func tuple<T1, T2, T3, T4, T5>(
         _ p1: Parser<T1>,
         _ p2: Parser<T2>,
@@ -68,8 +68,8 @@ extension Parser {
         }
     }
     
-    /// The parser `tuple(p1, p2, p3, p4, p6)` applies the parsers `p1`, `p2`, `p3`, `p4`, `p5`, and `p6` in sequence
-    /// and returns the results in a tuple.
+    /// The parser `tuple(p1, p2, p3, p4, p6)` applies the parsers `p1`, `p2`, `p3`, `p4`, `p5`, and `p6`
+    /// in sequence and returns the results in a tuple.
     public static func tuple<T1, T2, T3, T4, T5, T6>(
         _ p1: Parser<T1>,
         _ p2: Parser<T2>,
@@ -80,6 +80,22 @@ extension Parser {
     ) -> Parser<T> where T == (T1, T2, T3, T4, T5, T6) {
         return P.tuple(p1, p2, p3, p4, p5).flatMap { vs in
             p6.map { v6 in (vs.0, vs.1, vs.2, vs.3, vs.4, v6) }
+        }
+    }
+    
+    /// The parser `tuple(p1, p2, p3, p4, p6, p7)` applies the parsers `p1`, `p2`, `p3`, `p4`, `p5`, `p6`, and `p7`
+    /// in sequence and returns the results in a tuple.
+    public static func tuple<T1, T2, T3, T4, T5, T6, T7>(
+        _ p1: Parser<T1>,
+        _ p2: Parser<T2>,
+        _ p3: Parser<T3>,
+        _ p4: Parser<T4>,
+        _ p5: Parser<T5>,
+        _ p6: Parser<T6>,
+        _ p7: Parser<T7>
+    ) -> Parser<T> where T == (T1, T2, T3, T4, T5, T6, T7) {
+        return P.tuple(p1, p2, p3, p4, p5, p6).flatMap { vs in
+            p7.map { v7 in (vs.0, vs.1, vs.2, vs.3, vs.4, vs.5, v7) }
         }
     }
     
@@ -230,20 +246,6 @@ extension Parser {
                 return .failure(reply.errors, state)
             }
             return .failure([.nested(position: reply.state.position, errors: reply.errors)], state)
-        }
-    }
-    
-    /// `skip(p, apply: f)` applies the parser `p` and returns the result `f(x, str)`,
-    /// where `x` is the result returned by `p` and `str` is the substring skipped over by `p`.
-    public static func skip<U>(
-        _ p: Parser<U>,
-        apply transform: @escaping (U, Substring) -> T
-    ) -> Parser<T> {
-        return Parser { state in
-            let stream = state.stream
-            let reply = p.parse(state)
-            let newStream = reply.state.stream
-            return reply.map({ transform($0, stream[stream.startIndex..<newStream.startIndex]) })
         }
     }
     

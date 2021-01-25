@@ -5,11 +5,11 @@ import Strix
 final class FormatSpecifierParserTests: XCTestCase {
     let sut = Parser.formatSpecifier
     
-    func test_parse_nonFormat() {
+    func test_parse_nonFormat_throwError() {
         XCTAssertThrowsError(try sut.run("d"))
     }
     
-    func test_parse_invalidFormat() {
+    func test_parse_invalidFormat_throwError() {
         XCTAssertThrowsError(try sut.run("%m"))
     }
     
@@ -98,6 +98,21 @@ final class FormatSpecifierParserTests: XCTestCase {
     func test_parse_length_long() {
         XCTAssertEqual(try sut.run("%ld"), .placeholder(
                         .init(length: .long, conversion: .decimal)))
+    }
+    
+    func test_parse_variableName_goodName() {
+        XCTAssertEqual(try sut.run("%#@v1_minutes@"), .placeholder(
+                        .init(flags: [.hash], conversion: .object, variableName: "v1_minutes")))
+    }
+    
+    func test_parse_variableName_invalidCharacter_throwError() {
+        XCTAssertThrowsError(try sut.run("%#@v1_min&utes@"))
+        XCTAssertThrowsError(try sut.run("%#@v1_min utes@"))
+        XCTAssertThrowsError(try sut.run("%#@v1_min+utes@"))
+    }
+    
+    func test_parse_variableName_notEndWithCommercialAt_throwError() {
+        XCTAssertThrowsError(try sut.run("%#@v1_minutes"))
     }
     
     func test_parse_complex_placeholder() {

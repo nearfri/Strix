@@ -14,6 +14,23 @@ public struct FormatPlaceholder: Equatable {
     public var length: Length?
     public var conversion: Conversion
     public var variableName: String? // variable in stringsdict
+    
+    public init(index: FormatPlaceholder.Index? = nil,
+                flags: [FormatPlaceholder.Flag] = [],
+                width: FormatPlaceholder.Width? = nil,
+                precision: FormatPlaceholder.Precision? = nil,
+                length: FormatPlaceholder.Length? = nil,
+                conversion: FormatPlaceholder.Conversion,
+                variableName: String? = nil
+    ) {
+        self.index = index
+        self.flags = flags
+        self.width = width
+        self.precision = precision
+        self.length = length
+        self.conversion = conversion
+        self.variableName = variableName
+    }
 }
 
 extension FormatPlaceholder {

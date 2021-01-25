@@ -1,11 +1,6 @@
 import Foundation
 import Strix
 
-public enum FormatSpecifier: Equatable {
-    case percentSign
-    case placeholder(FormatPlaceholder)
-}
-
 extension Parser where T == FormatSpecifier {
     public static var formatSpecifier: Parser<FormatSpecifier> {
         return FormatSpecifierParserGenerator().formatSpecifier
@@ -33,18 +28,16 @@ private struct FormatSpecifierParserGenerator {
             Parser.optional(width),
             Parser.optional(precision),
             Parser.optional(length),
-            conversion)
+            conversion,
+            Parser.just(nil as String?))
         
-        return fields.map { index, flag, width, precision, length, conversion in
-            return .placeholder(
-                FormatPlaceholder(
-                    index: index,
-                    flags: flag,
-                    width: width,
-                    precision: precision,
-                    length: length,
-                    conversion: conversion))
-        }
+        return fields
+            .map(FormatPlaceholder.init)
+            .flatMap {
+                let expectsVariableName = $0.flags.contains(.hash) && $0.conversion == .object
+                return expectsVariableName ? variableName.map($0.withVariableName(_:)) : .just($0)
+            }
+            .map { .placeholder($0) }
     }
     
     private var index: Parser<Index> { .attempt(positiveInteger <* .character("$")) }
@@ -88,4 +81,17 @@ private struct FormatSpecifierParserGenerator {
         let allConversionChars = Conversion.allCases.map(\.rawValue)
         return Parser.any(of: allConversionChars).map({ Conversion(rawValue: $0)! })
     }()
+    
+    private let variableName: Parser<String> = {
+        let variableCharacters = Parser.any(of: [.asciiLetter, .decimalDigit, .character("_")])
+        return .skipped(by: .many(variableCharacters, minCount: 1)) <* .character("@")
+    }()
+}
+
+private extension FormatPlaceholder {
+    func withVariableName(_ variableName: String) -> FormatPlaceholder {
+        var result = self
+        result.variableName = variableName
+        return result
+    }
 }

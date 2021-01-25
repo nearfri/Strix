@@ -134,7 +134,7 @@ extension Parser where T == Substring {
     
     /// `skippedSubstring(by: p)` applies the parser `p` and returns the characters skipped over by `p` as a string.
     public static func skippedSubstring<U>(by p: Parser<U>) -> Parser<Substring> {
-        return skip(p, apply: { _, substr in substr })
+        return p.map({ _, substr in substr })
     }
     
     /// `restSubstringOfLine(strippingNewline: flag)` parses any characters before the end of the line and

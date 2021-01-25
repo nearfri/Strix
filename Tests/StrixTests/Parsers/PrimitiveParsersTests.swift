@@ -124,7 +124,7 @@ final class PrimitiveParsersTests: XCTestCase {
         let p3: Parser<Double> = .just(3.0)
         let p4: Parser<Bool> = .just(true)
         let p5: Parser<Character> = .just("c")
-        let p6: Parser<Int> = .just(4)
+        let p6: Parser<Int> = .just(6)
         
         // When
         let p = Parser.tuple(p1, p2, p3, p4, p5, p6)
@@ -136,7 +136,31 @@ final class PrimitiveParsersTests: XCTestCase {
         XCTAssertEqual(value.2, 3.0)
         XCTAssertEqual(value.3, true)
         XCTAssertEqual(value.4, "c")
-        XCTAssertEqual(value.5, 4)
+        XCTAssertEqual(value.5, 6)
+    }
+    
+    func test_tuple7() throws {
+        // Given
+        let p1: Parser<Int> = .just(1)
+        let p2: Parser<String> = .just("2")
+        let p3: Parser<Double> = .just(3.0)
+        let p4: Parser<Bool> = .just(true)
+        let p5: Parser<Character> = .just("c")
+        let p6: Parser<Int> = .just(6)
+        let p7: Parser<String> = .just("7")
+        
+        // When
+        let p = Parser.tuple(p1, p2, p3, p4, p5, p6, p7)
+        let value = try p.run("Input")
+        
+        // Then
+        XCTAssertEqual(value.0, 1)
+        XCTAssertEqual(value.1, "2")
+        XCTAssertEqual(value.2, 3.0)
+        XCTAssertEqual(value.3, true)
+        XCTAssertEqual(value.4, "c")
+        XCTAssertEqual(value.5, 6)
+        XCTAssertEqual(value.6, "7")
     }
     
     func test_tuple3_failure() {
@@ -492,24 +516,6 @@ final class PrimitiveParsersTests: XCTestCase {
         // Then
         XCTAssertEqual(reply.state.stream, input)
         XCTAssertEqual(reply.errors, [.nested(position: secondIndex, errors: p1Errors)])
-    }
-    
-    // MARK: - with skipped string
-    
-    func test_skipApply() {
-        // Given
-        let p1: Parser<Void> = Parser { state in
-            let stream = state.stream
-            return .success((), state.withStream(stream.dropFirst(3)))
-        }
-        
-        // When
-        let p: Parser<String> = .skip(p1, apply: { _, substr in String(substr) })
-        let reply = p.parse(ParserState(stream: "123456"))
-        
-        // Then
-        XCTAssertEqual(reply.result.value, "123")
-        XCTAssertEqual(reply.state.stream, "456")
     }
     
     // MARK: - lazy

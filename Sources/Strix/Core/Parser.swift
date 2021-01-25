@@ -16,6 +16,20 @@ public struct Parser<T> {
         }
     }
     
+    /// The parser `p.map(f)` applies the parser `p` and returns the result of the function application `f(x, str)`,
+    /// where `x` is the result returned by  `p` and `str` is the substring skipped over by `p`.
+    public func map<U>(_ transform: @escaping (T, Substring) throws -> U) -> Parser<U> {
+        return Parser<U> { state in
+            let stream = state.stream
+            let reply = parse(state)
+            let newStream = reply.state.stream
+            
+            return reply.map {
+                try transform($0, stream[stream.startIndex..<newStream.startIndex])
+            }
+        }
+    }
+    
     /// The parser `p.flatMap(f)` first applies the parser `p` to the input,
     /// then applies the function `f` to the result returned by `p` and finally applies the parser returned by `f` to the input.
     public func flatMap<U>(_ transform: @escaping (T) -> Parser<U>) -> Parser<U> {
@@ -24,6 +38,26 @@ public struct Parser<T> {
             switch reply.result {
             case .success(let v, _):
                 return transform(v)
+                    .parse(reply.state)
+                    .compareStateAndPrependingErrors(of: reply)
+            case .failure(let errors):
+                return .failure(errors, reply.state)
+            }
+        }
+    }
+    
+    /// The parser `p.flatMap(f)` first applies the parser `p` to the input,
+    /// then applies the function `f` to the result returned by `p` and the substring skipped over by `p`
+    /// and finally applies the parser returned by `f` to the input.
+    public func flatMap<U>(_ transform: @escaping (T, Substring) -> Parser<U>) -> Parser<U> {
+        return Parser<U> { state -> ParserReply<U> in
+            let stream = state.stream
+            let reply = parse(state)
+            let newStream = reply.state.stream
+            
+            switch reply.result {
+            case .success(let v, _):
+                return transform(v, stream[stream.startIndex..<newStream.startIndex])
                     .parse(reply.state)
                     .compareStateAndPrependingErrors(of: reply)
             case .failure(let errors):
