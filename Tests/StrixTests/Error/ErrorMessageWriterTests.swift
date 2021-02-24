@@ -230,6 +230,24 @@ final class ErrorMessageWriterPositionTests: BaseErrorMessageWriterTests {
     }
 }
 
+// MARK: - Without position
+
+final class ErrorMessageWriterWithoutPositionTests: BaseErrorMessageWriterTests {
+    func test_writeWithoutPosition() {
+        // Given
+        let errors: [ParseError] = [
+            .expected(label: "number"),
+        ]
+        let sut = ErrorMessageWriter(errors: errors)
+        
+        // When
+        sut.write(to: &errorStream)
+        
+        // Then
+        XCTAssertEqual(errorStream.text, "Expecting: number\n")
+    }
+}
+
 // MARK: - Expected error
 
 final class ErrorMessageWriterExpectedTests: BaseErrorMessageWriterTests {

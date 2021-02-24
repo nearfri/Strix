@@ -1,8 +1,8 @@
 import Foundation
 
 struct ErrorMessageWriter<Target: ErrorOutputStream> {
-    let input: String
-    let position: String.Index
+    let input: String?
+    let position: String.Index?
     let errorSplitter: ParseErrorSplitter
     
     init(input: String, position: String.Index, errors: [ParseError]) {
@@ -11,8 +11,14 @@ struct ErrorMessageWriter<Target: ErrorOutputStream> {
         self.errorSplitter = ParseErrorSplitter(errors)
     }
     
+    init(errors: [ParseError]) {
+        self.input = nil
+        self.position = nil
+        self.errorSplitter = ParseErrorSplitter(errors)
+    }
+    
     func write(to target: inout Target) {
-        writePosition(to: &target)
+        writePositionIfPossible(to: &target)
         
         writeExpectedErrors(to: &target)
         writeUnexpectedErrors(to: &target)
@@ -28,8 +34,10 @@ struct ErrorMessageWriter<Target: ErrorOutputStream> {
     
     // MARK: - Position
     
-    private func writePosition(to target: inout Target) {
-        PositionWriter(input: input, position: position).write(to: &target)
+    private func writePositionIfPossible(to target: inout Target) {
+        if let input = input, let position = position {
+            PositionWriter(input: input, position: position).write(to: &target)
+        }
     }
     
     // MARK: - Expected, unexpected error
@@ -81,9 +89,7 @@ struct ErrorMessageWriter<Target: ErrorOutputStream> {
             print("", to: &target)
             print("\(error.label) could not be parsed because:", to: &target)
             
-            target.indent.level += 1
-            Self(input: input, position: error.position, errors: error.errors).write(to: &target)
-            target.indent.level -= 1
+            writeNestedErrors(error.errors, at: error.position, to: &target)
         }
     }
     
@@ -92,10 +98,23 @@ struct ErrorMessageWriter<Target: ErrorOutputStream> {
             print("", to: &target)
             print("The parser backtracked after:", to: &target)
             
-            target.indent.level += 1
-            Self(input: input, position: error.position, errors: error.errors).write(to: &target)
-            target.indent.level -= 1
+            writeNestedErrors(error.errors, at: error.position, to: &target)
         }
+    }
+    
+    private func writeNestedErrors(_ errors: [ParseError],
+                                   at position: String.Index,
+                                   to target: inout Target) {
+        let nestedWriter: ErrorMessageWriter = {
+            guard let input = input else {
+                return ErrorMessageWriter(errors: errors)
+            }
+            return ErrorMessageWriter(input: input, position: position, errors: errors)
+        }()
+        
+        target.indent.level += 1
+        nestedWriter.write(to: &target)
+        target.indent.level -= 1
     }
 }
 

@@ -20,10 +20,20 @@ public struct RunError: LocalizedError, CustomStringConvertible {
         return buffer.text
     }
     
-    public var description: String {
-        let textPosition = TextPosition(string: input, index: position)
+    public var failureReason: String? {
+        var buffer = ErrorOutputBuffer()
         
+        ErrorMessageWriter(errors: underlyingErrors).write(to: &buffer)
+        
+        return buffer.text
+    }
+    
+    public var description: String {
         return "line: \(textPosition.line), column: \(textPosition.column), "
             + "underlyingErrors: \(underlyingErrors)"
+    }
+    
+    public var textPosition: TextPosition {
+        return TextPosition(string: input, index: position)
     }
 }
