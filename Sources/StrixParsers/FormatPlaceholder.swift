@@ -97,7 +97,7 @@ extension FormatPlaceholder {
 }
 
 extension FormatPlaceholder {
-    public var swiftType: Any.Type {
+    public var valueType: Any.Type {
         switch conversion {
         case .decimal, .DECIMAL, .int:
             switch length {
