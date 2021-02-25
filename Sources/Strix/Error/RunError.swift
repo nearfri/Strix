@@ -17,7 +17,7 @@ public struct RunError: LocalizedError, CustomStringConvertible {
         ErrorMessageWriter(input: input, position: position, errors: underlyingErrors)
             .write(to: &buffer)
         
-        return buffer.text
+        return buffer.text.trimmingCharacters(in: .newlines)
     }
     
     public var failureReason: String? {
@@ -25,7 +25,7 @@ public struct RunError: LocalizedError, CustomStringConvertible {
         
         ErrorMessageWriter(errors: underlyingErrors).write(to: &buffer)
         
-        return buffer.text
+        return buffer.text.trimmingCharacters(in: .newlines)
     }
     
     public var description: String {
