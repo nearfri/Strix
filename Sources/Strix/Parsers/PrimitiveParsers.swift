@@ -329,9 +329,8 @@ public class RecursiveParserGenerator<T> {
     private let placeholderParser: ParserObject<T>
     
     public init() {
-        let dummy: Parser<T> = Parser.fail(message: "a lazy parser was not initialized")
-        subjectParser = ParserObject {
-            return dummy.parse($0)
+        subjectParser = ParserObject { _ in
+            preconditionFailure("a recursive parser was not initialized")
         }
         
         placeholderParser = ParserObject { [unowned subjectParser] in
