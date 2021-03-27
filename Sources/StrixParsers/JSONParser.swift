@@ -24,22 +24,24 @@ extension Parser where T == JSON {
 
 private struct JSONParserGenerator {
     var json: Parser<JSON> {
-        return .any(of: [
-            objectJSON, arrayJSON, stringJSON, numberJSON, trueJSON, falseJSON, nullJSON
-        ])
+        return .recursive { placeholder in
+            return .any(of: [
+                objectJSON(json: placeholder), arrayJSON(json: placeholder),
+                stringJSON, numberJSON, trueJSON, falseJSON, nullJSON
+            ])
+        }
     }
     
-    private var objectJSON: Parser<JSON> {
-        let pair: Parser<(String, JSON)> = .tuple(stringLiteral <* ws,
-                                                  colon *> ws *> .lazy(json))
+    private func objectJSON(json: Parser<JSON>) -> Parser<JSON> {
+        let pair: Parser<(String, JSON)> = .tuple(stringLiteral <* ws, colon *> ws *> json)
         let pairs: Parser<[String: JSON]> = Parser.many(pair <* ws, separatedBy: comma *> ws).map {
             Dictionary($0, uniquingKeysWith: { _, last in last })
         }
         return (.character("{") *> ws *> pairs <* .character("}")).map({ .object($0) })
     }
     
-    private var arrayJSON: Parser<JSON> {
-        let values: Parser<[JSON]> = Parser.many(.lazy(json) <* ws, separatedBy: comma *> ws)
+    private func arrayJSON(json: Parser<JSON>) -> Parser<JSON> {
+        let values: Parser<[JSON]> = Parser.many(json <* ws, separatedBy: comma *> ws)
         return (.character("[") *> ws *> values <* .character("]")).map({ .array($0) })
     }
     

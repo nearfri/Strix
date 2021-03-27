@@ -518,22 +518,22 @@ final class PrimitiveParsersTests: XCTestCase {
         XCTAssertEqual(reply.errors, [.nested(position: secondIndex, errors: p1Errors)])
     }
     
-    // MARK: - lazy
+    // MARK: - recursive
     
-    func test_lazy() throws {
+    func test_recursive() throws {
         enum Container: Equatable {
             indirect case wrapper(Container)
             case value(Int)
         }
         
-        var containerParser: Parser<Container>!
-        
-        let wrapperParser: Parser<Container> =
-            (.character("(") *> .lazy(containerParser) <* .character(")")).map({ .wrapper($0) })
-        
-        let valueParser: Parser<Container> = Parser.int().map({ .value($0) })
-        
-        containerParser = wrapperParser <|> valueParser
+        let containerParser: Parser<Container> = .recursive { placeholder in
+            let wrapperParser: Parser<Container> =
+                (.character("(") *> placeholder <* .character(")")).map({ .wrapper($0) })
+            
+            let valueParser: Parser<Container> = Parser.int().map({ .value($0) })
+            
+            return wrapperParser <|> valueParser
+        }
         
         let parsedContainer: Container = try containerParser.run("((5))")
         let expectedContainer: Container = .wrapper(.wrapper(.value(5)))

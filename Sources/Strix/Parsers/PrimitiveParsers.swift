@@ -249,10 +249,11 @@ extension Parser {
         }
     }
     
-    /// `lazy(p)` creates a parser that forwards all calls to the parser `p`.
+    /// `recursive({ placeholder in subject(placeholder) })` creates a recursive parser that forwards all calls
+    /// to the parser `subject`. `placeholder` also forwards all calls to `subject`.
     /// It can be used to parse nested expressions like JSON.
-    public static func lazy(_ parser: @autoclosure @escaping () -> Parser<T>) -> Parser<T> {
-        return Parser { parser().parse($0) }
+    public static func recursive(_ body: @escaping (Parser<T>) -> Parser<T>) -> Parser<T> {
+        return RecursiveParserGenerator().make(body)
     }
 }
 
@@ -304,5 +305,59 @@ extension Parser where T == Void {
     /// The parser `skip(p)` skips over the result of `p`.
     public static func skip<U>(_ p: Parser<U>) -> Parser<Void> {
         return p.map({ _ in () })
+    }
+}
+
+/// `RecursiveParserGenerator` is used to parse nested expressions like ASCIIPlist or JSON.
+///
+/// In this example, `placeholder` is a placeholder for `subject`. It can be nested inside dictionary or array.
+///
+///     let generator = RecursiveParserGenerator<ASCIIPlist>()
+///     let placeholder = generator.placeholder
+///     generator.subject = .any(of: [dictionary(placeholder), array(placeholder), string, data])
+///     let plist = generator.make()
+public class RecursiveParserGenerator<T> {
+    private class ParserObject<T> {
+        var parse: (ParserState) -> ParserReply<T>
+        
+        init(_ parse: @escaping (ParserState) -> ParserReply<T>) {
+            self.parse = parse
+        }
+    }
+    
+    private let subjectParser: ParserObject<T>
+    private let placeholderParser: ParserObject<T>
+    
+    public init() {
+        let dummy: Parser<T> = Parser.fail(message: "a lazy parser was not initialized")
+        subjectParser = ParserObject {
+            return dummy.parse($0)
+        }
+        
+        placeholderParser = ParserObject { [unowned subjectParser] in
+            return subjectParser.parse($0)
+        }
+    }
+    
+    public func make(_ body: @escaping (_ placeholder: Parser<T>) -> Parser<T>) -> Parser<T> {
+        subject = body(placeholder)
+        return make()
+    }
+    
+    public var subject: Parser<T> {
+        get { Parser(subjectParser.parse) }
+        set { subjectParser.parse = newValue.parse }
+    }
+    
+    public var placeholder: Parser<T> {
+        return Parser { [placeholderParser] in
+            return placeholderParser.parse($0)
+        }
+    }
+    
+    public func make() -> Parser<T> {
+        return Parser { [subjectParser] in
+            return subjectParser.parse($0)
+        }
     }
 }

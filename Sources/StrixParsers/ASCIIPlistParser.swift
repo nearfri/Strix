@@ -26,6 +26,12 @@ extension Parser where T == ASCIIPlist {
 struct ASCIIPlistParserGenerator {
     private typealias DictionaryEntry = ASCIIPlist.DictionaryEntry
     
+    private let recursivePlistGenerator: RecursiveParserGenerator<ASCIIPlist> = .init()
+    
+    private var plistPlaceholder: Parser<ASCIIPlist> {
+        return recursivePlistGenerator.placeholder
+    }
+    
     var rootPlist: Parser<ASCIIPlist> {
         let plistOrEmptyDict = plist <|> .just(.dictionary([]))
         return .attempt(dictionaryContent(minCount: 1)) <|> (manyComment *> plistOrEmptyDict)
@@ -33,7 +39,8 @@ struct ASCIIPlistParserGenerator {
     
     var plist: Parser<ASCIIPlist> {
         let anyNode = Parser.any(of: [dictionaryNode, arrayNode, stringNode, dataNode])
-        return manyComment *> anyNode <* ws <* manyComment
+        recursivePlistGenerator.subject = manyComment *> anyNode <* ws <* manyComment
+        return recursivePlistGenerator.make()
     }
     
     private var dictionaryNode: Parser<ASCIIPlist> {
@@ -68,7 +75,7 @@ struct ASCIIPlistParserGenerator {
     
     private var dictionaryPair: Parser<(String, ASCIIPlist)> {
         return .tuple(stringOrWord <* ws <* manyComment,
-                      .character("=") *> ws *> manyComment *> .lazy(plist))
+                      .character("=") *> ws *> manyComment *> plistPlaceholder)
     }
     
     private var arrayNode: Parser<ASCIIPlist> {
@@ -77,7 +84,7 @@ struct ASCIIPlistParserGenerator {
     
     private var arrayContent: Parser<ASCIIPlist> {
         return manyComment *> Parser.many(
-            .lazy(plist) <* ws,
+            plistPlaceholder <* ws,
             separatedBy: .character(",") *> ws,
             allowEndBySeparator: true
         )
@@ -130,7 +137,7 @@ struct ASCIIPlistParserGenerator {
         let uint8: Parser<UInt8> = Parser.tuple(hex, hex)
             .map({ UInt8(String([$0, $1]), radix: 16)! })
         
-        let bytes: Parser<Data> = Parser { state in
+        let bytes: Parser<Data> = Parser { [ws] state in
             var data = Data()
             let byte: Parser<Void> = uint8.map({ data.append($0) })
             let skipWS: Parser<Void> = .skip(.notEmpty(ws))
