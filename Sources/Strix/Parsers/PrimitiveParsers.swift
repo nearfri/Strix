@@ -16,12 +16,12 @@ extension Parser {
     
     /// The parser `discardFirst(lhs, rhs)` applies the parsers `lhs` and `rhs` in sequence and returns the result of `rhs`.
     public static func discardFirst<U>(_ lhs: Parser<U>, _ rhs: Parser<T>) -> Parser<T> {
-        return P.tuple(lhs, rhs).map({ $0.1 })
+        return lhs.flatMap { _ in rhs }
     }
     
     /// The parser `discardFirst(lhs, rhs)` applies the parsers `lhs` and `rhs` in sequence and returns the result of `lhs`.
     public static func discardSecond<U>(_ lhs: Parser<T>, _ rhs: Parser<U>) -> Parser<T> {
-        return P.tuple(lhs, rhs).map({ $0.0 })
+        return lhs.flatMap { v1 in rhs.map { _ in v1 } }
     }
     
     /// The parser `tuple(p1, p2)` applies the parsers `p1` and `p2` in sequence and returns the results in a tuple.
@@ -252,7 +252,7 @@ extension Parser {
     /// `recursive({ placeholder in subject(placeholder) })` creates a recursive parser that forwards all calls
     /// to the parser `subject`. `placeholder` also forwards all calls to `subject`.
     /// It can be used to parse nested expressions like JSON.
-    public static func recursive(_ body: @escaping (Parser<T>) -> Parser<T>) -> Parser<T> {
+    public static func recursive(_ body: (Parser<T>) -> Parser<T>) -> Parser<T> {
         return RecursiveParserGenerator().make(body)
     }
 }
@@ -338,7 +338,7 @@ public class RecursiveParserGenerator<T> {
         }
     }
     
-    public func make(_ body: @escaping (_ placeholder: Parser<T>) -> Parser<T>) -> Parser<T> {
+    public func make(_ body: (_ placeholder: Parser<T>) -> Parser<T>) -> Parser<T> {
         subject = body(placeholder)
         return make()
     }

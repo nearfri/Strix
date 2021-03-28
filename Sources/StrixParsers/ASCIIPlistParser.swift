@@ -23,7 +23,7 @@ extension Parser where T == ASCIIPlist {
     public static var plist: Parser<ASCIIPlist> { ASCIIPlistParserGenerator().plist }
 }
 
-struct ASCIIPlistParserGenerator {
+private struct ASCIIPlistParserGenerator {
     private typealias DictionaryEntry = ASCIIPlist.DictionaryEntry
     
     private let recursivePlistGenerator: RecursiveParserGenerator<ASCIIPlist> = .init()

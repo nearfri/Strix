@@ -19,8 +19,9 @@ extension Parser {
         options: NumberParseOptions,
         transform: @escaping (NumberLiteral) throws -> T
     ) -> Parser<T> {
+        let numberLiteral = Parser<NumberLiteral>.numberLiteral(options: options)
         return Parser { state in
-            let literalReply = Parser<NumberLiteral>.numberLiteral(options: options).parse(state)
+            let literalReply = numberLiteral.parse(state)
             switch literalReply.result {
             case .success(let literal, _):
                 do {
@@ -139,7 +140,8 @@ private struct NumberLiteralParserGenerator {
     }
     
     func make() -> Parser<NumberLiteral> {
-        return Parser { state in
+        return Parser { [sign, classification, notation,
+                         integerPart, fractionalPart, exponentPart] state in
             var newState = state
             var numberLiteral = NumberLiteral()
             let literalString: () -> String = {
@@ -157,10 +159,10 @@ private struct NumberLiteralParserGenerator {
             
             notation.parse(&newState).value.map({ numberLiteral.notation = $0 })
             
-            integerPart(notation: numberLiteral.notation).parse(&newState)
+            integerPart(numberLiteral.notation).parse(&newState)
                 .value.map({ numberLiteral.integerPart = $0 })
             
-            fractionalPart(notation: numberLiteral.notation).parse(&newState)
+            fractionalPart(numberLiteral.notation).parse(&newState)
                 .value.map({ numberLiteral.fractionalPart = $0 })
             
             if numberLiteral.integerPart.isEmpty && numberLiteral.fractionalPart.isEmpty {
@@ -168,7 +170,7 @@ private struct NumberLiteralParserGenerator {
                 return .failure([.expected(label: "number")], state)
             }
             
-            switch exponentPart(notation: numberLiteral.notation).parse(&newState) {
+            switch exponentPart(numberLiteral.notation).parse(&newState) {
             case .success(let exp, _):
                 numberLiteral.exponentPart = exp
             case .failure(let errors):

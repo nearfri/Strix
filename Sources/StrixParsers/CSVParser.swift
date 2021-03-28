@@ -43,17 +43,15 @@ private struct CSVParserGenerator {
                                                            label: "non-separator")
 }
 
-extension CSVParserGenerator {
-    private func fixCSV(_ csv: CSV) -> CSV {
-        var csv = csv
-        
-        if let lastValidRecordIndex = csv.lastIndex(where: { $0 != [""] }) {
-            let invalidRecordIndex = lastValidRecordIndex + 1
-            csv.removeSubrange(invalidRecordIndex...)
-        } else {
-            csv.removeAll()
-        }
-        
-        return csv
+private func fixCSV(_ csv: CSV) -> CSV {
+    var csv = csv
+    
+    if let lastValidRecordIndex = csv.lastIndex(where: { $0 != [""] }) {
+        let invalidRecordIndex = lastValidRecordIndex + 1
+        csv.removeSubrange(invalidRecordIndex...)
+    } else {
+        csv.removeAll()
     }
+    
+    return csv
 }

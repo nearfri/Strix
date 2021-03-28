@@ -33,7 +33,7 @@ private struct FormatSpecifierParserGenerator {
         
         return fields
             .map(FormatPlaceholder.init)
-            .flatMap {
+            .flatMap { [variableName] in
                 let expectsVariableName = $0.flags.contains(.hash) && $0.conversion == .object
                 return expectsVariableName ? variableName.map($0.withVariableName(_:)) : .just($0)
             }
