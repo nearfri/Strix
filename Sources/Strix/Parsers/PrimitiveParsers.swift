@@ -306,6 +306,31 @@ extension Parser where T == Void {
     public static func skip<U>(_ p: Parser<U>) -> Parser<Void> {
         return p.map({ _ in () })
     }
+    
+    /// The parser `updateUserState(f)` sets the user state to `f(u)`, where `u` is the current `UserState`.
+    public static func updateUserState(
+        _ transform: @escaping (inout UserState) -> Void
+    ) -> Parser<Void> {
+        return Parser { state in
+            var state = state
+            transform(&state.userState)
+            return .success((), state)
+        }
+    }
+    
+    /// The parser `satisfyUserState(predicate, message: message)` succeeds if the function`predicate`
+    /// returns `true` when applied to the current `UserState`, otherwise it fails.
+    public static func satisfyUserState(
+        _ predicate: @escaping (UserState) -> Bool,
+        message: String
+    ) -> Parser<Void> {
+        return Parser { state in
+            if predicate(state.userState) {
+                return .success((), state)
+            }
+            return .failure([.generic(message: message)], state)
+        }
+    }
 }
 
 /// `RecursiveParserGenerator` is used to parse nested expressions like ASCIIPlist or JSON.

@@ -634,4 +634,46 @@ final class PrimitiveParsersTests: XCTestCase {
         XCTAssert(reply.result.isSuccess)
         XCTAssertEqual(reply.state.stream, "Input")
     }
+    
+    func test_updateUserState() {
+        // Given
+        var expectedUserState = UserState()
+        expectedUserState["greeting"] = "hello"
+        
+        let p: Parser<Void> = .updateUserState { userState in
+            userState["greeting"] = "hello"
+        }
+        
+        // When
+        let reply = p.parse(ParserState(stream: "Input"))
+        
+        // Then
+        XCTAssertEqual(reply.state.userState, expectedUserState)
+    }
+    
+    func test_satisfyUserState_succeed_returnSuccess() {
+        // Given
+        let message = "Nested tags are not allowed."
+        let p: Parser<Void> = .satisfyUserState({ _ in true }, message: message)
+        
+        // When
+        let reply = p.parse(ParserState(stream: "Input"))
+        
+        // Then
+        XCTAssert(reply.result.isSuccess)
+    }
+    
+    func test_satisfyUserState_failed_returnFailure() {
+        // Given
+        let message = "Nested tags are not allowed."
+        let p: Parser<Void> = .satisfyUserState({ _ in false }, message: message)
+        
+        // When
+        let reply = p.parse(ParserState(stream: "Input"))
+        
+        // Then
+        XCTAssert(reply.result.isFailure)
+        XCTAssertEqual(reply.state.stream, "Input")
+        XCTAssertEqual(reply.errors, [.generic(message: message)])
+    }
 }
