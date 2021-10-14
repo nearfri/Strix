@@ -10,7 +10,10 @@ struct ParseErrorSplitter {
     var compoundErrors: [(label: String, position: String.Index, errors: [ParseError])] = []
     
     init(_ errors: [ParseError]) {
-        for error in errors {
+        var errorSet: Set<ParseError> = []
+        
+        for error in errors where !errorSet.contains(error) {
+            errorSet.insert(error)
             append(error)
         }
     }
