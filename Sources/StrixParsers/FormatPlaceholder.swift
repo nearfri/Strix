@@ -1,5 +1,4 @@
 import Foundation
-import Darwin
 
 // https://developer.apple.com/library/archive/documentation/CoreFoundation/Conceptual/CFStrings/formatSpecifiers.html
 // https://developer.apple.com/library/archive/documentation/MacOSX/Conceptual/BPInternational/StringsdictFileFormat/StringsdictFileFormat.html
@@ -148,12 +147,12 @@ extension FormatPlaceholder {
             }
         case .cString:
             if length == .long {
-                return UnsafePointer<UniChar>.self
+                return UnsafePointer<unichar>.self
             }
             return UnsafePointer<CUnsignedChar>.self
-        case .CSTRING:      return UnsafePointer<UniChar>.self
-        case .char:         return length == .long ? UniChar.self : CUnsignedChar.self
-        case .CHAR:         return UniChar.self
+        case .CSTRING:      return UnsafePointer<unichar>.self
+        case .char:         return length == .long ? unichar.self : CUnsignedChar.self
+        case .CHAR:         return unichar.self
         case .pointer:      return UnsafeRawPointer.self
         case .object:       return NSObject.self
         }
