@@ -1,4 +1,5 @@
 import Foundation
+import CoreFoundation
 
 @dynamicMemberLookup
 public enum JSON: Equatable {
