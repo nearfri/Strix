@@ -14,88 +14,91 @@ extension Parser {
         return Parser { state in .failure([.generic(message: message)], state) }
     }
     
-    /// The parser `discardFirst(lhs, rhs)` applies the parsers `lhs` and `rhs` in sequence and returns the result of `rhs`.
+    /// The parser `discardFirst(lhs, rhs)` applies the parsers `lhs` and `rhs`
+    /// in sequence and returns the result of `rhs`.
     public static func discardFirst<U>(_ lhs: Parser<U>, _ rhs: Parser<T>) -> Parser<T> {
         return lhs.flatMap { _ in rhs }
     }
     
-    /// The parser `discardFirst(lhs, rhs)` applies the parsers `lhs` and `rhs` in sequence and returns the result of `lhs`.
+    /// The parser `discardFirst(lhs, rhs)` applies the parsers `lhs` and `rhs`
+    /// in sequence and returns the result of `lhs`.
     public static func discardSecond<U>(_ lhs: Parser<T>, _ rhs: Parser<U>) -> Parser<T> {
         return lhs.flatMap { v1 in rhs.map { _ in v1 } }
     }
     
-    /// The parser `tuple(p1, p2)` applies the parsers `p1` and `p2` in sequence and returns the results in a tuple.
-    public static func tuple<T1, T2>(
-        _ p1: Parser<T1>,
-        _ p2: Parser<T2>
-    ) -> Parser<T> where T == (T1, T2) {
-        return p1.flatMap { v1 in p2.map { v2 in (v1, v2) } }
+    /// The parser `tuple(p0, p1)` applies the parsers `p0` and `p1` in sequence and returns the results in a tuple.
+    public static func tuple<T0, T1>(
+        _ p0: Parser<T0>,
+        _ p1: Parser<T1>
+    ) -> Parser<T> where T == (T0, T1) {
+        return p0.flatMap { v0 in p1.map { v1 in (v0, v1) } }
     }
     
-    /// The parser `tuple(p1, p2, p3)` applies the parsers `p1`, `p2`, and `p3` in sequence and returns the results in a tuple.
-    public static func tuple<T1, T2, T3>(
+    /// The parser `tuple(p0, p1, p2)` applies the parsers `p0`, `p1`, and `p2`
+    /// in sequence and returns the results in a tuple.
+    public static func tuple<T0, T1, T2>(
+        _ p0: Parser<T0>,
+        _ p1: Parser<T1>,
+        _ p2: Parser<T2>
+    ) -> Parser<T> where T == (T0, T1, T2) {
+        return p0.flatMap { v0 in p1.flatMap { v1 in p2.map { v2 in (v0, v1, v2) } } }
+    }
+    
+    /// The parser `tuple(p0, p1, p2, p3)` applies the parsers `p0`, `p1`, `p2`, and `p3`
+    /// in sequence and returns the results in a tuple.
+    public static func tuple<T0, T1, T2, T3>(
+        _ p0: Parser<T0>,
         _ p1: Parser<T1>,
         _ p2: Parser<T2>,
         _ p3: Parser<T3>
-    ) -> Parser<T> where T == (T1, T2, T3) {
-        return p1.flatMap { v1 in p2.flatMap { v2 in p3.map { v3 in (v1, v2, v3) } } }
+    ) -> Parser<T> where T == (T0, T1, T2, T3) {
+        return P.tuple(p0, p1, p2).flatMap { vs in
+            p3.map { v3 in (vs.0, vs.1, vs.2, v3) }
+        }
     }
     
-    /// The parser `tuple(p1, p2, p3, p4)` applies the parsers `p1`, `p2`, `p3`, and `p4`
+    /// The parser `tuple(p0, p1, p2, p3, p4)` applies the parsers `p0`, `p1`, `p2`, `p3`, and `p4`
     /// in sequence and returns the results in a tuple.
-    public static func tuple<T1, T2, T3, T4>(
+    public static func tuple<T0, T1, T2, T3, T4>(
+        _ p0: Parser<T0>,
         _ p1: Parser<T1>,
         _ p2: Parser<T2>,
         _ p3: Parser<T3>,
         _ p4: Parser<T4>
-    ) -> Parser<T> where T == (T1, T2, T3, T4) {
-        return P.tuple(p1, p2, p3).flatMap { vs in
-            p4.map { v4 in (vs.0, vs.1, vs.2, v4) }
+    ) -> Parser<T> where T == (T0, T1, T2, T3, T4) {
+        return P.tuple(p0, p1, p2, p3).flatMap { vs in
+            p4.map { v4 in (vs.0, vs.1, vs.2, vs.3, v4) }
         }
     }
     
-    /// The parser `tuple(p1, p2, p3, p4, p5)` applies the parsers `p1`, `p2`, `p3`, `p4`, and `p5`
+    /// The parser `tuple(p0, p1, p2, p3, p4, p5)` applies the parsers `p0`, `p1`, `p2`, `p3`, `p4`, and `p5`
     /// in sequence and returns the results in a tuple.
-    public static func tuple<T1, T2, T3, T4, T5>(
+    public static func tuple<T0, T1, T2, T3, T4, T5>(
+        _ p0: Parser<T0>,
         _ p1: Parser<T1>,
         _ p2: Parser<T2>,
         _ p3: Parser<T3>,
         _ p4: Parser<T4>,
         _ p5: Parser<T5>
-    ) -> Parser<T> where T == (T1, T2, T3, T4, T5) {
-        return P.tuple(p1, p2, p3, p4).flatMap { vs in
-            p5.map { v5 in (vs.0, vs.1, vs.2, vs.3, v5) }
+    ) -> Parser<T> where T == (T0, T1, T2, T3, T4, T5) {
+        return P.tuple(p0, p1, p2, p3, p4).flatMap { vs in
+            p5.map { v5 in (vs.0, vs.1, vs.2, vs.3, vs.4, v5) }
         }
     }
     
-    /// The parser `tuple(p1, p2, p3, p4, p6)` applies the parsers `p1`, `p2`, `p3`, `p4`, `p5`, and `p6`
-    /// in sequence and returns the results in a tuple.
-    public static func tuple<T1, T2, T3, T4, T5, T6>(
+    /// The parser `tuple(p0, p1, p2, p3, p4, p5, p6)` applies the parsers
+    /// `p0`, `p1`, `p2`, `p3`, `p4`, `p5`, and `p6` in sequence and returns the results in a tuple.
+    public static func tuple<T0, T1, T2, T3, T4, T5, T6>(
+        _ p0: Parser<T0>,
         _ p1: Parser<T1>,
         _ p2: Parser<T2>,
         _ p3: Parser<T3>,
         _ p4: Parser<T4>,
         _ p5: Parser<T5>,
         _ p6: Parser<T6>
-    ) -> Parser<T> where T == (T1, T2, T3, T4, T5, T6) {
-        return P.tuple(p1, p2, p3, p4, p5).flatMap { vs in
-            p6.map { v6 in (vs.0, vs.1, vs.2, vs.3, vs.4, v6) }
-        }
-    }
-    
-    /// The parser `tuple(p1, p2, p3, p4, p6, p7)` applies the parsers `p1`, `p2`, `p3`, `p4`, `p5`, `p6`, and `p7`
-    /// in sequence and returns the results in a tuple.
-    public static func tuple<T1, T2, T3, T4, T5, T6, T7>(
-        _ p1: Parser<T1>,
-        _ p2: Parser<T2>,
-        _ p3: Parser<T3>,
-        _ p4: Parser<T4>,
-        _ p5: Parser<T5>,
-        _ p6: Parser<T6>,
-        _ p7: Parser<T7>
-    ) -> Parser<T> where T == (T1, T2, T3, T4, T5, T6, T7) {
-        return P.tuple(p1, p2, p3, p4, p5, p6).flatMap { vs in
-            p7.map { v7 in (vs.0, vs.1, vs.2, vs.3, vs.4, vs.5, v7) }
+    ) -> Parser<T> where T == (T0, T1, T2, T3, T4, T5, T6) {
+        return P.tuple(p0, p1, p2, p3, p4, p5).flatMap { vs in
+            p6.map { v6 in (vs.0, vs.1, vs.2, vs.3, vs.4, vs.5, v6) }
         }
     }
     
