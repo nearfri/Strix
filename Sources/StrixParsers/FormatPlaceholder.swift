@@ -31,6 +31,10 @@ public struct FormatPlaceholder: Equatable {
         self.conversion = conversion
         self.variableName = variableName
     }
+    
+    public var isPluralVariable: Bool {
+        return flags.contains(.hash) && variableName != nil
+    }
 }
 
 extension FormatPlaceholder {
