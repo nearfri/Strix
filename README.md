@@ -1,5 +1,5 @@
 # Strix 🦉
-[![Swift](https://github.com/nearfri/Strix/workflows/Swift/badge.svg)](https://github.com/nearfri/Strix/actions?query=workflow%3ASwift)
+[![Swift](https://github.com/nearfri/Strix/actions/workflows/swift.yml/badge.svg)](https://github.com/nearfri/Strix/actions/workflows/swift.yml)
 [![Swift Compatibility](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fnearfri%2FStrix%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/nearfri/Strix)
 [![Platform Compatibility](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fnearfri%2FStrix%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/nearfri/Strix)
 
