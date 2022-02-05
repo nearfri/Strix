@@ -2,6 +2,15 @@
 # Created by https://www.toptal.com/developers/gitignore/api/macos,swift
 # Edit at https://www.toptal.com/developers/gitignore?templates=macos,swift
 
+# SPM default
+.DS_Store
+/.build
+/Packages
+/*.xcodeproj
+xcuserdata/
+DerivedData/
+.swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata
+
 ### macOS ###
 # General
 .DS_Store
