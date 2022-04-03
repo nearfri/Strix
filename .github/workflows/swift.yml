@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  test:
+  build:
     env:
       PACKAGE_NAME: Strix
       COVERAGE_FILE: ./coverage_report.lcov
