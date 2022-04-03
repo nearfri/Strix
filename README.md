@@ -2,6 +2,7 @@
 [![Swift](https://github.com/nearfri/Strix/actions/workflows/swift.yml/badge.svg)](https://github.com/nearfri/Strix/actions/workflows/swift.yml)
 [![Swift Compatibility](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fnearfri%2FStrix%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/nearfri/Strix)
 [![Platform Compatibility](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fnearfri%2FStrix%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/nearfri/Strix)
+[![codecov](https://codecov.io/gh/nearfri/Strix/branch/main/graph/badge.svg?token=G7bysdMZ41)](https://codecov.io/gh/nearfri/Strix)
 
 Strix is a parser combinator library written in Swift.
 
