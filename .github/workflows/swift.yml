@@ -1,20 +1,41 @@
 name: Swift
 
-on: [push]
+on:
+  push:
+  
+  pull_request:
+  
+  workflow_dispatch:
 
 jobs:
-  build:
-
+  test:
+    env:
+      PACKAGE_NAME: Strix
+      COVERAGE_FILE: ./coverage_report.lcov
+      
     runs-on: macOS-latest
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v2
-    - name: Setup Xcode version
-      uses: maxim-lobanov/setup-xcode@v1
-      with:
-        xcode-version: latest-stable
-    - name: Build
-      run: swift build -v
-    - name: Run tests
-      run: swift test -v
+      - name: Checkout
+        uses: actions/checkout@v3
+        
+      - name: Setup Xcode version
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+          
+      - name: Build
+        run: swift build -v
+        
+      - name: Run tests
+        run: swift test -v --enable-code-coverage
+      
+      - name: Gather code coverage
+        run: xcrun llvm-cov export -format="lcov" .build/debug/${{ env.PACKAGE_NAME }}PackageTests.xctest/Contents/MacOS/${{ env.PACKAGE_NAME }}PackageTests -instr-profile .build/debug/codecov/default.profdata > ${{ env.COVERAGE_FILE }}
+      
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v2
+        with:
+          fail_ci_if_error: true
+          files: ${{ env.COVERAGE_FILE }}
+          verbose: true
