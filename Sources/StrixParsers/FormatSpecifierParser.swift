@@ -5,6 +5,10 @@ extension Parser where T == FormatSpecifier {
     public static var formatSpecifier: Parser<FormatSpecifier> {
         return FormatSpecifierParserGenerator().formatSpecifier
     }
+    
+    public static var formatSpecifierContent: Parser<FormatSpecifier> {
+        return FormatSpecifierParserGenerator().formatSpecifierContent
+    }
 }
 
 private struct FormatSpecifierParserGenerator {
@@ -16,7 +20,11 @@ private struct FormatSpecifierParserGenerator {
     private typealias Conversion = FormatPlaceholder.Conversion
     
     var formatSpecifier: Parser<FormatSpecifier> {
-        return .character("%") *> (percentSign <|> placeholder)
+        return .character("%") *> formatSpecifierContent
+    }
+    
+    var formatSpecifierContent: Parser<FormatSpecifier> {
+        return percentSign <|> placeholder
     }
     
     private let percentSign: Parser<FormatSpecifier> = .character("%") *> .just(.percentSign)
