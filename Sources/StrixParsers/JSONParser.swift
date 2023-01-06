@@ -26,18 +26,18 @@ private struct JSONParserGenerator {
     var json: Parser<JSON> {
         return .recursive { placeholder in
             return .any(of: [
-                objectJSON(json: placeholder), arrayJSON(json: placeholder),
+                dictionaryJSON(json: placeholder), arrayJSON(json: placeholder),
                 stringJSON, numberJSON, trueJSON, falseJSON, nullJSON
             ])
         }
     }
     
-    private func objectJSON(json: Parser<JSON>) -> Parser<JSON> {
+    private func dictionaryJSON(json: Parser<JSON>) -> Parser<JSON> {
         let pair: Parser<(String, JSON)> = .tuple(stringLiteral <* ws, colon *> ws *> json)
         let pairs: Parser<[String: JSON]> = Parser.many(pair <* ws, separatedBy: comma *> ws).map {
             Dictionary($0, uniquingKeysWith: { _, last in last })
         }
-        return (.character("{") *> ws *> pairs <* .character("}")).map({ .object($0) })
+        return (.character("{") *> ws *> pairs <* .character("}")).map({ .dictionary($0) })
     }
     
     private func arrayJSON(json: Parser<JSON>) -> Parser<JSON> {

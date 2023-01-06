@@ -3,7 +3,7 @@ import CoreFoundation
 
 @dynamicMemberLookup
 public enum JSON: Equatable {
-    case object([String: JSON])
+    case dictionary([String: JSON])
     case array([JSON])
     case string(String)
     case number(NSNumber)
@@ -19,8 +19,8 @@ public enum JSON: Equatable {
 
 extension JSON {
     public subscript(key: String) -> JSON? {
-        if case .object(let obj) = self {
-            return obj[key]
+        if case .dictionary(let dict) = self {
+            return dict[key]
         }
         return nil
     }
@@ -83,8 +83,8 @@ extension JSON {
             self = .string(string)
         case let array as [Any]:
             self = .array(try array.map { try JSON(jsonObject: $0) })
-        case let object as [String: Any]:
-            self = .object(try object.mapValues { try JSON(jsonObject: $0) })
+        case let dictionary as [String: Any]:
+            self = .dictionary(try dictionary.mapValues { try JSON(jsonObject: $0) })
         default:
             throw InvalidTypeError(type: type(of: jsonObject), value: jsonObject)
         }
@@ -100,7 +100,7 @@ extension JSON {
 
 extension JSON: ExpressibleByDictionaryLiteral {
     public init(dictionaryLiteral elements: (String, JSON)...) {
-        self = .object(Dictionary(uniqueKeysWithValues: elements))
+        self = .dictionary(Dictionary(uniqueKeysWithValues: elements))
     }
 }
 
@@ -155,8 +155,8 @@ private struct JSONFormatter {
     
     private mutating func write(_ json: JSON) {
         switch json {
-        case .object(let obj):
-            write(obj)
+        case .dictionary(let dict):
+            write(dict)
         case .array(let arr):
             write(arr)
         case .string(let str):
@@ -170,8 +170,8 @@ private struct JSONFormatter {
         }
     }
     
-    private mutating func write(_ object: [String: JSON]) {
-        if object.isEmpty {
+    private mutating func write(_ dictionary: [String: JSON]) {
+        if dictionary.isEmpty {
             text.write("{}")
             return
         }
@@ -179,8 +179,8 @@ private struct JSONFormatter {
         text.write("{\n")
         indent.level += 1
         
-        for (index, (key, json)) in object.enumerated() {
-            let isLastElement = index + 1 == object.count
+        for (index, (key, json)) in dictionary.enumerated() {
+            let isLastElement = index + 1 == dictionary.count
             text.write("\(indent)\"\(key)\": ")
             write(json)
             text.write(isLastElement ? "\n" : ",\n")

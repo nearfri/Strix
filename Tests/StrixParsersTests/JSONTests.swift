@@ -31,8 +31,8 @@ enum JSONSeed {
     }
     """
     
-    static let menuJSON: JSON = .object([
-        "menu": .object([
+    static let menuJSON: JSON = .dictionary([
+        "menu": .dictionary([
             "id": .string("menu-file"),
             "value": .string("File"),
             "superMenu": .null,
@@ -42,9 +42,9 @@ enum JSONSeed {
             "hasItem": .bool(true),
             "itemCount": .number(3),
             "items": .array([
-                .object(["value": .string("New"), "onclick": .string("CreateNewDoc()")]),
-                .object(["value": .string("Open"), "onclick": .string("OpenDoc()")]),
-                .object(["value": .string("Close"), "onclick": .string("CloseDoc()")])
+                .dictionary(["value": .string("New"), "onclick": .string("CreateNewDoc()")]),
+                .dictionary(["value": .string("Open"), "onclick": .string("OpenDoc()")]),
+                .dictionary(["value": .string("Close"), "onclick": .string("CloseDoc()")])
             ])
         ])
     ])
@@ -110,7 +110,7 @@ final class JSONTests: XCTestCase {
     func test_initWithDictionaryLiteral() {
         XCTAssertEqual(
             ["name": "naver", "category": "IT"],
-            JSON.object(["name": .string("naver"), "category": .string("IT")])
+            JSON.dictionary(["name": .string("naver"), "category": .string("IT")])
         )
     }
     

@@ -43,7 +43,7 @@ final class JSONParserTests: XCTestCase {
         XCTAssertEqual(try sut.parse(jsonString), json)
     }
     
-    func test_parse_object() throws {
+    func test_parse_dictionary() throws {
         let jsonString = """
         {
             "optional": null,
@@ -53,7 +53,7 @@ final class JSONParserTests: XCTestCase {
         }
         """
         
-        let json = JSON.object([
+        let json = JSON.dictionary([
             "optional": .null,
             "boolean": .bool(true),
             "numeric": .number(123),
@@ -75,9 +75,9 @@ final class JSONParserTests: XCTestCase {
         }
         """
         
-        let json = JSON.object([
+        let json = JSON.dictionary([
             "list": .array([
-                .object([
+                .dictionary([
                     "name": .string("Tim"),
                     "age": .number(20)
                 ])
