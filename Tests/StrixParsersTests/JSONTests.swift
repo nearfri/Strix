@@ -2,12 +2,51 @@ import XCTest
 @testable import StrixParsers
 
 enum JSONSeed {
-    static let menuJSONString = """
+    struct Window: Codable, Equatable {
+        struct Menu: Codable, Equatable {
+            struct Item: Codable, Equatable {
+                var value: String
+                var onClick: String
+            }
+            
+            let id: String
+            var value: String
+            var description: String?
+            var isEnabled: Bool
+            var groupCount: Int
+            var height: Double
+            var hasItem: Bool
+            var itemCount: Int
+            var items: [Item]
+        }
+        
+        var menu: Menu
+    }
+    
+    static let window = Window(
+        menu: Window.Menu(
+            id: "menu-file",
+            value: "File",
+            description: nil,
+            isEnabled: false,
+            groupCount: 0,
+            height: 50.5,
+            hasItem: true,
+            itemCount: 3,
+            items: [
+                Window.Menu.Item(value: "New", onClick: "createNewDoc()"),
+                Window.Menu.Item(value: "Open", onClick: "openDoc()"),
+                Window.Menu.Item(value: "Close", onClick: "closeDoc()")
+            ]
+        )
+    )
+    
+    static let windowJSONString = """
     {
         "menu": {
             "id": "menu-file",
             "value": "File",
-            "superMenu": null,
+            "description": null,
             "isEnabled": false,
             "groupCount": 0,
             "height": 50.5,
@@ -16,69 +55,109 @@ enum JSONSeed {
             "items": [
                 {
                     "value": "New",
-                    "onclick": "CreateNewDoc()"
+                    "onClick": "createNewDoc()"
                 },
                 {
                     "value": "Open",
-                    "onclick": "OpenDoc()"
+                    "onClick": "openDoc()"
                 },
                 {
                     "value": "Close",
-                    "onclick": "CloseDoc()"
+                    "onClick": "closeDoc()"
                 }
             ]
         }
     }
     """
     
-    static let menuJSON: JSON = .dictionary([
+    static let windowJSON: JSON = .dictionary([
         "menu": .dictionary([
             "id": .string("menu-file"),
             "value": .string("File"),
-            "superMenu": .null,
+            "description": .null,
             "isEnabled": .bool(false),
             "groupCount": .number(0),
             "height": .number(50.5),
             "hasItem": .bool(true),
             "itemCount": .number(3),
             "items": .array([
-                .dictionary(["value": .string("New"), "onclick": .string("CreateNewDoc()")]),
-                .dictionary(["value": .string("Open"), "onclick": .string("OpenDoc()")]),
-                .dictionary(["value": .string("Close"), "onclick": .string("CloseDoc()")])
+                .dictionary(["value": .string("New"), "onClick": .string("createNewDoc()")]),
+                .dictionary(["value": .string("Open"), "onClick": .string("openDoc()")]),
+                .dictionary(["value": .string("Close"), "onClick": .string("closeDoc()")])
             ])
         ])
     ])
 }
 
 final class JSONTests: XCTestCase {
+    func test_data() throws {
+        // Given
+        let json: JSON = JSONSeed.windowJSON
+        
+        // When
+        let data = json.data()
+        
+        // Then
+        XCTAssertEqual(try JSONDecoder().decode(JSONSeed.Window.self, from: data), JSONSeed.window)
+    }
+    
+    func test_data_topLevelString() throws {
+        // Given
+        let json: JSON = "hello"
+        
+        // When
+        let data = json.data()
+        
+        // Then
+        XCTAssertEqual(data, Data("\"hello\"".utf8))
+    }
+    
+    func test_jsonObject() throws {
+        // Given
+        let json: JSON = JSONSeed.windowJSON
+        
+        // When
+        let jsonObject = json.jsonObject()
+        
+        // Then
+        let data = try JSONSerialization.data(withJSONObject: jsonObject)
+        XCTAssertEqual(try JSONDecoder().decode(JSONSeed.Window.self, from: data), JSONSeed.window)
+    }
+    
     func test_initWithData() throws {
         // Given
-        let data = JSONSeed.menuJSONString.data(using: .utf8)!
+        let data = Data(JSONSeed.windowJSONString.utf8)
         
         // When
         let json = try JSON(data: data)
         
         // Then
-        XCTAssertEqual(json, JSONSeed.menuJSON)
+        XCTAssertEqual(json, JSONSeed.windowJSON)
     }
     
     func test_initWithJSONObject() throws {
         // Given
-        let data = JSONSeed.menuJSONString.data(using: .utf8)!
+        let data = JSONSeed.windowJSONString.data(using: .utf8)!
         let jsonObj = try JSONSerialization.jsonObject(with: data)
         
         // When
         let json = try JSON(jsonObject: jsonObj)
         
         // Then
-        XCTAssertEqual(json, JSONSeed.menuJSON)
+        XCTAssertEqual(json, JSONSeed.windowJSON)
     }
     
-    func test_dynamicMemberLookup() {
-        XCTAssertEqual(JSONSeed.menuJSON.menu?.id?.stringValue, "menu-file")
-        XCTAssertEqual(JSONSeed.menuJSON.menu?.isEnabled?.boolValue, false)
-        XCTAssertEqual(JSONSeed.menuJSON.menu?.hasItem?.boolValue, true)
-        XCTAssertEqual(JSONSeed.menuJSON.menu?.itemCount?.intValue, 3)
+    func test_dynamicMemberLookup_get() {
+        XCTAssertEqual(JSONSeed.windowJSON.menu?.id?.stringValue, "menu-file")
+        XCTAssertEqual(JSONSeed.windowJSON.menu?.isEnabled?.boolValue, false)
+        XCTAssertEqual(JSONSeed.windowJSON.menu?.hasItem?.boolValue, true)
+        XCTAssertEqual(JSONSeed.windowJSON.menu?.itemCount?.intValue, 3)
+    }
+    
+    func test_dynamicMemberLookup_set() {
+        var json = JSONSeed.windowJSON
+        json.menu?.id = .string("hello")
+        XCTAssertEqual(json.menu?.id, "hello")
     }
     
     func test_initWithBoolLiteral() {
@@ -109,8 +188,12 @@ final class JSONTests: XCTestCase {
     
     func test_initWithDictionaryLiteral() {
         XCTAssertEqual(
-            ["name": "naver", "category": "IT"],
-            JSON.dictionary(["name": .string("naver"), "category": .string("IT")])
+            ["name": "Bradley", "age": 25],
+            JSON.dictionary(["name": .string("Bradley"), "age": .number(25)])
+        )
+        XCTAssertNotEqual(
+            ["name": "Bradley", "age": 25],
+            JSON.dictionary(["name": .string("Bradley"), "age": .string("25")])
         )
     }
     
@@ -136,12 +219,12 @@ final class JSONTests: XCTestCase {
     
     func test_description_complexType() {
         // Dictionary 타입은 순서 유지가 안되므로 재정렬 후 비교.
-        let actual = JSONSeed.menuJSON.description
+        let actual = JSONSeed.windowJSON.description
             .replacingOccurrences(of: ",", with: "")
             .split(separator: "\n")
             .sorted()
         
-        let expected = JSONSeed.menuJSONString
+        let expected = JSONSeed.windowJSONString
             .replacingOccurrences(of: ",", with: "")
             .split(separator: "\n")
             .sorted()

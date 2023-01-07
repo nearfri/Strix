@@ -11,7 +11,12 @@ public enum JSON: Equatable {
     case null
     
     public subscript(dynamicMember member: String) -> JSON? {
-        return self[member]
+        get {
+            return self[member]
+        }
+        set {
+            self[member] = newValue
+        }
     }
 }
 
@@ -19,15 +24,23 @@ public enum JSON: Equatable {
 
 extension JSON {
     public subscript(key: String) -> JSON? {
-        if case .dictionary(let dict) = self {
-            return dict[key]
+        get {
+            if case .dictionary(let dict) = self {
+                return dict[key]
+            }
+            return nil
         }
-        return nil
+        set {
+            if case .dictionary(var dict) = self {
+                dict[key] = newValue
+                self = .dictionary(dict)
+            }
+        }
     }
     
     public subscript(index: Int) -> JSON? {
-        if case .array(let arr) = self {
-            return index < arr.count ? arr[index] : nil
+        if case .array(let arr) = self, index < arr.count {
+            return arr[index]
         }
         return nil
     }
@@ -65,6 +78,27 @@ extension JSON {
 // MARK: -
 
 extension JSON {
+    public func data() -> Data {
+        return try! JSONSerialization.data(withJSONObject: jsonObject(), options: .fragmentsAllowed)
+    }
+    
+    public func jsonObject() -> Any {
+        switch self {
+        case .dictionary(let dictionary):
+            return dictionary.mapValues({ $0.jsonObject() })
+        case .array(let array):
+            return array.map({ $0.jsonObject() })
+        case .string(let string):
+            return string
+        case .number(let number):
+            return number
+        case .bool(let bool):
+            return (bool ? kCFBooleanTrue : kCFBooleanFalse) as CFBoolean
+        case .null:
+            return NSNull()
+        }
+    }
+    
     public init(data: Data) throws {
         let jsonObject = try JSONSerialization.jsonObject(with: data)
         try self.init(jsonObject: jsonObject)
@@ -99,38 +133,38 @@ extension JSON {
 // MARK: -
 
 extension JSON: ExpressibleByDictionaryLiteral {
-    public init(dictionaryLiteral elements: (String, JSON)...) {
-        self = .dictionary(Dictionary(uniqueKeysWithValues: elements))
+    public init(dictionaryLiteral elements: (String, JSONConvertible)...) {
+        self = Dictionary(uniqueKeysWithValues: elements).jsonValue()
     }
 }
 
 extension JSON: ExpressibleByArrayLiteral {
-    public init(arrayLiteral elements: JSON...) {
-        self = .array(elements)
+    public init(arrayLiteral elements: JSONConvertible...) {
+        self = elements.jsonValue()
     }
 }
 
 extension JSON: ExpressibleByStringLiteral {
     public init(stringLiteral value: String) {
-        self = .string(value)
+        self = value.jsonValue()
     }
 }
 
 extension JSON: ExpressibleByFloatLiteral {
     public init(floatLiteral value: Double) {
-        self = .number(NSNumber(value: value))
+        self = value.jsonValue()
     }
 }
 
 extension JSON: ExpressibleByIntegerLiteral {
     public init(integerLiteral value: Int) {
-        self = .number(NSNumber(value: value))
+        self = value.jsonValue()
     }
 }
 
 extension JSON: ExpressibleByBooleanLiteral {
     public init(booleanLiteral value: Bool) {
-        self = .bool(value)
+        self = value.jsonValue()
     }
 }
 

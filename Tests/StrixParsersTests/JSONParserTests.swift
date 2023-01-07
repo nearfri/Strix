@@ -88,6 +88,6 @@ final class JSONParserTests: XCTestCase {
     }
     
     func test_parse_complex() throws {
-        XCTAssertEqual(try sut.parse(JSONSeed.menuJSONString), JSONSeed.menuJSON)
+        XCTAssertEqual(try sut.parse(JSONSeed.windowJSONString), JSONSeed.windowJSON)
     }
 }
