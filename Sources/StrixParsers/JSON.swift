@@ -108,6 +108,8 @@ extension JSON {
         switch jsonObject {
         case is NSNull:
             self = .null
+        case let opt as Any? where opt == nil:
+            self = .null
         case let bool as CFBoolean where CFGetTypeID(bool) == CFBooleanGetTypeID():
             // number는 boolean으로 변환될 수 있으므로 타입까지 체크.
             self = .bool(CFBooleanGetValue(bool))
@@ -133,38 +135,41 @@ extension JSON {
 // MARK: -
 
 extension JSON: ExpressibleByDictionaryLiteral {
-    public init(dictionaryLiteral elements: (String, JSONConvertible)...) {
-        self = Dictionary(uniqueKeysWithValues: elements).jsonValue()
+    public init(dictionaryLiteral elements: (String, JSONConvertibleValue)...) {
+        let dict = Dictionary(uniqueKeysWithValues: elements)
+            .mapValues({ try! JSON(jsonObject: $0) })
+        
+        self = .dictionary(dict)
     }
 }
 
 extension JSON: ExpressibleByArrayLiteral {
-    public init(arrayLiteral elements: JSONConvertible...) {
-        self = elements.jsonValue()
+    public init(arrayLiteral elements: JSONConvertibleValue...) {
+        self = .array(elements.map({ try! JSON(jsonObject: $0) }))
     }
 }
 
 extension JSON: ExpressibleByStringLiteral {
     public init(stringLiteral value: String) {
-        self = value.jsonValue()
+        self = .string(value)
     }
 }
 
 extension JSON: ExpressibleByFloatLiteral {
     public init(floatLiteral value: Double) {
-        self = value.jsonValue()
+        self = .number(NSNumber(value: value))
     }
 }
 
 extension JSON: ExpressibleByIntegerLiteral {
     public init(integerLiteral value: Int) {
-        self = value.jsonValue()
+        self = .number(NSNumber(value: value))
     }
 }
 
 extension JSON: ExpressibleByBooleanLiteral {
     public init(booleanLiteral value: Bool) {
-        self = value.jsonValue()
+        self = .bool(value)
     }
 }
 

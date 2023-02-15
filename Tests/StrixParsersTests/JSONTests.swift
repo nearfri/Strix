@@ -184,6 +184,9 @@ final class JSONTests: XCTestCase {
     func test_initWithArrayLiteral() {
         XCTAssertEqual(["hello", 3], JSON.array([.string("hello"), .number(3)]))
         XCTAssertNotEqual([3, "hello"], JSON.array([.string("hello"), .number(3)]))
+        
+        XCTAssertEqual([1, [1.1, nil as Double?]],
+                       JSON.array([.number(1), JSON.array([.number(1.1), .null])]))
     }
     
     func test_initWithDictionaryLiteral() {
@@ -195,6 +198,10 @@ final class JSONTests: XCTestCase {
             ["name": "Bradley", "age": 25],
             JSON.dictionary(["name": .string("Bradley"), "age": .string("25")])
         )
+        
+        XCTAssertEqual(["a": 1, "b": ["b.1": 1.1, "b.2": nil as Double?]],
+                       JSON.dictionary(["a": .number(1),
+                                        "b": JSON.dictionary(["b.1": .number(1.1), "b.2": .null])]))
     }
     
     func test_description_arrayType() {
