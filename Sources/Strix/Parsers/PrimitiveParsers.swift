@@ -345,7 +345,7 @@ extension Parser where T == Void {
 ///     generator.subject = .any(of: [dictionary(placeholder), array(placeholder), string, data])
 ///     let plist = generator.make()
 public class RecursiveParserGenerator<T> {
-    private class ParserObject<T> {
+    private class ParserObject {
         var parse: (ParserState) -> ParserReply<T>
         
         init(_ parse: @escaping (ParserState) -> ParserReply<T>) {
@@ -353,8 +353,8 @@ public class RecursiveParserGenerator<T> {
         }
     }
     
-    private let subjectParser: ParserObject<T>
-    private let placeholderParser: ParserObject<T>
+    private let subjectParser: ParserObject
+    private let placeholderParser: ParserObject
     
     public init() {
         subjectParser = ParserObject { _ in
