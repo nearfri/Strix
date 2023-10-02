@@ -321,7 +321,7 @@ extension Parser where T == Void {
         }
     }
     
-    /// The parser `satisfyUserInfo(predicate, message: message)` succeeds if the function`predicate`
+    /// The parser `satisfyUserInfo(predicate, message: message)` succeeds if the function `predicate`
     /// returns `true` when applied to the current `UserInfo`, otherwise it fails.
     public static func satisfyUserInfo(
         _ predicate: @escaping (UserInfo) -> Bool,
