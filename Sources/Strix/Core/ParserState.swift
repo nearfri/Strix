@@ -2,12 +2,12 @@ import Foundation
 
 public struct ParserState: Equatable {
     public var stream: Substring
-    public var userState: UserState
+    public var userInfo: UserInfo
 //    public var tag: Int = 0
     
-    public init(stream: Substring, userState: UserState = .init()) {
+    public init(stream: Substring, userInfo: UserInfo = .init()) {
         self.stream = stream
-        self.userState = userState
+        self.userInfo = userInfo
     }
     
     public var position: Substring.Index {
@@ -15,6 +15,6 @@ public struct ParserState: Equatable {
     }
     
     public func withStream(_ newStream: Substring) -> ParserState {
-        return .init(stream: newStream, userState: userState)
+        return .init(stream: newStream, userInfo: userInfo)
     }
 }

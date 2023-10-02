@@ -310,25 +310,25 @@ extension Parser where T == Void {
         return p.map({ _ in () })
     }
     
-    /// The parser `updateUserState(f)` sets the user state to `f(u)`, where `u` is the current `UserState`.
-    public static func updateUserState(
-        _ transform: @escaping (inout UserState) -> Void
+    /// The parser `updateUserInfo(f)` sets the user info to `f(u)`, where `u` is the current `UserInfo`.
+    public static func updateUserInfo(
+        _ transform: @escaping (inout UserInfo) -> Void
     ) -> Parser<Void> {
         return Parser { state in
             var state = state
-            transform(&state.userState)
+            transform(&state.userInfo)
             return .success((), state)
         }
     }
     
-    /// The parser `satisfyUserState(predicate, message: message)` succeeds if the function`predicate`
-    /// returns `true` when applied to the current `UserState`, otherwise it fails.
-    public static func satisfyUserState(
-        _ predicate: @escaping (UserState) -> Bool,
+    /// The parser `satisfyUserInfo(predicate, message: message)` succeeds if the function`predicate`
+    /// returns `true` when applied to the current `UserInfo`, otherwise it fails.
+    public static func satisfyUserInfo(
+        _ predicate: @escaping (UserInfo) -> Bool,
         message: String
     ) -> Parser<Void> {
         return Parser { state in
-            if predicate(state.userState) {
+            if predicate(state.userInfo) {
                 return .success((), state)
             }
             return .failure([.generic(message: message)], state)
