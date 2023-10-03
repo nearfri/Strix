@@ -67,7 +67,7 @@ public struct Parser<T> {
     }
     
     /// The parser `p.print(label)` prints log messages before and after applying the parser `p`.
-    public func print(_ label: String = "", to output: TextOutputStream? = nil) -> Parser<T> {
+    public func print(_ label: String, to output: TextOutputStream? = nil) -> Parser<T> {
         let write: (String) -> Void = {
             if var output = output {
                 return { output.write($0) }
@@ -79,9 +79,7 @@ public struct Parser<T> {
             let position = TextPosition(string: state.stream.base, index: state.position)
             let character = state.stream.first.map({ "\"\($0)\"" }) ?? "EOS"
             write("(\(position.line):\(position.column):\(character)): ")
-            if !label.isEmpty {
-                write("\(label): ")
-            }
+            write("\(label): ")
             write(message + "\n")
         }
         
