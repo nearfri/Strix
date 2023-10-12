@@ -3,7 +3,7 @@ import XCTest
 
 private enum Seed {
     static let state1: ParserState = .init(stream: "123456")
-    static let state2: ParserState = state1.withStream(state1.stream.dropFirst())
+    static let state2: ParserState = state1.advanced()
     
     static let intErrors: [ParseError] = [.expected(label: "integer")]
     static let strErrors: [ParseError] = [.expected(label: "string")]
@@ -160,7 +160,7 @@ final class ParserTests: XCTestCase {
         let input = "hello"
         let errors: [ParseError] = Seed.intErrors
         let parser: Parser<Int> = .init { state in
-            return .failure(errors, state.withStream(state.stream.dropFirst()))
+            return .failure(errors, state.advanced())
         }
         
         // When

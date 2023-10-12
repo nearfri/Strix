@@ -47,7 +47,7 @@ final class SequenceParsersTests: XCTestCase {
             if count > 5 {
                 return .failure([.expected(label: "number")], state)
             }
-            return .success(count, state.withStream(state.stream.dropFirst()))
+            return .success(count, state.advanced())
         }
         
         // When
@@ -68,7 +68,7 @@ final class SequenceParsersTests: XCTestCase {
             if count > 4 {
                 return .failure([.expected(label: "number")], state)
             }
-            return .success(count, state.withStream(state.stream.dropFirst()))
+            return .success(count, state.advanced())
         }
         
         // When
@@ -93,7 +93,7 @@ final class SequenceParsersTests: XCTestCase {
             if sepCount > 2 {
                 return .failure([.expected(label: "comma")], state)
             }
-            return .success(",", state.withStream(state.stream.dropFirst()))
+            return .success(",", state.advanced())
         }
         
         // When
@@ -118,7 +118,7 @@ final class SequenceParsersTests: XCTestCase {
         var sepCount = 0
         let sep: Parser<String> = Parser { state in
             sepCount += 1
-            return .success(",", state.withStream(state.stream.dropFirst()))
+            return .success(",", state.advanced())
         }
         
         // When
@@ -143,7 +143,7 @@ final class SequenceParsersTests: XCTestCase {
         var sepCount = 0
         let sep: Parser<String> = Parser { state in
             sepCount += 1
-            return .success(",", state.withStream(state.stream.dropFirst()))
+            return .success(",", state.advanced())
         }
         
         // When

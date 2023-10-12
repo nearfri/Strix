@@ -14,6 +14,10 @@ public struct ParserState: Equatable {
         return stream.startIndex
     }
     
+    public func advanced(by n: Int = 1) -> ParserState {
+        return withStream(stream.dropFirst(n))
+    }
+    
     public func withStream(_ newStream: Substring) -> ParserState {
         return .init(stream: newStream, userInfo: userInfo)
     }

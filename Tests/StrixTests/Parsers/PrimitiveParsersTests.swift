@@ -210,7 +210,7 @@ final class PrimitiveParsersTests: XCTestCase {
         // Given
         let p1: Parser<Int> = Parser { state in
             return .failure([.generic(message: "Invalid input")],
-                            state.withStream(state.stream.dropFirst()))
+                            state.advanced())
         }
         let p2: Parser<Int> = .just(2)
         
@@ -244,7 +244,7 @@ final class PrimitiveParsersTests: XCTestCase {
         let p1: Parser<Int> = .fail(message: "Fail 1")
         let p2: Parser<Int> = Parser { state in
             return .failure([.generic(message: "Fail 3")],
-                            state.withStream(state.stream.dropFirst()))
+                            state.advanced())
         }
         let p3: Parser<Int> = .just(3)
         
@@ -308,7 +308,7 @@ final class PrimitiveParsersTests: XCTestCase {
     func test_notEmpty_succeedWithChange_succeed() {
         // Given
         let p1: Parser<String> = Parser { state in
-            return .success("hello", state.withStream(state.stream.dropFirst()))
+            return .success("hello", state.advanced())
         }
         
         // When
@@ -336,7 +336,7 @@ final class PrimitiveParsersTests: XCTestCase {
     func test_oneWithSatisfying_succeed_returnValue() {
         // Given
         let p1: Parser<String> = Parser { state in
-            return .success("Hello", [], state.withStream(state.stream.dropFirst()))
+            return .success("Hello", [], state.advanced())
         }
         
         // When
@@ -363,7 +363,7 @@ final class PrimitiveParsersTests: XCTestCase {
     func test_oneWithSatisfying_predicateSucceded_returnValue() throws {
         // Given
         let p1: Parser<Int> = Parser { state in
-            return .success(1, state.withStream(state.stream.dropFirst()))
+            return .success(1, state.advanced())
         }
         
         // When
@@ -378,7 +378,7 @@ final class PrimitiveParsersTests: XCTestCase {
     func test_oneWithSatisfying_predicateFailed_backtrackAndReturnFailure() throws {
         // Given
         let p1: Parser<Int> = Parser { state in
-            return .success(0, state.withStream(state.stream.dropFirst()))
+            return .success(0, state.advanced())
         }
         
         // When
@@ -395,7 +395,7 @@ final class PrimitiveParsersTests: XCTestCase {
     func test_attempt_succeed_consumeInput() {
         // Given
         let p1: Parser<String> = Parser { state in
-            return .success("hello", state.withStream(state.stream.dropFirst()))
+            return .success("hello", state.advanced())
         }
         
         // When
@@ -410,7 +410,7 @@ final class PrimitiveParsersTests: XCTestCase {
     func test_attempt_fail_backtrack() {
         // Given
         let p1: Parser<String> = Parser { state in
-            return .failure([], state.withStream(state.stream.dropFirst()))
+            return .failure([], state.advanced())
         }
         
         // When
@@ -424,7 +424,7 @@ final class PrimitiveParsersTests: XCTestCase {
     func test_attemptWithLabel_succeed_consumeInput() {
         // Given
         let p1: Parser<String> = Parser { state in
-            return .success("hello", state.withStream(state.stream.dropFirst()))
+            return .success("hello", state.advanced())
         }
         
         // When
@@ -472,7 +472,7 @@ final class PrimitiveParsersTests: XCTestCase {
     func test_lookAhead_succeed_backtrackAndReturnValue() {
         // Given
         let p1: Parser<String> = Parser { state in
-            return .success("hello", state.withStream(state.stream.dropFirst()))
+            return .success("hello", state.advanced())
         }
         
         // When
@@ -574,7 +574,7 @@ final class PrimitiveParsersTests: XCTestCase {
     func test_follow_succeed_backtrackAndSucceed() {
         // Given
         let p1: Parser<String> = Parser { state in
-            return .success("hello", state.withStream(state.stream.dropFirst()))
+            return .success("hello", state.advanced())
         }
         
         // When
@@ -589,7 +589,7 @@ final class PrimitiveParsersTests: XCTestCase {
     func test_follow_fail_backtrackAndReturnExpectedError() {
         // Given
         let p1: Parser<String> = Parser { state in
-            return .failure([], state.withStream(state.stream.dropFirst()))
+            return .failure([], state.advanced())
         }
         
         // When
@@ -607,7 +607,7 @@ final class PrimitiveParsersTests: XCTestCase {
     func test_not_succeed_backtrackAndReturnUnexpectedError() {
         // Given
         let p1: Parser<String> = Parser { state in
-            return .success("hello", state.withStream(state.stream.dropFirst()))
+            return .success("hello", state.advanced())
         }
         
         // When
@@ -623,7 +623,7 @@ final class PrimitiveParsersTests: XCTestCase {
     func test_not_fail_backtrackAndSucceed() {
         // Given
         let p1: Parser<String> = Parser { state in
-            return .failure([], state.withStream(state.stream.dropFirst()))
+            return .failure([], state.advanced())
         }
         
         // When

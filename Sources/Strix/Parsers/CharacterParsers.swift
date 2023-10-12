@@ -9,7 +9,7 @@ extension Parser where T == Character {
     ) -> Parser<Character> {
         return Parser { state in
             if let c = state.stream.first, predicate(c) {
-                return .success(c, state.withStream(state.stream.dropFirst()))
+                return .success(c, state.advanced())
             }
             return .failure([.expected(label: label)], state)
         }
