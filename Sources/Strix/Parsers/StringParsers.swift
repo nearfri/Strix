@@ -49,18 +49,30 @@ extension Parser where T == Substring {
     /// `substring(str, caseSensitive: flag)` parses the string `str` and returns the parsed string.
     /// It is an atomic parser: either it succeeds or it fails without consuming any input.
     public static func substring(_ str: String, caseSensitive: Bool = true) -> Parser<Substring> {
+        let equal: (Character, Character) -> Bool = {
+            return caseSensitive
+                ? { lhs, rhs in lhs == rhs }
+                : { lhs, rhs in lhs.lowercased() == rhs.lowercased() }
+        }()
+        
         return Parser { state in
             let stream = state.stream
-            let options: String.CompareOptions = caseSensitive ? [] : .caseInsensitive
+            var streamIndex = stream.startIndex
+            var strIndex = str.startIndex
             
-            guard stream.commonPrefix(with: str, options: options).count == str.count else {
-                let error = ParseError.expectedString(string: str, caseSensitive: caseSensitive)
-                return .failure([error], state)
+            while true {
+                if strIndex == str.endIndex {
+                    return .success(stream[stream.startIndex..<streamIndex],
+                                    state.withStream(stream[streamIndex...]))
+                }
+                if streamIndex == stream.endIndex || !equal(stream[streamIndex], str[strIndex]) {
+                    let error = ParseError.expectedString(string: str, caseSensitive: caseSensitive)
+                    return .failure([error], state)
+                }
+                
+                streamIndex = stream.index(after: streamIndex)
+                strIndex = str.index(after: strIndex)
             }
-            
-            let newIndex = stream.index(stream.startIndex, offsetBy: str.count)
-            return .success(stream[stream.startIndex..<newIndex],
-                            state.withStream(stream[newIndex...]))
         }
     }
     
