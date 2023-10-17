@@ -21,7 +21,7 @@ extension Parser where T == Character {
         let predicate: (Character) -> Bool = { c in
             let scalars = String(c).precomposedStringWithCanonicalMapping.unicodeScalars
             let isSingleScalar = scalars.index(after: scalars.startIndex) == scalars.endIndex
-            return isSingleScalar && characterSet.contains(scalars.first!)
+            return isSingleScalar && characterSet.contains(scalars[scalars.startIndex])
         }
         return satisfy(predicate, label: label)
     }
