@@ -25,7 +25,7 @@ extension Parser where T == JSON {
 private struct JSONParserGenerator {
     var json: Parser<JSON> {
         return .recursive { placeholder in
-            return .any(of: [
+            return .one(of: [
                 dictionaryJSON(json: placeholder), arrayJSON(json: placeholder),
                 stringJSON, numberJSON, trueJSON, falseJSON, nullJSON
             ])

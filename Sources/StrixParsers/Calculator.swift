@@ -21,7 +21,7 @@ public class Calculator {
 
 private struct TokenizerGenerator {
     var tokenizer: Parser<Token> {
-        return ws *> .any(of: [number, name, singleOperator, end])
+        return ws *> .one(of: [number, name, singleOperator, end])
     }
     
     private var ws: Parser<[Character]> {

@@ -201,7 +201,7 @@ private struct NumberLiteralParserGenerator {
         }
         parsers.append(.just(.none))
         
-        return .any(of: parsers)
+        return .one(of: parsers)
     }
     
     private var classification: Parser<NumberLiteral.Classification> {
@@ -215,7 +215,7 @@ private struct NumberLiteralParserGenerator {
         }
         parsers.append(.just(.finite))
         
-        return .any(of: parsers)
+        return .one(of: parsers)
     }
     
     private var notation: Parser<NumberLiteral.Notation> {
@@ -232,7 +232,7 @@ private struct NumberLiteralParserGenerator {
         }
         parsers.append(.just(.decimal))
         
-        return .any(of: parsers)
+        return .one(of: parsers)
     }
     
     private func integerPart(notation: NumberLiteral.Notation) -> Parser<String> {

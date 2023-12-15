@@ -38,7 +38,7 @@ private struct ASCIIPlistParserGenerator {
     }
     
     var plist: Parser<ASCIIPlist> {
-        let anyNode = Parser.any(of: [dictionaryNode, arrayNode, stringNode, dataNode])
+        let anyNode = Parser.one(of: [dictionaryNode, arrayNode, stringNode, dataNode])
         recursivePlistGenerator.subject = manyComment *> anyNode <* ws <* manyComment
         return recursivePlistGenerator.make()
     }

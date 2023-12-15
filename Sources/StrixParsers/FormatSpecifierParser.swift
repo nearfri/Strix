@@ -82,7 +82,7 @@ private struct FormatSpecifierParserGenerator {
             return .string(length.rawValue) *> .just(length)
         }
         let label = "any string in [\(Length.allCases.map(\.rawValue).joined(separator: ", "))]"
-        return Parser.any(of: lengthParsers) <?> label
+        return Parser.one(of: lengthParsers) <?> label
     }()
     
     private let conversion: Parser<Conversion> = {
@@ -91,7 +91,7 @@ private struct FormatSpecifierParserGenerator {
     }()
     
     private let variableName: Parser<String> = {
-        let variableCharacters = Parser.any(of: [.asciiLetter, .decimalDigit, .character("_")])
+        let variableCharacters = Parser.one(of: [.asciiLetter, .decimalDigit, .character("_")])
         return .skipped(by: .many(variableCharacters, minCount: 1)) <* .character("@")
     }()
 }

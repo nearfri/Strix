@@ -117,9 +117,9 @@ extension Parser {
         }
     }
     
-    /// The parser `any(of: parsers)` is an optimized implementation of `p1 <|> p2 <|> ... <|> pn`,
+    /// The parser `one(of: parsers)` is an optimized implementation of `p1 <|> p2 <|> ... <|> pn`,
     /// where `p1` ... `pn` are the parsers in the sequence `parsers`.
-    public static func any<S: Sequence>(of parsers: S) -> Parser<T> where S.Element == Parser<T> {
+    public static func one<S: Sequence>(of parsers: S) -> Parser<T> where S.Element == Parser<T> {
         return Parser { state in
             var errors: [ParseError] = []
             
@@ -138,6 +138,11 @@ extension Parser {
             
             return .failure(errors, state)
         }
+    }
+    
+    @available(*, deprecated, renamed: "one(of:)")
+    public static func any<S: Sequence>(of parsers: S) -> Parser<T> where S.Element == Parser<T> {
+        return one(of: parsers)
     }
     
     /// The parser `optional(p)` parses an optional occurrence of `p` as an option value.

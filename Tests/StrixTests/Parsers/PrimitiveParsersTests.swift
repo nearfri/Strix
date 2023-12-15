@@ -223,23 +223,23 @@ final class PrimitiveParsersTests: XCTestCase {
         XCTAssertEqual(reply.errors, [.generic(message: "Invalid input")])
     }
     
-    // MARK: - anyOf
+    // MARK: - oneOf
     
-    func test_anyOf_returnFirstSuccess() {
+    func test_oneOf_returnFirstSuccess() {
         // Given
         let p1: Parser<Int> = .fail(message: "Fail 1")
         let p2: Parser<Int> = .just(2)
         let p3: Parser<Int> = .just(3)
         
         // When
-        let p: Parser<Int> = .any(of: [p1, p2, p3])
+        let p: Parser<Int> = .one(of: [p1, p2, p3])
         let reply = p.parse(ParserState(stream: "Input"))
         
         // Then
         XCTAssertEqual(reply.result.value, 2)
     }
     
-    func test_anyOf_failWithChange_returnFailure() {
+    func test_oneOf_failWithChange_returnFailure() {
         // Given
         let p1: Parser<Int> = .fail(message: "Fail 1")
         let p2: Parser<Int> = Parser { state in
@@ -249,21 +249,21 @@ final class PrimitiveParsersTests: XCTestCase {
         let p3: Parser<Int> = .just(3)
         
         // When
-        let p: Parser<Int> = .any(of: [p1, p2, p3])
+        let p: Parser<Int> = .one(of: [p1, p2, p3])
         let reply = p.parse(ParserState(stream: "Input"))
         
         // Then
         XCTAssert(reply.result.isFailure)
     }
     
-    func test_anyOf_failWithoutChange_mergeErrors() {
+    func test_oneOf_failWithoutChange_mergeErrors() {
         // Given
         let p1: Parser<Int> = .fail(message: "Fail 1")
         let p2: Parser<Int> = .fail(message: "Fail 2")
         let p3: Parser<Int> = .fail(message: "Fail 3")
         
         // When
-        let p: Parser<Int> = .any(of: [p1, p2, p3])
+        let p: Parser<Int> = .one(of: [p1, p2, p3])
         let reply = p.parse(ParserState(stream: "Input"))
         
         // Then
