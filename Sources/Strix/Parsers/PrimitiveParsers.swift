@@ -347,7 +347,7 @@ extension Parser where T == Void {
 ///
 ///     let generator = RecursiveParserGenerator<ASCIIPlist>()
 ///     let placeholder = generator.placeholder
-///     generator.subject = .any(of: [dictionary(placeholder), array(placeholder), string, data])
+///     generator.subject = .one(of: [dictionary(placeholder), array(placeholder), string, data])
 ///     let plist = generator.make()
 public class RecursiveParserGenerator<T> {
     private class ParserObject {
