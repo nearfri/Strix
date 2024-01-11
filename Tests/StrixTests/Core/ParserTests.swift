@@ -130,6 +130,63 @@ final class ParserTests: XCTestCase {
         XCTAssertEqual(substr, "1")
     }
     
+    func test_label_succeed_returnValue() {
+        // Given
+        let p1: Parser<String> = Parser { state in
+            return .success("Hello", [], state.advanced())
+        }
+        
+        // When
+        let p: Parser<String> = p1.label("Greeting")
+        let reply = p.parse(ParserState(stream: "Input"))
+        
+        // Then
+        XCTAssertEqual(reply.result.value, "Hello")
+        XCTAssertEqual(reply.errors, [])
+    }
+    
+    func test_label_failWithoutChange_returnFailureWithLabel() {
+        // Given
+        let p1: Parser<String> = .fail(message: "Fail")
+        
+        // When
+        let p: Parser<String> = p1.label("Greeting")
+        let reply = p.parse(ParserState(stream: "Input"))
+        
+        // Then
+        XCTAssertEqual(reply.errors, [.expected(label: "Greeting")])
+    }
+    
+    func test_satisfying_predicateSucceded_returnValue() throws {
+        // Given
+        let p1: Parser<Int> = Parser { state in
+            return .success(1, state.advanced())
+        }
+        
+        // When
+        let p: Parser<Int> = p1.satisfying("positive integer", { $0 > 0 })
+        let reply = p.parse(ParserState(stream: "Input"))
+        
+        // Then
+        XCTAssertEqual(reply.state.stream, "nput")
+        XCTAssertEqual(reply.result.value, 1)
+    }
+    
+    func test_satisfying_predicateFailed_backtrackAndReturnFailure() throws {
+        // Given
+        let p1: Parser<Int> = Parser { state in
+            return .success(0, state.advanced())
+        }
+        
+        // When
+        let p: Parser<Int> = p1.satisfying("positive integer", { $0 > 0 })
+        let reply = p.parse(ParserState(stream: "Input"))
+        
+        // Then
+        XCTAssertEqual(reply.state.stream, "Input")
+        XCTAssert(reply.result.isFailure)
+    }
+    
     func test_print() {
         // Given
         let parser = Seed.intSuccessParser

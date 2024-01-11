@@ -66,6 +66,28 @@ public struct Parser<T> {
         }
     }
     
+    /// The parser `p.label(label)` applies the parser `p`.
+    /// If `p` does not change the parser state (usually because `p` failed),
+    /// the errors are replaced with `.expected(label:)`.
+    public func label(_ label: String) -> Parser<T> {
+        return satisfying(label, { _ in true })
+    }
+    
+    /// The parser `p.satisfying(label, predicate)` applies the parser `p`.
+    /// If the function `predicate` returns `false`, backtrack to the original parser state
+    /// and fails with `.expected(label: label)`.
+    /// If `p` does not change the parser state (usually because `p` failed),
+    /// the errors are replaced with `.expected(label:)`.
+    public func satisfying(_ label: String, _ predicate: @escaping (T) -> Bool) -> Parser<T> {
+        return Parser { state in
+            let reply = parse(state)
+            if let value = reply.result.value, !predicate(value) {
+                return .failure([.expected(label: label)], state)
+            }
+            return reply.state != state ? reply : reply.withErrors([.expected(label: label)])
+        }
+    }
+    
     /// The parser `p.print(label)` prints log messages before and after applying the parser `p`.
     public func print(_ label: String, to output: TextOutputStream? = nil) -> Parser<T> {
         let write: (String) -> Void = {

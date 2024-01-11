@@ -331,65 +331,6 @@ final class PrimitiveParsersTests: XCTestCase {
         XCTAssert(reply.result.isFailure)
     }
     
-    // MARK: - one
-    
-    func test_oneWithSatisfying_succeed_returnValue() {
-        // Given
-        let p1: Parser<String> = Parser { state in
-            return .success("Hello", [], state.advanced())
-        }
-        
-        // When
-        let p: Parser<String> = .one(p1, label: "Greeting")
-        let reply = p.parse(ParserState(stream: "Input"))
-        
-        // Then
-        XCTAssertEqual(reply.result.value, "Hello")
-        XCTAssertEqual(reply.errors, [])
-    }
-    
-    func test_oneWithSatisfying_failWithoutChange_returnFailureWithLabel() {
-        // Given
-        let p1: Parser<String> = .fail(message: "Fail")
-        
-        // When
-        let p: Parser<String> = .one(p1, label: "Greeting")
-        let reply = p.parse(ParserState(stream: "Input"))
-        
-        // Then
-        XCTAssertEqual(reply.errors, [.expected(label: "Greeting")])
-    }
-    
-    func test_oneWithSatisfying_predicateSucceded_returnValue() throws {
-        // Given
-        let p1: Parser<Int> = Parser { state in
-            return .success(1, state.advanced())
-        }
-        
-        // When
-        let p: Parser<Int> = .one(p1, satisfying: { $0 > 0 }, label: "positive integer")
-        let reply = p.parse(ParserState(stream: "Input"))
-        
-        // Then
-        XCTAssertEqual(reply.state.stream, "nput")
-        XCTAssertEqual(reply.result.value, 1)
-    }
-    
-    func test_oneWithSatisfying_predicateFailed_backtrackAndReturnFailure() throws {
-        // Given
-        let p1: Parser<Int> = Parser { state in
-            return .success(0, state.advanced())
-        }
-        
-        // When
-        let p: Parser<Int> = .one(p1, satisfying: { $0 > 0 }, label: "positive integer")
-        let reply = p.parse(ParserState(stream: "Input"))
-        
-        // Then
-        XCTAssertEqual(reply.state.stream, "Input")
-        XCTAssert(reply.result.isFailure)
-    }
-    
     // MARK: - attempt
     
     func test_attempt_succeed_consumeInput() {

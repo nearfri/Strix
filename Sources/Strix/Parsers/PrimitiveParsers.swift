@@ -161,32 +161,6 @@ extension Parser {
         }
     }
     
-    /// The parser `one(p, label: label)` applies the parser `p`.
-    /// If `p` does not change the parser state (usually because `p` failed),
-    /// the errors are replaced with `.expected(label:)`.
-    public static func one(_ p: Parser<T>, label: String) -> Parser<T> {
-        return one(p, satisfying: { _ in true }, label: label)
-    }
-    
-    /// The parser `one(p, satisfying: predicate, label: label)` applies the parser `p`.
-    /// If the function `predicate` returns `false`, backtrack to the original parser state
-    /// and fails with `.expected(label: label)`.
-    /// If `p` does not change the parser state (usually because `p` failed),
-    /// the errors are replaced with `.expected(label:)`.
-    public static func one(
-        _ p: Parser<T>,
-        satisfying predicate: @escaping (T) -> Bool,
-        label: String
-    ) -> Parser<T> {
-        return Parser { state in
-            let reply = p.parse(state)
-            if let value = reply.result.value, !predicate(value) {
-                return .failure([.expected(label: label)], state)
-            }
-            return reply.state != state ? reply : reply.withErrors([.expected(label: label)])
-        }
-    }
-    
     /// The parser `attempt(p)` applies the parser `p`.
     /// If `p` fails after changing the parser state, backtrack to the original parser state and report a error.
     public static func attempt(_ p: Parser<T>) -> Parser<T> {

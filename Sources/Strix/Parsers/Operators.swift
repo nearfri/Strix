@@ -22,9 +22,9 @@ extension Parser {
         return discardSecond(lhs, rhs)
     }
     
-    /// `p <?> label` is equivalent to `one(p, label: label)`.
+    /// `p <?> label` is equivalent to `p.label(label)`.
     public static func <?> (p: Parser<T>, label: String) -> Parser<T> {
-        return one(p, label: label)
+        return p.label(label)
     }
     
     /// `p <!> label` is equivalent to `p.print(label)`.
