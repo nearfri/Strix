@@ -62,7 +62,7 @@ private struct JSONParserGenerator {
     }
     
     private var nonEscape: Parser<Character> {
-        return .satisfy({ $0 != "\"" && $0 != "\\" }, label: "non-escaped character")
+        return .satisfy("non-escaped character", { $0 != "\"" && $0 != "\\" })
     }
     
     private var escape: Parser<Character> {

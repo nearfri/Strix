@@ -7,7 +7,7 @@ final class CharacterParsersTests: XCTestCase {
         let state = ParserState(stream: "123")
         
         // When
-        let p: Parser<Character> = .satisfy({ _ in true }, label: "number")
+        let p: Parser<Character> = .satisfy("number", { _ in true })
         let reply = p.parse(state)
         
         // Then
@@ -21,7 +21,7 @@ final class CharacterParsersTests: XCTestCase {
         let state = ParserState(stream: "123")
         
         // When
-        let p: Parser<Character> = .satisfy({ _ in false }, label: "number")
+        let p: Parser<Character> = .satisfy("number", { _ in false })
         let reply = p.parse(state)
         
         // Then

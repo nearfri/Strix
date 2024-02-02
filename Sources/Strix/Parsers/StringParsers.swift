@@ -140,7 +140,7 @@ extension Parser where T == Substring {
     /// `restSubstringOfLine(strippingNewline: flag)` parses any characters before the end of the line and
     /// skips to the beginning of the next line. It returns the parsed characters before the end of the line as a string.
     public static func restSubstringOfLine(strippingNewline: Bool = true) -> Parser<Substring> {
-        let notNewline: Parser<Character> = .satisfy({ !$0.isNewline }, label: "not newline")
+        let notNewline: Parser<Character> = .satisfy("not newline", { !$0.isNewline })
         let letters: Parser<[Character]> = .many(notNewline)
         let newlineOrEOS: Parser<Void> = .skip(.newline) <|> .endOfStream
         

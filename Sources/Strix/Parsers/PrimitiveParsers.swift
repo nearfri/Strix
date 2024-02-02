@@ -300,11 +300,11 @@ extension Parser where T == Void {
         }
     }
     
-    /// The parser `satisfyUserInfo(predicate, message: message)` succeeds if the function `predicate`
+    /// The parser `satisfyUserInfo(message, predicate)` succeeds if the function `predicate`
     /// returns `true` when applied to the current `UserInfo`, otherwise it fails.
     public static func satisfyUserInfo(
-        _ predicate: @escaping (UserInfo) -> Bool,
-        message: String
+        _ message: String,
+        _ predicate: @escaping (UserInfo) -> Bool
     ) -> Parser<Void> {
         return Parser { state in
             if predicate(state.userInfo) {
@@ -312,6 +312,14 @@ extension Parser where T == Void {
             }
             return .failure([.generic(message: message)], state)
         }
+    }
+    
+    @available(*, deprecated, renamed: "satisfyUserInfo(_:_:)")
+    public static func satisfyUserInfo(
+        _ predicate: @escaping (UserInfo) -> Bool,
+        message: String
+    ) -> Parser<Void> {
+        return satisfyUserInfo(message, predicate)
     }
 }
 

@@ -48,8 +48,7 @@ let escapedText: Parser<String> = Parser.many((.none(of: "\"") <|> twoDoubleQuot
     .map({ String($0) })
 let escapedField: Parser<String> = doubleQuote *> escapedText <* doubleQuote
 
-let nonSeparator: Parser<Character> = .satisfy({ $0 != "," && !$0.isNewline },
-                                               label: "non-separator")
+let nonSeparator: Parser<Character> = .satisfy("non-separator", { $0 != "," && !$0.isNewline })
 let nonEscapedField: Parser<String> = .skipped(by: .many(nonSeparator))
 
 let field: Parser<String> = escapedField <|> nonEscapedField

@@ -39,8 +39,8 @@ private struct CSVParserGenerator {
     private let twoDoubleQuote: Parser<Character> = Parser.string("\"\"") *> .just("\"")
     
     private var nonEscapedField: Parser<String> { .skipped(by: .many(nonSeparator)) }
-    private let nonSeparator: Parser<Character> = .satisfy({ $0 != "," && !$0.isNewline },
-                                                           label: "non-separator")
+    private let nonSeparator: Parser<Character> = .satisfy("non-separator",
+                                                           { $0 != "," && !$0.isNewline })
 }
 
 private func fixCSV(_ csv: CSV) -> CSV {

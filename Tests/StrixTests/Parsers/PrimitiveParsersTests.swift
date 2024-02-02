@@ -595,8 +595,7 @@ final class PrimitiveParsersTests: XCTestCase {
     
     func test_satisfyUserInfo_succeed_returnSuccess() {
         // Given
-        let message = "Nested tags are not allowed."
-        let p: Parser<Void> = .satisfyUserInfo({ _ in true }, message: message)
+        let p: Parser<Void> = .satisfyUserInfo("Nested tags are not allowed.", { _ in true })
         
         // When
         let reply = p.parse(ParserState(stream: "Input"))
@@ -608,7 +607,7 @@ final class PrimitiveParsersTests: XCTestCase {
     func test_satisfyUserInfo_failed_returnFailure() {
         // Given
         let message = "Nested tags are not allowed."
-        let p: Parser<Void> = .satisfyUserInfo({ _ in false }, message: message)
+        let p: Parser<Void> = .satisfyUserInfo(message, { _ in false })
         
         // When
         let reply = p.parse(ParserState(stream: "Input"))
