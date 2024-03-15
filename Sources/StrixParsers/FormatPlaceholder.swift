@@ -132,6 +132,7 @@ extension FormatPlaceholder {
         case .float, .scientific, .generalFloat, .hexFloat,
              .FLOAT, .SCIENTIFIC, .GENERALFLOAT, .HEXFLOAT:
             switch length {
+            case nil:           return CDouble.self
             case .long:         return CDouble.self
             case .longDouble:   return CLongDouble.self
             default:            return CDouble.self // invalid length
