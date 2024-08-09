@@ -237,6 +237,21 @@ extension Parser {
     public static func recursive(_ body: (Parser<T>) -> Parser<T>) -> Parser<T> {
         return RecursiveParserGenerator().make(body)
     }
+    
+    /// `match(regex, label: label)` matches the regular expression given by the `regex`.
+    /// If the regular expression matches, the parser skips the matched characters and returns them.
+    /// If the regular expression does not match, the parser fails without consuming input.
+    public static func match<Output>(
+        _ regex: Regex<Output>,
+        label: String
+    ) -> Parser<T> where T == Regex<Output>.Match {
+        return Parser { state in
+            if let match = state.stream.prefixMatch(of: regex) {
+                return .success(match, state.withStream(state.stream[match.range.upperBound...]))
+            }
+            return .failure([.expected(label: label)], state)
+        }
+    }
 }
 
 extension Parser where T == Void {

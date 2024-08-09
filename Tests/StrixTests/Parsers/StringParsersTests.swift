@@ -97,38 +97,6 @@ final class StringParsersTests: XCTestCase {
         XCTAssertEqual(reply.state.stream, "Parser World")
     }
     
-    // MARK: - stringMatchingRegex
-    
-    func test_stringMatchingRegex_succeed() {
-        // Given
-        let input = "a123b"
-        let pattern = "[0-9]+"
-        let state = ParserState(stream: input[input.index(after: input.startIndex)...])
-        
-        // When
-        let p: Parser<String> = .string(matchingRegex: pattern, label: "number")
-        let reply = p.parse(state)
-        
-        // Then
-        XCTAssertEqual(reply.result.value, "123")
-        XCTAssertEqual(reply.state.stream, "b")
-    }
-    
-    func test_stringMatchingRegex_fail() {
-        // Given
-        let input = "a123b"
-        let pattern = "[0-9]+"
-        let state = ParserState(stream: input[input.startIndex...])
-        
-        // When
-        let p: Parser<String> = .string(matchingRegex: pattern, label: "number")
-        let reply = p.parse(state)
-        
-        // Then
-        XCTAssert(reply.result.isFailure)
-        XCTAssertEqual(reply.state.stream, "a123b")
-    }
-    
     // MARK: - restOfLine
     
     func test_restOfLine_strippingNewlineIsTrue() {

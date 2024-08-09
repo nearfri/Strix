@@ -26,13 +26,6 @@ extension Parser where T == String {
         .map({ String($0) })
     }
     
-    /// `string(matchingRegex: pattern, label: label)` matches the regular expression given by the `pattern`.
-    /// If the regular expression matches, the parser skips the matched characters and returns them as a string.
-    /// If the regular expression does not match, the parser fails without consuming input.
-    public static func string(matchingRegex pattern: String, label: String) -> Parser<String> {
-        return SubParser.substring(matchingRegex: pattern, label: label).map({ String($0) })
-    }
-    
     /// `skipped(by: p)` applies the parser `p` and returns the characters skipped over by `p` as a string.
     public static func skipped<U>(by p: Parser<U>) -> Parser<String> {
         return SubParser.skippedSubstring(by: p).map({ String($0) })
@@ -101,34 +94,6 @@ extension Parser where T == Substring {
                 }
                 newState = newState.advanced()
             }
-        }
-    }
-    
-    /// `substring(matchingRegex: pattern, label: label)` matches the regular expression given by the `pattern`.
-    /// If the regular expression matches, the parser skips the matched characters and returns them as a string.
-    /// If the regular expression does not match, the parser fails without consuming input.
-    public static func substring(
-        matchingRegex pattern: String,
-        label: String
-    ) -> Parser<Substring> {
-        do {
-            let expression = try NSRegularExpression(pattern: pattern, options: [])
-            
-            return Parser { state in
-                let input = state.stream.base
-                let searchRange = NSRange(state.stream.startIndex..., in: input)
-                let matchRange = expression
-                    .firstMatch(in: input, options: [.anchored], range: searchRange)
-                    .flatMap({ Range($0.range, in: input) })
-                
-                if let matchRange = matchRange {
-                    return .success(input[matchRange],
-                                    state.withStream(input[matchRange.upperBound...]))
-                }
-                return .failure([.expected(label: label)], state)
-            }
-        } catch {
-            preconditionFailure("regex pattern \(pattern) is invalid")
         }
     }
     
