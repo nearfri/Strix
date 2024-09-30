@@ -1,8 +1,8 @@
-import XCTest
+import Testing
 @testable import Strix
 
-final class IndentTests: XCTestCase {
-    func test_toString() {
+@Suite struct IndentTests {
+    @Test func toString() {
         // Given
         let indent = Indent(level: 2, width: 4)
         
@@ -10,10 +10,10 @@ final class IndentTests: XCTestCase {
         let indentString = indent.toString()
         
         // Then
-        XCTAssertEqual(indentString, String(repeating: " ", count: 8))
+        #expect(indentString == String(repeating: " ", count: 8))
     }
     
-    func test_description() {
+    @Test func description() {
         // Given
         let indent = Indent(level: 2, width: 4)
         var description = ""
@@ -22,10 +22,10 @@ final class IndentTests: XCTestCase {
         print(indent, terminator: "", to: &description)
         
         // Then
-        XCTAssertEqual(description, String(repeating: " ", count: 8))
+        #expect(description == String(repeating: " ", count: 8))
     }
     
-    func test_interpolation() {
+    @Test func interpolation() {
         // Given
         let indent = Indent(level: 2, width: 4)
         var description = ""
@@ -34,6 +34,6 @@ final class IndentTests: XCTestCase {
         print("\(indent)", terminator: "", to: &description)
         
         // Then
-        XCTAssertEqual(description, String(repeating: " ", count: 8))
+        #expect(description == String(repeating: " ", count: 8))
     }
 }

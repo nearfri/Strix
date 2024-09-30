@@ -1,142 +1,142 @@
-import XCTest
+import Testing
+import Foundation
 @testable import Strix
 
-final class NumberLiteralTests: XCTestCase {
-    func test_integerPartValue() {
+@Suite struct NumberLiteralTests {
+    @Test func integerPartValue() {
         var literal = NumberLiteral(
             string: "", sign: .plus, classification: .finite, notation: .decimal,
             integerPart: "100", fractionalPart: "", exponentPart: "")
         
         literal.notation = .decimal
-        XCTAssertEqual(literal.integerPartValue, 100)
+        #expect(literal.integerPartValue == 100)
         
         literal.notation = .hexadecimal
-        XCTAssertEqual(literal.integerPartValue, 0x100)
+        #expect(literal.integerPartValue == 0x100)
         
         literal.notation = .octal
-        XCTAssertEqual(literal.integerPartValue, 0o100)
+        #expect(literal.integerPartValue == 0o100)
         
         literal.notation = .binary
-        XCTAssertEqual(literal.integerPartValue, 0b100)
+        #expect(literal.integerPartValue == 0b100)
     }
     
-    func test_fractionalPartValue() {
+    @Test func fractionalPartValue() {
         var literal = NumberLiteral(
             string: "", sign: .plus, classification: .finite, notation: .decimal,
             integerPart: "", fractionalPart: "001", exponentPart: "")
         
         literal.notation = .decimal
-        XCTAssertEqual(literal.fractionalPartValue, 0.001)
-        XCTAssertEqual(literal.fractionalPartValue, 1.0 / pow(10, 3))
+        #expect(literal.fractionalPartValue == 0.001)
+        #expect(literal.fractionalPartValue == 1.0 / pow(10, 3))
         
         literal.notation = .hexadecimal
-        XCTAssertEqual(literal.fractionalPartValue, 1.0 / pow(16, 3))
+        #expect(literal.fractionalPartValue == 1.0 / pow(16, 3))
         
         literal.notation = .octal
-        XCTAssertEqual(literal.fractionalPartValue, 1.0 / pow(8, 3))
+        #expect(literal.fractionalPartValue == 1.0 / pow(8, 3))
         
         literal.notation = .binary
-        XCTAssertEqual(literal.fractionalPartValue, 1.0 / pow(2, 3))
+        #expect(literal.fractionalPartValue == 1.0 / pow(2, 3))
     }
     
-    func test_exponentPartValue() {
+    @Test func exponentPartValue() {
         var literal = NumberLiteral(
             string: "", sign: .plus, classification: .finite, notation: .decimal,
             integerPart: "", fractionalPart: "", exponentPart: "3")
         
         literal.notation = .decimal
-        XCTAssertEqual(literal.exponentPartValue, 1000)
+        #expect(literal.exponentPartValue == 1000)
         
         literal.notation = .hexadecimal
-        XCTAssertEqual(literal.exponentPartValue, 8)
+        #expect(literal.exponentPartValue == 8)
         
         literal.exponentPart = "-3"
         literal.notation = .decimal
-        XCTAssertEqual(literal.exponentPartValue, 1.0 / 1000)
+        #expect(literal.exponentPartValue == 1.0 / 1000)
         
         literal.notation = .hexadecimal
-        XCTAssertEqual(literal.exponentPartValue, 1.0 / 8)
+        #expect(literal.exponentPartValue == 1.0 / 8)
     }
     
-    func test_toValue_int() {
+    @Test func toValue_int() {
         var literal = NumberLiteral(
             string: "", sign: .none, classification: .finite, notation: .decimal,
             integerPart: "123", fractionalPart: "", exponentPart: "")
         
-        XCTAssertEqual(literal.toValue(type: Int.self), 123)
+        #expect(literal.toValue(type: Int.self) == 123)
         
         literal.sign = .plus
-        XCTAssertEqual(literal.toValue(type: Int.self), 123)
+        #expect(literal.toValue(type: Int.self) == 123)
         
         literal.sign = .minus
-        XCTAssertEqual(literal.toValue(type: Int.self), -123)
+        #expect(literal.toValue(type: Int.self) == -123)
     }
     
-    func test_toValue_int_withExponent() {
+    @Test func toValue_int_withExponent() {
         var literal = NumberLiteral(
             string: "", sign: .none, classification: .finite, notation: .decimal,
             integerPart: "123", fractionalPart: "", exponentPart: "3")
         
-        XCTAssertEqual(literal.toValue(type: Int.self), 123000)
+        #expect(literal.toValue(type: Int.self) == 123000)
         
         literal.sign = .plus
-        XCTAssertEqual(literal.toValue(type: Int.self), 123000)
+        #expect(literal.toValue(type: Int.self) == 123000)
         
         literal.sign = .minus
-        XCTAssertEqual(literal.toValue(type: Int.self), -123000)
+        #expect(literal.toValue(type: Int.self) == -123000)
         
         literal.exponentPart = "-3"
-        XCTAssertNil(literal.toValue(type: Int.self))
+        #expect(literal.toValue(type: Int.self) == nil)
     }
     
-    func test_toValue_intOverflow() {
+    @Test func toValue_intOverflow() {
         var literal = NumberLiteral(
             string: "", sign: .plus, classification: .finite, notation: .decimal,
             integerPart: "255", fractionalPart: "", exponentPart: "")
         
-        XCTAssertEqual(literal.toValue(type: UInt8.self), 255)
+        #expect(literal.toValue(type: UInt8.self) == 255)
         
         literal.integerPart = "256"
-        XCTAssertNil(literal.toValue(type: UInt8.self))
+        #expect(literal.toValue(type: UInt8.self) == nil)
     }
     
-    func test_toValue_double() {
+    @Test func toValue_double() {
         var literal = NumberLiteral(
             string: "", sign: .none, classification: .finite, notation: .decimal,
             integerPart: "123", fractionalPart: "456", exponentPart: "")
         
-        XCTAssertEqual(literal.toValue(type: Double.self), 123.456)
+        #expect(literal.toValue(type: Double.self) == 123.456)
         
         literal.sign = .plus
-        XCTAssertEqual(literal.toValue(type: Double.self), 123.456)
+        #expect(literal.toValue(type: Double.self) == 123.456)
         
         literal.sign = .minus
-        XCTAssertEqual(literal.toValue(type: Double.self), -123.456)
+        #expect(literal.toValue(type: Double.self) == -123.456)
     }
     
-    func test_toValue_double_withExponent() {
+    @Test func toValue_double_withExponent() {
         var literal = NumberLiteral(
             string: "", sign: .none, classification: .finite, notation: .decimal,
             integerPart: "123", fractionalPart: "456", exponentPart: "3")
         
-        XCTAssertEqual(literal.toValue(type: Double.self), 123456)
+        #expect(literal.toValue(type: Double.self) == 123456)
         
         literal.sign = .plus
-        XCTAssertEqual(literal.toValue(type: Double.self), 123456)
+        #expect(literal.toValue(type: Double.self) == 123456)
         
         literal.sign = .minus
-        XCTAssertEqual(literal.toValue(type: Double.self), -123456)
+        #expect(literal.toValue(type: Double.self) == -123456)
         
         literal.exponentPart = "-3"
-        XCTAssertEqual(literal.toValue(type: Double.self)!, -0.123456, accuracy: 0.0000000001)
+        #expect(literal.toValue(type: Double.self)! - -0.123456 < 0.000_001)
     }
     
-    func test_toNumber() {
+    @Test func toNumber() {
         let literal = NumberLiteral(
             string: "", sign: .none, classification: .finite, notation: .decimal,
             integerPart: "123", fractionalPart: "456", exponentPart: "2")
         
-        XCTAssertEqual(literal.toNumber(), 12345.6 as NSNumber)
+        #expect(literal.toNumber() == 12345.6 as NSNumber)
     }
 }
-

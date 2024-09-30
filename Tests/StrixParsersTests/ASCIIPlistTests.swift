@@ -1,9 +1,10 @@
-import XCTest
+import Testing
+import Foundation
 @testable import StrixParsers
 
 private typealias DictionaryEntry = ASCIIPlist.DictionaryEntry
 
-private enum Seed {
+private enum Fixture {
     static let plist: ASCIIPlist = .dictionary([
         DictionaryEntry(comment: "String value", key: "Greeting", value: .string(
             "Hello\nWorld"
@@ -21,29 +22,29 @@ private enum Seed {
     ])
     
     static let plistString: String = """
-    /* String value */
-    "Greeting" = "Hello\\nWorld";
-    
-    /* Data value */
-    "Binaries" = <0fbd77f71c2735ae>;
-    
-    /* Array values */
-    "Cities" = (
-        "San Francisco",
-        "New York",
-        "Seoul"
-    );
-    
-    /* Dictionary values */
-    "AnimalSmells" = {
-        "pig" = "piggish";
-        "lamb" = "lambish";
-    };
-    """
+        /* String value */
+        "Greeting" = "Hello\\nWorld";
+        
+        /* Data value */
+        "Binaries" = <0fbd77f71c2735ae>;
+        
+        /* Array values */
+        "Cities" = (
+            "San Francisco",
+            "New York",
+            "Seoul"
+        );
+        
+        /* Dictionary values */
+        "AnimalSmells" = {
+            "pig" = "piggish";
+            "lamb" = "lambish";
+        };
+        """
 }
 
-final class ASCIIPlistTests: XCTestCase {
-    func test_description() {
-        XCTAssertEqual(Seed.plist.description, Seed.plistString)
+@Suite struct ASCIIPlistTests {
+    @Test func description() {
+        #expect(Fixture.plist.description == Fixture.plistString)
     }
 }

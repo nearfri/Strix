@@ -1,10 +1,10 @@
-import XCTest
+import Testing
 @testable import Strix
 
-final class StringParsersTests: XCTestCase {
+@Suite struct StringParsersTests {
     // MARK: - string
     
-    func test_string_caseSensitive_succeed() {
+    @Test func string_caseSensitive_succeed() {
         // Given
         let state = ParserState(stream: "Hello World")
         
@@ -13,11 +13,11 @@ final class StringParsersTests: XCTestCase {
         let reply = p.parse(state)
         
         // Then
-        XCTAssertEqual(reply.result.value, "Hello")
-        XCTAssertEqual(reply.state.stream, " World")
+        #expect(reply.result.value == "Hello")
+        #expect(reply.state.stream == " World")
     }
     
-    func test_string_caseSensitive_fail() {
+    @Test func string_caseSensitive_fail() {
         // Given
         let state = ParserState(stream: "Hello World")
         
@@ -26,11 +26,11 @@ final class StringParsersTests: XCTestCase {
         let reply = p.parse(state)
         
         // Then
-        XCTAssert(reply.result.isFailure)
-        XCTAssertEqual(reply.state.stream, "Hello World")
+        #expect(reply.result.isFailure)
+        #expect(reply.state.stream == "Hello World")
     }
     
-    func test_string_caseInsensitive() {
+    @Test func string_caseInsensitive() {
         // Given
         let state = ParserState(stream: "Hello World")
         
@@ -39,11 +39,11 @@ final class StringParsersTests: XCTestCase {
         let reply = p.parse(state)
         
         // Then
-        XCTAssertEqual(reply.result.value, "Hello")
-        XCTAssertEqual(reply.state.stream, " World")
+        #expect(reply.result.value == "Hello")
+        #expect(reply.state.stream == " World")
     }
     
-    func test_string_endBeforeMatch_returnFailure() {
+    @Test func string_endBeforeMatch_returnFailure() {
         // Given
         let state = ParserState(stream: "Hell")
         
@@ -52,13 +52,13 @@ final class StringParsersTests: XCTestCase {
         let reply = p.parse(state)
         
         // Then
-        XCTAssert(reply.result.isFailure)
-        XCTAssertEqual(reply.state.stream, "Hell")
+        #expect(reply.result.isFailure)
+        #expect(reply.state.stream == "Hell")
     }
     
     // MARK: - stringUntil
     
-    func test_stringUntil_skipBoundaryIsTrue_succeed() {
+    @Test func stringUntil_skipBoundaryIsTrue_succeed() {
         // Given
         let state = ParserState(stream: "Hello Parser World")
         
@@ -67,11 +67,11 @@ final class StringParsersTests: XCTestCase {
         let reply = p.parse(state)
         
         // Then
-        XCTAssertEqual(reply.result.value, "Hello ")
-        XCTAssertEqual(reply.state.stream, " World")
+        #expect(reply.result.value == "Hello ")
+        #expect(reply.state.stream == " World")
     }
     
-    func test_stringUntil_skipBoundaryIsTrue_fail() {
+    @Test func stringUntil_skipBoundaryIsTrue_fail() {
         // Given
         let state = ParserState(stream: "Hello Parser World")
         
@@ -80,11 +80,11 @@ final class StringParsersTests: XCTestCase {
         let reply = p.parse(state)
         
         // Then
-        XCTAssert(reply.result.isFailure)
-        XCTAssertEqual(reply.state.stream, "Hello Parser World")
+        #expect(reply.result.isFailure)
+        #expect(reply.state.stream == "Hello Parser World")
     }
     
-    func test_stringUntil_skipBoundaryIsFalse() {
+    @Test func stringUntil_skipBoundaryIsFalse() {
         // Given
         let state = ParserState(stream: "Hello Parser World")
         
@@ -93,13 +93,13 @@ final class StringParsersTests: XCTestCase {
         let reply = p.parse(state)
         
         // Then
-        XCTAssertEqual(reply.result.value, "Hello ")
-        XCTAssertEqual(reply.state.stream, "Parser World")
+        #expect(reply.result.value == "Hello ")
+        #expect(reply.state.stream == "Parser World")
     }
     
     // MARK: - restOfLine
     
-    func test_restOfLine_strippingNewlineIsTrue() {
+    @Test func restOfLine_strippingNewlineIsTrue() {
         // Given
         let input = """
         Hello
@@ -112,11 +112,11 @@ final class StringParsersTests: XCTestCase {
         let reply = p.parse(state)
         
         // Then
-        XCTAssertEqual(reply.result.value, "ello")
-        XCTAssertEqual(reply.state.stream, "World")
+        #expect(reply.result.value == "ello")
+        #expect(reply.state.stream == "World")
     }
     
-    func test_restOfLine_strippingNewlineIsFalse() {
+    @Test func restOfLine_strippingNewlineIsFalse() {
         // Given
         let input = """
         Hello
@@ -129,11 +129,11 @@ final class StringParsersTests: XCTestCase {
         let reply = p.parse(state)
         
         // Then
-        XCTAssertEqual(reply.result.value, "ello\n")
-        XCTAssertEqual(reply.state.stream, "World")
+        #expect(reply.result.value == "ello\n")
+        #expect(reply.state.stream == "World")
     }
     
-    func test_restOfLine_atLastLine() {
+    @Test func restOfLine_atLastLine() {
         // Given
         let input = "Hello"
         let state = ParserState(stream: input[input.index(after: input.startIndex)...])
@@ -143,11 +143,11 @@ final class StringParsersTests: XCTestCase {
         let reply = p.parse(state)
         
         // Then
-        XCTAssertEqual(reply.result.value, "ello")
-        XCTAssertEqual(reply.state.stream.startIndex, reply.state.stream.endIndex)
+        #expect(reply.result.value == "ello")
+        #expect(reply.state.stream.startIndex == reply.state.stream.endIndex)
     }
     
-    func test_restOfLine_atEOS() {
+    @Test func restOfLine_atEOS() {
         // Given
         let input = "Hello"
         let state = ParserState(stream: input[input.endIndex...])
@@ -157,7 +157,7 @@ final class StringParsersTests: XCTestCase {
         let reply = p.parse(state)
         
         // Then
-        XCTAssertEqual(reply.result.value, "")
-        XCTAssertEqual(reply.state.stream.startIndex, reply.state.stream.endIndex)
+        #expect(reply.result.value == "")
+        #expect(reply.state.stream.startIndex == reply.state.stream.endIndex)
     }
 }

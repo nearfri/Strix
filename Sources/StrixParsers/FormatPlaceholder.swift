@@ -37,6 +37,31 @@ public struct FormatPlaceholder: Equatable, Sendable {
     }
 }
 
+extension FormatPlaceholder: CustomStringConvertible {
+    public var description: String {
+        let components: [String?] = [
+            index.map({ "index: \($0)" }),
+            
+            {
+                let flagDescs = flags.map({ "\($0)" })
+                return flagDescs.isEmpty ? nil : "flags: \(flagDescs)"
+            }(),
+            
+            width.map({ "width: \($0)" }),
+            
+            precision.map({ "precision: \($0) "}),
+            
+            length.map({ "length: \($0)" }),
+            
+            "conversion: \(conversion)",
+            
+            variableName.map({ "variableName: \($0)" }),
+        ]
+        
+        return "FormatPlaceholder(\(components.compactMap({ $0 }).joined(separator: ", ")))"
+    }
+}
+
 extension FormatPlaceholder {
     public typealias Index = Int
     

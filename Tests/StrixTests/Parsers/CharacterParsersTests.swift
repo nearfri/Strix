@@ -1,8 +1,8 @@
-import XCTest
+import Testing
 @testable import Strix
 
-final class CharacterParsersTests: XCTestCase {
-    func test_satisfy_succeed_returnCharacter() {
+@Suite struct CharacterParsersTests {
+    @Test func satisfy_succeed_returnCharacter() {
         // Given
         let state = ParserState(stream: "123")
         
@@ -11,12 +11,11 @@ final class CharacterParsersTests: XCTestCase {
         let reply = p.parse(state)
         
         // Then
-        XCTAssertEqual(reply.result.value, "1")
-        XCTAssertEqual(reply.state.stream.startIndex,
-                       state.stream.index(after: state.stream.startIndex))
+        #expect(reply.result.value == "1")
+        #expect(reply.state.stream.startIndex == state.stream.index(after: state.stream.startIndex))
     }
     
-    func test_satisfy_fail_returnFailure() {
+    @Test func satisfy_fail_returnFailure() {
         // Given
         let state = ParserState(stream: "123")
         
@@ -25,12 +24,12 @@ final class CharacterParsersTests: XCTestCase {
         let reply = p.parse(state)
         
         // Then
-        XCTAssert(reply.result.isFailure)
-        XCTAssertEqual(reply.state.stream.startIndex, state.stream.startIndex)
-        XCTAssertEqual(reply.errors, [.expected(label: "number")])
+        #expect(reply.result.isFailure)
+        #expect(reply.state.stream.startIndex == state.stream.startIndex)
+        #expect(reply.errors == [.expected(label: "number")])
     }
     
-    func test_anyOfCharacterSet_succeed() {
+    @Test func anyOfCharacterSet_succeed() {
         // Given
         let state = ParserState(stream: "123")
         
@@ -39,10 +38,10 @@ final class CharacterParsersTests: XCTestCase {
         let reply = p.parse(state)
         
         // Then
-        XCTAssertEqual(reply.result.value, "1")
+        #expect(reply.result.value == "1")
     }
     
-    func test_anyOfCharacterSet_fail() {
+    @Test func anyOfCharacterSet_fail() {
         // Given
         let state = ParserState(stream: "abc")
         
@@ -51,10 +50,10 @@ final class CharacterParsersTests: XCTestCase {
         let reply = p.parse(state)
         
         // Then
-        XCTAssert(reply.result.isFailure)
+        #expect(reply.result.isFailure)
     }
     
-    func test_anyOfSequence() {
+    @Test func anyOfSequence() {
         // Given
         let state = ParserState(stream: "123")
         
@@ -63,10 +62,10 @@ final class CharacterParsersTests: XCTestCase {
         let reply = p.parse(state)
         
         // Then
-        XCTAssertEqual(reply.result.value, "1")
+        #expect(reply.result.value == "1")
     }
     
-    func test_noneOfSequence() {
+    @Test func noneOfSequence() {
         // Given
         let state = ParserState(stream: "abc")
         
@@ -75,10 +74,10 @@ final class CharacterParsersTests: XCTestCase {
         let reply = p.parse(state)
         
         // Then
-        XCTAssertEqual(reply.result.value, "a")
+        #expect(reply.result.value == "a")
     }
     
-    func test_hexadecimalDigit_succeed() {
+    @Test func hexadecimalDigit_succeed() {
         // Given
         let state = ParserState(stream: "f")
         
@@ -87,10 +86,10 @@ final class CharacterParsersTests: XCTestCase {
         let reply = p.parse(state)
         
         // Then
-        XCTAssertEqual(reply.result.value, "f")
+        #expect(reply.result.value == "f")
     }
     
-    func test_hexadecimalDigit_fail() {
+    @Test func hexadecimalDigit_fail() {
         // Given
         let state = ParserState(stream: "g")
         
@@ -99,6 +98,6 @@ final class CharacterParsersTests: XCTestCase {
         let reply = p.parse(state)
         
         // Then
-        XCTAssert(reply.result.isFailure)
+        #expect(reply.result.isFailure)
     }
 }

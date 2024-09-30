@@ -1,7 +1,7 @@
-import XCTest
+import Testing
 @testable import Strix
 
-private enum Seed {
+private enum Fixture {
     static var state1: ParserState { .init(stream: "123456") }
     static var state2: ParserState { state1.advanced() }
     
@@ -25,34 +25,34 @@ private class TextOutput: TextOutputStream {
     }
 }
 
-final class ParserTests: XCTestCase {
-    func test_map_success_success() {
+@Suite struct ParserTests {
+    @Test func map_success_success() {
         // Given
-        let parser = Seed.strSuccessParser
+        let parser = Fixture.strSuccessParser
         
         // When
         let mappedParser = parser.map({ $0 })
-        let reply = mappedParser.parse(Seed.state1)
+        let reply = mappedParser.parse(Fixture.state1)
         
         // Then
-        XCTAssertEqual(reply.result.value, "wow")
+        #expect(reply.result.value == "wow")
     }
     
-    func test_map_failure_failure() {
+    @Test func map_failure_failure() {
         // Given
-        let parser = Seed.strFailureParser
+        let parser = Fixture.strFailureParser
         
         // When
         let mappedParser = parser.map({ $0 })
-        let reply = mappedParser.parse(Seed.state1)
+        let reply = mappedParser.parse(Fixture.state1)
         
         // Then
-        XCTAssertNil(reply.result.value)
+        #expect(reply.result.value == nil)
     }
     
-    func test_mapWithSubstring_success_success() {
+    @Test func mapWithSubstring_success_success() {
         // Given
-        let parser = Seed.strSuccessParser
+        let parser = Fixture.strSuccessParser
         var substr: Substring = ""
         
         // When
@@ -60,79 +60,79 @@ final class ParserTests: XCTestCase {
             substr = str
             return v
         }
-        let reply = mappedParser.parse(Seed.state1)
+        let reply = mappedParser.parse(Fixture.state1)
         
         // Then
-        XCTAssertEqual(reply.result.value, "wow")
-        XCTAssertEqual(substr, "1")
+        #expect(reply.result.value == "wow")
+        #expect(substr == "1")
     }
     
-    func test_mapWithSubstring_failure_failure() {
+    @Test func mapWithSubstring_failure_failure() {
         // Given
-        let parser = Seed.strFailureParser
+        let parser = Fixture.strFailureParser
         
         // When
         let mappedParser: Parser<Substring> = parser.map({ $1 })
-        let reply = mappedParser.parse(Seed.state1)
+        let reply = mappedParser.parse(Fixture.state1)
         
         // Then
-        XCTAssertNil(reply.result.value)
+        #expect(reply.result.value == nil)
     }
     
-    func test_flatMap_successAndSuccess_success() {
+    @Test func flatMap_successAndSuccess_success() {
         // Given
-        let parser = Seed.intSuccessParser
+        let parser = Fixture.intSuccessParser
         
         // When
-        let mappedParser = parser.flatMap({ _ in Seed.strSuccessParser })
-        let reply = mappedParser.parse(Seed.state1)
+        let mappedParser = parser.flatMap({ _ in Fixture.strSuccessParser })
+        let reply = mappedParser.parse(Fixture.state1)
         
         // Then
-        XCTAssertEqual(reply.result.value, "wow")
+        #expect(reply.result.value == "wow")
     }
     
-    func test_flatMap_successAndFailure_failure() {
+    @Test func flatMap_successAndFailure_failure() {
         // Given
-        let parser = Seed.intSuccessParser
+        let parser = Fixture.intSuccessParser
         
         // When
-        let mappedParser = parser.flatMap({ _ in Seed.strFailureParser })
-        let reply = mappedParser.parse(Seed.state1)
+        let mappedParser = parser.flatMap({ _ in Fixture.strFailureParser })
+        let reply = mappedParser.parse(Fixture.state1)
         
         // Then
-        XCTAssertNil(reply.result.value)
+        #expect(reply.result.value == nil)
     }
     
-    func test_flatMap_failureAndSuccess_failure() {
+    @Test func flatMap_failureAndSuccess_failure() {
         // Given
-        let parser = Seed.intFailureParser
+        let parser = Fixture.intFailureParser
         
         // When
-        let mappedParser = parser.flatMap({ _ in Seed.strSuccessParser })
-        let reply = mappedParser.parse(Seed.state1)
+        let mappedParser = parser.flatMap({ _ in Fixture.strSuccessParser })
+        let reply = mappedParser.parse(Fixture.state1)
         
         // Then
-        XCTAssertNil(reply.result.value)
+        #expect(reply.result.value == nil)
     }
     
-    func test_flatMapWithSubstring_successAndSuccess_success() {
+    @Test func flatMapWithSubstring_successAndSuccess_success() {
         // Given
-        let parser = Seed.intSuccessParser
+        let parser = Fixture.intSuccessParser
         var substr: Substring = ""
         
         // When
         let mappedParser = parser.flatMap { _, str -> Parser<String> in
             substr = str
-            return Seed.strSuccessParser
+            return Fixture.strSuccessParser
         }
-        let reply = mappedParser.parse(Seed.state1)
+        let reply = mappedParser.parse(Fixture.state1)
         
         // Then
-        XCTAssertEqual(reply.result.value, "wow")
-        XCTAssertEqual(substr, "1")
+        #expect(reply.result.value == "wow")
+        #expect(substr == "1")
     }
     
-    func test_label_succeed_returnValue() {
+    @Test func label_succeed_returnValue() {
         // Given
         let p1: Parser<String> = Parser { state in
             return .success("Hello", [], state.advanced())
@@ -143,11 +143,11 @@ final class ParserTests: XCTestCase {
         let reply = p.parse(ParserState(stream: "Input"))
         
         // Then
-        XCTAssertEqual(reply.result.value, "Hello")
-        XCTAssertEqual(reply.errors, [])
+        #expect(reply.result.value == "Hello")
+        #expect(reply.errors == [])
     }
     
-    func test_label_failWithoutChange_returnFailureWithLabel() {
+    @Test func label_failWithoutChange_returnFailureWithLabel() {
         // Given
         let p1: Parser<String> = .fail(message: "Fail")
         
@@ -156,10 +156,10 @@ final class ParserTests: XCTestCase {
         let reply = p.parse(ParserState(stream: "Input"))
         
         // Then
-        XCTAssertEqual(reply.errors, [.expected(label: "Greeting")])
+        #expect(reply.errors == [.expected(label: "Greeting")])
     }
     
-    func test_satisfying_predicateSucceded_returnValue() throws {
+    @Test func satisfying_predicateSucceded_returnValue() throws {
         // Given
         let p1: Parser<Int> = Parser { state in
             return .success(1, state.advanced())
@@ -170,11 +170,11 @@ final class ParserTests: XCTestCase {
         let reply = p.parse(ParserState(stream: "Input"))
         
         // Then
-        XCTAssertEqual(reply.state.stream, "nput")
-        XCTAssertEqual(reply.result.value, 1)
+        #expect(reply.state.stream == "nput")
+        #expect(reply.result.value == 1)
     }
     
-    func test_satisfying_predicateFailed_backtrackAndReturnFailure() throws {
+    @Test func satisfying_predicateFailed_backtrackAndReturnFailure() {
         // Given
         let p1: Parser<Int> = Parser { state in
             return .success(0, state.advanced())
@@ -185,54 +185,53 @@ final class ParserTests: XCTestCase {
         let reply = p.parse(ParserState(stream: "Input"))
         
         // Then
-        XCTAssertEqual(reply.state.stream, "Input")
-        XCTAssert(reply.result.isFailure)
+        #expect(reply.state.stream == "Input")
+        #expect(reply.result.isFailure)
     }
     
-    func test_print() {
+    @Test func print() {
         // Given
-        let parser = Seed.intSuccessParser
+        let parser = Fixture.intSuccessParser
         let textOutput = TextOutput()
         
         // When
         let printableParser = parser.print("int number", to: textOutput)
-        _ = printableParser.parse(Seed.state1)
+        _ = printableParser.parse(Fixture.state1)
         
         // Then
-        XCTAssertEqual(textOutput.text, """
-        (1:1:"1"): int number: enter
-        (1:2:"2"): int number: leave: success(1, [expected(label: "integer")])
-        
-        """)
+        #expect(textOutput.text == """
+            (1:1:"1"): int number: enter
+            (1:2:"2"): int number: leave: success(1, [expected(label: "integer")])
+            
+            """)
     }
     
-    func test_run_success() throws {
+    @Test func run_success() {
         // Given
-        let parser = Seed.intSuccessParser
+        let parser = Fixture.intSuccessParser
         
         // When, then
-        XCTAssertNoThrow(try parser.run("123456"))
+        #expect(throws: Never.self, performing: {
+            try parser.run("123456")
+        })
     }
     
-    func test_run_failure() {
+    @Test func run_failure() throws {
         // Given
         let input = "hello"
-        let errors: [ParseError] = Seed.intErrors
+        let errors: [ParseError] = Fixture.intErrors
         let parser: Parser<Int> = .init { state in
             return .failure(errors, state.advanced())
         }
         
-        // When
-        XCTAssertThrowsError(try parser.run(input)) { error in
-            guard let runError = error as? RunError else {
-                XCTFail("Invalid error type: \(type(of: error))")
-                return
-            }
-            
-            // Then
-            XCTAssertEqual(runError.input, input)
-            XCTAssertEqual(runError.position, input.index(after: input.startIndex))
-            XCTAssertEqual(runError.underlyingErrors, errors)
-        }
+        let expectedError = RunError(
+            input: input,
+            position: input.index(after: input.startIndex),
+            underlyingErrors: errors)
+        
+        // When, then
+        #expect(throws: expectedError, performing: {
+            try parser.run(input)
+        })
     }
 }

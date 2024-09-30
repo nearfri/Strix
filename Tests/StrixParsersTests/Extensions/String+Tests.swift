@@ -1,15 +1,18 @@
-import XCTest
+import Testing
 @testable import StrixParsers
 
-final class String_Tests: XCTestCase {
-    func test_addingBackslashEncoding() {
-        XCTAssertEqual("ab\"cd".addingBackslashEncoding(), #"ab\"cd"#)
-        XCTAssertEqual("ab\\cd".addingBackslashEncoding(), #"ab\cd"#)
-        XCTAssertEqual("ab\\ncd".addingBackslashEncoding(), #"ab\ncd"#)
-        XCTAssertEqual("ab\ncd".addingBackslashEncoding(), #"ab\ncd"#)
-        XCTAssertEqual("ab\rcd".addingBackslashEncoding(), #"ab\rcd"#)
-        XCTAssertEqual("ab\tcd".addingBackslashEncoding(), #"ab\tcd"#)
-        XCTAssertEqual("ab\u{0008}cd".addingBackslashEncoding(), #"ab\bcd"#)
-        XCTAssertEqual("ab\u{000C}cd".addingBackslashEncoding(), #"ab\fcd"#)
+@Suite struct StringTests {
+    @Test(arguments: [
+        ("ab\"cd", #"ab\"cd"#),
+        ("ab\\cd", #"ab\cd"#),
+        ("ab\\ncd", #"ab\ncd"#),
+        ("ab\ncd", #"ab\ncd"#),
+        ("ab\rcd", #"ab\rcd"#),
+        ("ab\tcd", #"ab\tcd"#),
+        ("ab\u{0008}cd", #"ab\bcd"#),
+        ("ab\u{000C}cd", #"ab\fcd"#),
+    ])
+    func addingBackslashEncoding2(input: String, expected: String) {
+        #expect(input.addingBackslashEncoding() == expected)
     }
 }

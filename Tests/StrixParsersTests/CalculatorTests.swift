@@ -1,26 +1,36 @@
-import XCTest
+import Testing
+import Foundation
 @testable import StrixParsers
 
-final class CalculatorTests: XCTestCase {
-    let sut: Calculator = .init()
+@Suite struct CalculatorTests {
+    private let sut: Calculator = .init()
     
-    func test_calculate() throws {
-        XCTAssertEqual(try sut("123"), 123.0)
-        XCTAssertEqual(try sut("-123"), -123.0)
-        XCTAssertEqual(try sut("3 + 4 * 2"), 3 + 4 * 2)
-        XCTAssertEqual(try sut("1 + 10 % 3"), Double(1 + 10 % 3))
-        XCTAssertEqual(try sut("3 + 4 ^ 6 * 8 + 2"), 3 + pow(4, 6) * 8 + 2)
-        XCTAssertEqual(try sut("9 * -(4 - 2)"), 9 * -(4 - 2))
-        XCTAssertEqual(try sut("+2*pow(+3 * (+2 + -4) ^ +4, 3) / -2"),
-                       2 * pow(3 * pow(2-4, 4), 3) / -2)
+    @Test(arguments: [
+        ("123", 123.0),
+        ("-123", -123.0),
+        ("3 + 4 * 2", 3 + 4 * 2),
+        ("1 + 10 % 3", Double(1 + 10 % 3)),
+        ("3 + 4 ^ 6 * 8 + 2", 3.0 + pow(4, 6) * 8 + 2),
+        ("9 * -(4 - 2)", 9 * -(4 - 2)),
+        ("+2*pow(+3 * (+2 + -4) ^ +4, 3) / -2", 2 * pow(3 * pow(2-4, 4), 3) / -2),
+    ] as [(String, Double)])
+    func calculate(input: String, expected: Double) throws {
+        try #expect(sut(input) == expected)
     }
     
-    func test_calculate_unknownNullDenotation_throwError() {
-        XCTAssertThrowsError(try sut("*123"))
+    @Test func calculate_unknownNullDenotation_throwError() {
+        #expect(throws: Error.self, performing: {
+            try sut("*123")
+        })
     }
     
-    func test_calculate_tokenizerFailure_throwError() {
-        XCTAssertThrowsError(try sut("12.0e"))
-        XCTAssertThrowsError(try sut("#"))
+    @Test func calculate_tokenizerFailure_throwError() {
+        #expect(throws: Error.self, performing: {
+            try sut("12.0e")
+        })
+        
+        #expect(throws: Error.self, performing: {
+            try sut("#")
+        })
     }
 }

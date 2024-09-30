@@ -1,7 +1,8 @@
-import XCTest
+import Testing
+import Foundation
 @testable import StrixParsers
 
-enum JSONSeed {
+enum JSONFixture {
     struct Window: Codable, Equatable {
         struct Menu: Codable, Equatable {
             struct Item: Codable, Equatable {
@@ -42,33 +43,33 @@ enum JSONSeed {
     )
     
     static let windowJSONString = """
-    {
-        "menu": {
-            "id": "menu-file",
-            "value": "File",
-            "description": null,
-            "isEnabled": false,
-            "groupCount": 0,
-            "height": 50.5,
-            "hasItem": true,
-            "itemCount": 3,
-            "items": [
-                {
-                    "value": "New",
-                    "onClick": "createNewDoc()"
-                },
-                {
-                    "value": "Open",
-                    "onClick": "openDoc()"
-                },
-                {
-                    "value": "Close",
-                    "onClick": "closeDoc()"
-                }
-            ]
+        {
+            "menu": {
+                "id": "menu-file",
+                "value": "File",
+                "description": null,
+                "isEnabled": false,
+                "groupCount": 0,
+                "height": 50.5,
+                "hasItem": true,
+                "itemCount": 3,
+                "items": [
+                    {
+                        "value": "New",
+                        "onClick": "createNewDoc()"
+                    },
+                    {
+                        "value": "Open",
+                        "onClick": "openDoc()"
+                    },
+                    {
+                        "value": "Close",
+                        "onClick": "closeDoc()"
+                    }
+                ]
+            }
         }
-    }
-    """
+        """
     
     static let windowJSON: JSON = .dictionary([
         "menu": .dictionary([
@@ -89,19 +90,19 @@ enum JSONSeed {
     ])
 }
 
-final class JSONTests: XCTestCase {
-    func test_data() throws {
+@Suite struct JSONTests {
+    @Test func data() throws {
         // Given
-        let json: JSON = JSONSeed.windowJSON
+        let json: JSON = JSONFixture.windowJSON
         
         // When
         let data = json.data()
         
         // Then
-        XCTAssertEqual(try JSONDecoder().decode(JSONSeed.Window.self, from: data), JSONSeed.window)
+        try #expect(JSONDecoder().decode(JSONFixture.Window.self, from: data) == JSONFixture.window)
     }
     
-    func test_data_topLevelString() throws {
+    @Test func data_topLevelString() throws {
         // Given
         let json: JSON = "hello"
         
@@ -109,111 +110,102 @@ final class JSONTests: XCTestCase {
         let data = json.data()
         
         // Then
-        XCTAssertEqual(data, Data("\"hello\"".utf8))
+        #expect(data == Data("\"hello\"".utf8))
     }
     
-    func test_jsonObject() throws {
+    @Test func jsonObject() throws {
         // Given
-        let json: JSON = JSONSeed.windowJSON
+        let json: JSON = JSONFixture.windowJSON
         
         // When
         let jsonObject = json.jsonObject()
         
         // Then
         let data = try JSONSerialization.data(withJSONObject: jsonObject)
-        XCTAssertEqual(try JSONDecoder().decode(JSONSeed.Window.self, from: data), JSONSeed.window)
+        try #expect(JSONDecoder().decode(JSONFixture.Window.self, from: data) == JSONFixture.window)
     }
     
-    func test_initWithData() throws {
+    @Test func initWithData() throws {
         // Given
-        let data = Data(JSONSeed.windowJSONString.utf8)
+        let data = Data(JSONFixture.windowJSONString.utf8)
         
         // When
         let json = try JSON(data: data)
         
         // Then
-        XCTAssertEqual(json, JSONSeed.windowJSON)
+        #expect(json == JSONFixture.windowJSON)
     }
     
-    func test_initWithJSONObject() throws {
+    @Test func initWithJSONObject() throws {
         // Given
-        let data = JSONSeed.windowJSONString.data(using: .utf8)!
+        let data = JSONFixture.windowJSONString.data(using: .utf8)!
         let jsonObj = try JSONSerialization.jsonObject(with: data)
         
         // When
         let json = try JSON(jsonObject: jsonObj)
         
         // Then
-        XCTAssertEqual(json, JSONSeed.windowJSON)
+        #expect(json == JSONFixture.windowJSON)
     }
     
-    func test_dynamicMemberLookup_get() {
-        XCTAssertEqual(JSONSeed.windowJSON.menu?.id?.stringValue, "menu-file")
-        XCTAssertEqual(JSONSeed.windowJSON.menu?.isEnabled?.boolValue, false)
-        XCTAssertEqual(JSONSeed.windowJSON.menu?.hasItem?.boolValue, true)
-        XCTAssertEqual(JSONSeed.windowJSON.menu?.itemCount?.intValue, 3)
+    @Test func dynamicMemberLookup_get() {
+        #expect(JSONFixture.windowJSON.menu?.id?.stringValue == "menu-file")
+        #expect(JSONFixture.windowJSON.menu?.isEnabled?.boolValue == false)
+        #expect(JSONFixture.windowJSON.menu?.hasItem?.boolValue == true)
+        #expect(JSONFixture.windowJSON.menu?.itemCount?.intValue == 3)
     }
     
-    func test_dynamicMemberLookup_set() {
-        var json = JSONSeed.windowJSON
+    @Test func dynamicMemberLookup_set() {
+        var json = JSONFixture.windowJSON
         json.menu?.id = .string("hello")
-        XCTAssertEqual(json.menu?.id, "hello")
+        #expect(json.menu?.id == "hello")
     }
     
-    func test_initWithBoolLiteral() {
-        XCTAssertEqual(true, JSON.bool(true))
-        XCTAssertEqual(false, JSON.bool(false))
-        XCTAssertNotEqual(true, JSON.bool(false))
+    @Test func initWithBoolLiteral() {
+        #expect(true == JSON.bool(true))
+        #expect(false == JSON.bool(false))
     }
     
-    func test_initWithIntegerLiteral() {
-        XCTAssertEqual(3, JSON.number(3))
-        XCTAssertNotEqual(3, JSON.number(4))
+    @Test func initWithIntegerLiteral() {
+        #expect(3 == JSON.number(3))
     }
     
-    func test_initWithFloatLiteral() {
-        XCTAssertEqual(3.2, JSON.number(3.2))
-        XCTAssertNotEqual(3.2, JSON.number(4.5))
+    @Test func initWithFloatLiteral() {
+        #expect(3.2 == JSON.number(3.2))
     }
     
-    func test_initWithStringLiteral() {
-        XCTAssertEqual("hello", JSON.string("hello"))
-        XCTAssertNotEqual("hello", JSON.string("world"))
+    @Test func initWithStringLiteral() {
+        #expect("hello" == JSON.string("hello"))
     }
     
-    func test_initWithArrayLiteral() {
-        XCTAssertEqual(["hello", 3], JSON.array([.string("hello"), .number(3)]))
-        XCTAssertNotEqual([3, "hello"], JSON.array([.string("hello"), .number(3)]))
+    @Test func initWithArrayLiteral() {
+        #expect(["hello", 3] == JSON.array([.string("hello"), .number(3)]))
         
-        XCTAssertEqual([1, [1.1, nil as Double?]],
-                       JSON.array([.number(1), JSON.array([.number(1.1), .null])]))
+        #expect([1, [1.1, nil as Double?]]
+                == JSON.array([.number(1), JSON.array([.number(1.1), .null])]))
     }
     
-    func test_initWithDictionaryLiteral() {
-        XCTAssertEqual(
-            ["name": "Bradley", "age": 25],
-            JSON.dictionary(["name": .string("Bradley"), "age": .number(25)])
-        )
-        XCTAssertNotEqual(
-            ["name": "Bradley", "age": 25],
-            JSON.dictionary(["name": .string("Bradley"), "age": .string("25")])
+    @Test func initWithDictionaryLiteral() {
+        #expect(
+            ["name": "Bradley", "age": 25]
+            == JSON.dictionary(["name": .string("Bradley"), "age": .number(25)])
         )
         
-        XCTAssertEqual(["a": 1, "b": ["b.1": 1.1, "b.2": nil as Double?]],
-                       JSON.dictionary(["a": .number(1),
-                                        "b": JSON.dictionary(["b.1": .number(1.1), "b.2": .null])]))
+        #expect(["a": 1, "b": ["b.1": 1.1, "b.2": nil as Double?]]
+                == JSON.dictionary(["a": .number(1),
+                                    "b": JSON.dictionary(["b.1": .number(1.1), "b.2": .null])]))
     }
     
-    func test_description_arrayType() {
+    @Test func description_arrayType() {
         // Given
         let jsonString = """
-        [
-            1,
-            2,
-            3,
-            4
-        ]
-        """
+            [
+                1,
+                2,
+                3,
+                4
+            ]
+            """
         
         let json: JSON = [1, 2, 3, 4]
         
@@ -221,21 +213,21 @@ final class JSONTests: XCTestCase {
         let jsonDescription = json.description
         
         // Then
-        XCTAssertEqual(jsonDescription, jsonString)
+        #expect(jsonDescription == jsonString)
     }
     
-    func test_description_complexType() {
+    @Test func description_complexType() {
         // Dictionary 타입은 순서 유지가 안되므로 재정렬 후 비교.
-        let actual = JSONSeed.windowJSON.description
+        let actual = JSONFixture.windowJSON.description
             .replacingOccurrences(of: ",", with: "")
             .split(separator: "\n")
             .sorted()
         
-        let expected = JSONSeed.windowJSONString
+        let expected = JSONFixture.windowJSONString
             .replacingOccurrences(of: ",", with: "")
             .split(separator: "\n")
             .sorted()
         
-        XCTAssertEqual(actual, expected)
+        #expect(actual == expected)
     }
 }

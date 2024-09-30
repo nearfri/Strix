@@ -1,8 +1,8 @@
-import XCTest
+import Testing
 @testable import Strix
 
-final class ParseErrorSplitterTests: XCTestCase {
-    func test_hasErrors_noError_returnFalse() {
+@Suite struct ParseErrorSplitterTests {
+    @Test func hasErrors_noError_returnFalse() {
         // Given
         let errors: [ParseError] = []
         let errorSplitter = ParseErrorSplitter(errors)
@@ -11,10 +11,10 @@ final class ParseErrorSplitterTests: XCTestCase {
         let hasError = errorSplitter.hasErrors
         
         // Then
-        XCTAssertFalse(hasError)
+        #expect(!hasError)
     }
     
-    func test_hasErrors_hasError_returnTrue() {
+    @Test func hasErrors_hasError_returnTrue() {
         // Given
         let errors: [ParseError] = [.expected(label: "number")]
         let errorSplitter = ParseErrorSplitter(errors)
@@ -23,10 +23,10 @@ final class ParseErrorSplitterTests: XCTestCase {
         let hasError = errorSplitter.hasErrors
         
         // Then
-        XCTAssert(hasError)
+        #expect(hasError)
     }
     
-    func test_init_removeDuplicates() {
+    @Test func init_removeDuplicates() {
         // Given
         let errors: [ParseError] = [.expected(label: "whitespace"), .expected(label: "whitespace")]
         
@@ -34,6 +34,6 @@ final class ParseErrorSplitterTests: XCTestCase {
         let errorSplitter = ParseErrorSplitter(errors)
         
         // Then
-        XCTAssertEqual(errorSplitter.expectedErrors, ["whitespace"])
+        #expect(errorSplitter.expectedErrors == ["whitespace"])
     }
 }
