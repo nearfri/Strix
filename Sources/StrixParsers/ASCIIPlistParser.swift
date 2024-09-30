@@ -9,11 +9,11 @@ public struct ASCIIPlistParser {
         parser = ws *> Parser.rootPlist <* ws <* .endOfStream
     }
     
-    public func parse(_ plistString: String) throws -> ASCIIPlist {
+    public func parse(_ plistString: String) throws(RunError) -> ASCIIPlist {
         return try parser.run(plistString)
     }
     
-    public func callAsFunction(_ plistString: String) throws -> ASCIIPlist {
+    public func callAsFunction(_ plistString: String) throws(RunError) -> ASCIIPlist {
         return try parse(plistString)
     }
 }

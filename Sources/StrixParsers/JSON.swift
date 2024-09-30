@@ -2,7 +2,7 @@ import Foundation
 import CoreFoundation
 
 @dynamicMemberLookup
-public enum JSON: Equatable, Sendable {
+public enum JSON: Hashable, Sendable {
     case dictionary([String: JSON])
     case array([JSON])
     case string(String)

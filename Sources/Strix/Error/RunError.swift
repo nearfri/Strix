@@ -1,6 +1,6 @@
 import Foundation
 
-public struct RunError: LocalizedError, CustomStringConvertible {
+public struct RunError: LocalizedError, Equatable, CustomStringConvertible {
     public var input: String
     public var position: String.Index
     public var underlyingErrors: [ParseError]

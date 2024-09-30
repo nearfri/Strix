@@ -9,11 +9,11 @@ public struct JSONParser {
         parser = ws *> Parser.json <* ws <* .endOfStream
     }
     
-    public func parse(_ jsonString: String) throws -> JSON {
+    public func parse(_ jsonString: String) throws(RunError) -> JSON {
         return try parser.run(jsonString)
     }
     
-    public func callAsFunction(_ jsonString: String) throws -> JSON {
+    public func callAsFunction(_ jsonString: String) throws(RunError) -> JSON {
         return try parse(jsonString)
     }
 }

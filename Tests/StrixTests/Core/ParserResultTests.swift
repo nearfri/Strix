@@ -56,7 +56,9 @@ final class ParserResultTests: XCTestCase {
         let sut = ParserResult.success("hello", [])
         
         // When
-        let mapped: ParserResult<Int> = sut.map({ _ in throw ParseError.expected(label: "Hello") })
+        let mapped: ParserResult<Int> = sut.map({ _ throws(ParseError) in
+            throw ParseError.expected(label: "Hello")
+        })
         
         // Then
         XCTAssertNil(mapped.value)
