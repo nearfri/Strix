@@ -1,4 +1,4 @@
-import XCTest
+import Testing
 @testable import Strix
 
 private struct IsInLinkUserInfoKey: UserInfoKey {
@@ -12,23 +12,17 @@ private extension UserInfo {
     }
 }
 
-final class UserInfoTests: XCTestCase {
-    var sut: UserInfo = .init()
+@Suite struct UserInfoTests {
+    private var sut: UserInfo = .init()
     
-    override func setUpWithError() throws {
-        try super.setUpWithError()
-        
-        sut = .init()
-    }
-    
-    func test_subscript_computedProperty() {
+    @Test mutating func subscript_computedProperty() {
         // Given
-        XCTAssertFalse(sut.isInLink)
+        #expect(!sut.isInLink)
         
         // When
         sut.isInLink = true
         
         // Then
-        XCTAssertTrue(sut.isInLink)
+        #expect(sut.isInLink)
     }
 }

@@ -10,11 +10,11 @@ public class Calculator {
         tokenizer = TokenizerGenerator().tokenizer
     }
     
-    public func calculate(_ expression: String) throws -> Double {
+    public func calculate(_ expression: String) throws(PrattError) -> Double {
         return try prattParser.parse(expression, with: tokenizer)
     }
     
-    public func callAsFunction(_ expression: String) throws -> Double {
+    public func callAsFunction(_ expression: String) throws(PrattError) -> Double {
         return try calculate(expression)
     }
 }
@@ -64,46 +64,47 @@ private struct PrattParserGenerator {
             return left
         }
         
-        prattParser.addDenotation(for: .number) { (token, parser) -> Double in
+        prattParser.addDenotation(for: .number) { (token, parser) throws(PrattError) -> Double in
             guard let number = Double(token.value) else {
-                throw ParseError.generic(message: "\(token.value) is outside the allowable range")
+                throw .parsingFailure(.generic(
+                    message: "\(token.value) is outside the allowable range"))
             }
             return number
         }
         
-        addOperator("^", bp: 140) { (left, token, parser) -> Double in
+        addOperator("^", bp: 140) { (left, token, parser) throws(PrattError) -> Double in
             let right = try parser.expression(withRightBindingPower: 139)
             return pow(left, right)
         }
-        addOperator("+") { (token, parser) -> Double in
+        addOperator("+") { (token, parser) throws(PrattError) -> Double in
             return try parser.expression(withRightBindingPower: 130)
         }
-        addOperator("-") { (token, parser) -> Double in
+        addOperator("-") { (token, parser) throws(PrattError) -> Double in
             return try -parser.expression(withRightBindingPower: 130)
         }
-        addOperator("*", bp: 120) { (left, token, parser) -> Double in
+        addOperator("*", bp: 120) { (left, token, parser) throws(PrattError) -> Double in
             return try left * parser.expression(withRightBindingPower: 120)
         }
-        addOperator("/", bp: 120) { (left, token, parser) -> Double in
+        addOperator("/", bp: 120) { (left, token, parser) throws(PrattError) -> Double in
             return try left / parser.expression(withRightBindingPower: 120)
         }
-        addOperator("%", bp: 120) { (left, token, parser) -> Double in
+        addOperator("%", bp: 120) { (left, token, parser) throws(PrattError) -> Double in
             let right = try parser.expression(withRightBindingPower: 120)
             return left.truncatingRemainder(dividingBy: right)
         }
-        addOperator("+", bp: 110) { (left, token, parser) -> Double in
+        addOperator("+", bp: 110) { (left, token, parser) throws(PrattError) -> Double in
             return try left + parser.expression(withRightBindingPower: 110)
         }
-        addOperator("-", bp: 110) { (left, token, parser) -> Double in
+        addOperator("-", bp: 110) { (left, token, parser) throws(PrattError) -> Double in
             return try left - parser.expression(withRightBindingPower: 110)
         }
-        addOperator(")", bp: 0) { (left, token, parser) -> Double in
+        addOperator(")", bp: 0) { (left, token, parser) throws(PrattError) -> Double in
             return left
         }
-        addOperator("(") { (token, parser) -> Double in
+        addOperator("(") { (token, parser) throws(PrattError) -> Double in
             let expr = try parser.expression(withRightBindingPower: 0)
             guard parser.nextToken.value == ")" else {
-                throw ParseError.expectedString(string: ")", caseSensitive: true)
+                throw .parsingFailure(.expectedString(string: ")", caseSensitive: true))
             }
             try parser.advance()
             return expr
@@ -137,31 +138,40 @@ private struct PrattParserGenerator {
         prattParser.addDenotation(for: token, bindingPower: bp, expression: exp)
     }
     
-    private func addFunction1(_ value: String, compute: @escaping (Double) throws -> Double) {
-        addFunction(value) { (params) -> Double in
+    private func addFunction1(
+        _ value: String,
+        compute: @escaping (Double) throws(PrattError) -> Double
+    ) {
+        addFunction(value) { (params) throws(PrattError) -> Double in
             guard params.count == 1 else {
-                throw ParseError.generic(message: "\"\(value)\" function take exactly one argument")
+                throw .parsingFailure(.generic(
+                    message: "\"\(value)\" function take exactly one argument"))
             }
             return try compute(params[0])
         }
     }
     
-    private func addFunction2(_ value: String,
-                              compute: @escaping (Double, Double) throws -> Double
+    private func addFunction2(
+        _ value: String,
+        compute: @escaping (Double, Double) throws(PrattError) -> Double
     ) {
-        addFunction(value) { (params) -> Double in
+        addFunction(value) { (params) throws(PrattError) -> Double in
             guard params.count == 2 else {
-                throw ParseError.generic(message: "\"\(value)\" function take exactly two argument")
+                throw .parsingFailure(.generic(
+                    message: "\"\(value)\" function take exactly two argument"))
             }
             return try compute(params[0], params[1])
         }
     }
     
-    private func addFunction(_ value: String, compute: @escaping ([Double]) throws -> Double) {
+    private func addFunction(
+        _ value: String,
+        compute: @escaping ([Double]) throws(PrattError) -> Double
+    ) {
         let token = Token(type: .name, value: value)
-        prattParser.addDenotation(for: token) { (token, parser) -> Double in
+        prattParser.addDenotation(for: token) { (token, parser) throws(PrattError) -> Double in
             guard parser.nextToken.value == "(" else {
-                throw ParseError.expectedString(string: "(", caseSensitive: true)
+                throw .parsingFailure(.expectedString(string: "(", caseSensitive: true))
             }
             try parser.advance()
             
@@ -179,7 +189,7 @@ private struct PrattParserGenerator {
             let expr = try compute(params)
             
             guard parser.nextToken.value == ")" else {
-                throw ParseError.expectedString(string: ")", caseSensitive: true)
+                throw .parsingFailure(.expectedString(string: ")", caseSensitive: true))
             }
             try parser.advance()
             

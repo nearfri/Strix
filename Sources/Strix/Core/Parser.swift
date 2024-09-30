@@ -10,7 +10,7 @@ public struct Parser<T> {
     
     /// The parser `p.map(f)` applies the parser `p` and returns the result of the function application `f(x)`,
     /// where `x` is the result returned by  `p`.
-    public func map<U>(_ transform: @escaping (T) throws -> U) -> Parser<U> {
+    public func map<U>(_ transform: @escaping (T) throws(ParseError) -> U) -> Parser<U> {
         return Parser<U> { state -> ParserReply<U> in
             return parse(state).map(transform)
         }
@@ -18,14 +18,16 @@ public struct Parser<T> {
     
     /// The parser `p.map(f)` applies the parser `p` and returns the result of the function application `f(x, str)`,
     /// where `x` is the result returned by  `p` and `str` is the substring skipped over by `p`.
-    public func map<U>(_ transform: @escaping (T, Substring) throws -> U) -> Parser<U> {
+    public func map<U>(_ transform: @escaping (T, Substring) throws(ParseError) -> U) -> Parser<U> {
         return Parser<U> { state in
             let stream = state.stream
             let reply = parse(state)
             let newStream = reply.state.stream
             
-            return reply.map {
-                try transform($0, stream[stream.startIndex..<newStream.startIndex])
+            // TODO: Using FullTypedThrows
+            // https://forums.swift.org/t/where-is-fulltypedthrows/72346
+            return reply.map { value throws(ParseError) in
+                try transform(value, stream[stream.startIndex..<newStream.startIndex])
             }
         }
     }
@@ -114,7 +116,7 @@ public struct Parser<T> {
     }
     
     /// `p.run(str)` runs the parser `p` on the content of the string `str`.
-    public func run(_ input: String) throws -> T {
+    public func run(_ input: String) throws(RunError) -> T {
         let initialState = ParserState(stream: input[...])
         
         let reply = parse(initialState)
@@ -128,7 +130,7 @@ public struct Parser<T> {
     }
     
     /// `p(str)` runs the parser `p` on the content of the string `str`.
-    public func callAsFunction(_ input: String) throws -> T {
+    public func callAsFunction(_ input: String) throws(RunError) -> T {
         return try run(input)
     }
     

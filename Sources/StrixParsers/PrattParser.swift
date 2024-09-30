@@ -1,7 +1,7 @@
 import Foundation
 import Strix
 
-public enum TokenType: Int {
+public enum TokenType: Int, Sendable {
     case end
     case number
     case string
@@ -10,7 +10,7 @@ public enum TokenType: Int {
     case comment
 }
 
-public struct Token: Hashable {
+public struct Token: Hashable, Sendable {
     public var type: TokenType
     public var value: String
     
@@ -23,7 +23,8 @@ public struct Token: Hashable {
 public protocol TokenHandling {}
 
 public struct NullDenotation<T>: TokenHandling {
-    public typealias Expression = (_ token: Token, _ parser: PrattParser<T>) throws -> T
+    public typealias Expression
+    = (_ token: Token, _ parser: PrattParser<T>) throws(PrattError) -> T
     
     public let expression: Expression
     
@@ -33,8 +34,8 @@ public struct NullDenotation<T>: TokenHandling {
 }
 
 public struct LeftDenotation<T>: TokenHandling {
-    public typealias Expression =
-        (_ leftValue: T, _ token: Token, _ parser: PrattParser<T>) throws -> T
+    public typealias Expression
+    = (_ leftValue: T, _ token: Token, _ parser: PrattParser<T>) throws(PrattError) -> T
     
     public let bindingPower: Int
     public let expression: Expression
@@ -54,11 +55,10 @@ private class DenotationGroup<Denotation: TokenHandling> {
     }
 }
 
-extension PrattParser {
-    public enum Error: Swift.Error {
-        case tokenizerFailure(Swift.Error)
-        case denotationNotFound(String)
-    }
+public enum PrattError: Error {
+    case tokenizerFailure(RunError)
+    case parsingFailure(ParseError)
+    case denotationNotFound(String)
 }
 
 public final class PrattParser<T> {
@@ -66,11 +66,11 @@ public final class PrattParser<T> {
     private var leftDenotationGroups: [TokenType: DenotationGroup<LeftDenotation<T>>] = [:]
     
     public private(set) var nextToken: Token = Token(type: .end)
-    public private(set) var advance: () throws -> Void = {}
+    public private(set) var advance: () throws(PrattError) -> Void = {}
     
     public init() {}
     
-    public func parse<S: Sequence>(_ tokens: S) throws -> T where S.Element == Token {
+    public func parse<S: Sequence>(_ tokens: S) throws(PrattError) -> T where S.Element == Token {
         let tokens = AnyIterator(tokens.makeIterator())
         advance = { [self] in
             if let token = tokens.next() {
@@ -83,14 +83,14 @@ public final class PrattParser<T> {
         return try parse()
     }
     
-    public func parse(_ string: String, with tokenizer: Parser<Token>) throws -> T {
+    public func parse(_ string: String, with tokenizer: Parser<Token>) throws(PrattError) -> T {
         var state = ParserState(stream: string[...])
-        advance = { [self] in
+        advance = { [self] () throws(PrattError) -> Void in
             switch tokenizer.parse(&state) {
             case let .success(token, _):
                 nextToken = token
             case let .failure(errors):
-                throw Error.tokenizerFailure(
+                throw PrattError.tokenizerFailure(
                     RunError(input: string, position: state.position, underlyingErrors: errors))
             }
         }
@@ -98,7 +98,7 @@ public final class PrattParser<T> {
         return try parse()
     }
     
-    private func parse() throws -> T {
+    private func parse() throws(PrattError) -> T {
         defer {
             nextToken = Token(type: .end)
             advance = {}
@@ -108,7 +108,7 @@ public final class PrattParser<T> {
         return try expression(withRightBindingPower: 0)
     }
     
-    public func expression(withRightBindingPower rightBindingPower: Int) throws -> T {
+    public func expression(withRightBindingPower rightBindingPower: Int) throws(PrattError) -> T {
         let token = nextToken
         let nud = try nullDenotation(for: token)
         try advance()
@@ -179,16 +179,16 @@ extension PrattParser {
 }
 
 extension PrattParser {
-    private func nullDenotation(for token: Token) throws -> NullDenotation<T> {
+    private func nullDenotation(for token: Token) throws(PrattError) -> NullDenotation<T> {
         guard let result: NullDenotation = denotation(for: token, in: nullDenotationGroups) else {
-            throw Error.denotationNotFound("could not find the null denotation for \(token)")
+            throw PrattError.denotationNotFound("could not find the null denotation for \(token)")
         }
         return result
     }
     
-    private func leftDenotation(for token: Token) throws -> LeftDenotation<T> {
+    private func leftDenotation(for token: Token) throws(PrattError) -> LeftDenotation<T> {
         guard let result: LeftDenotation = denotation(for: token, in: leftDenotationGroups) else {
-            throw Error.denotationNotFound("could not find the left denotation for \(token)")
+            throw PrattError.denotationNotFound("could not find the left denotation for \(token)")
         }
         return result
     }

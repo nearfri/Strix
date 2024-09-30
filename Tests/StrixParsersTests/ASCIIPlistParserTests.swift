@@ -1,71 +1,102 @@
-import XCTest
+import Testing
+import Foundation
+import Strix
 @testable import StrixParsers
 
-final class ASCIIPlistParserTests: XCTestCase {
+@Suite struct ASCIIPlistParserTests {
     typealias DictionaryEntry = ASCIIPlist.DictionaryEntry
     
     let sut = ASCIIPlistParser()
     
-    func test_parse_string() {
-        XCTAssertEqual(try sut.parse(#""This is a string""#), .string("This is a string"))
-        
-        XCTAssertEqual(try sut.parse(#""ab\"cd""#), .string("ab\"cd"))
-        XCTAssertEqual(try sut.parse(#""ab\\cd""#), .string("ab\\cd"))
-        XCTAssertEqual(try sut.parse(#""ab\/cd""#), .string("ab/cd"))
-        XCTAssertEqual(try sut.parse(#""ab\bcd""#), .string("ab\u{0008}cd"))
-        XCTAssertEqual(try sut.parse(#""ab\fcd""#), .string("ab\u{000C}cd"))
-        XCTAssertEqual(try sut.parse(#""ab\ncd""#), .string("ab\ncd"))
-        XCTAssertEqual(try sut.parse(#""ab\rcd""#), .string("ab\rcd"))
-        XCTAssertEqual(try sut.parse(#""ab\tcd""#), .string("ab\tcd"))
+    @Test(arguments: [
+        (#""This is a string""#, "This is a string"),
+        (#""ab\"cd""#, "ab\"cd"),
+        (#""ab\\cd""#, "ab\\cd"),
+        (#""ab\/cd""#, "ab/cd"),
+        (#""ab\bcd""#, "ab\u{0008}cd"),
+        (#""ab\fcd""#, "ab\u{000C}cd"),
+        (#""ab\ncd""#, "ab\ncd"),
+        (#""ab\rcd""#, "ab\rcd"),
+        (#""ab\tcd""#, "ab\tcd"),
+    ] as [(String, String)])
+    func parse_string(input: String, expected: String) throws {
+        try #expect(sut.parse(input) == .string(expected))
     }
     
-    func test_parse_quoteOmittedASCIIWord() {
-        XCTAssertEqual(try sut.parse("hello"), .string("hello"))
-        XCTAssertEqual(try sut.parse("1564"), .string("1564"))
+    @Test func parse_quoteOmittedASCIIWord() throws {
+        try #expect(sut.parse("hello") == .string("hello"))
+        try #expect(sut.parse("1564") == .string("1564"))
     }
     
-    func test_data() {
-        XCTAssertEqual(try sut.parse("<0123456789abcdef>"),
-                       .data(Data([0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef])))
-        
-        XCTAssertEqual(try sut.parse("<0fbd777f 1c2735ae>"),
-                       .data(Data([0x0f, 0xbd, 0x77, 0x7f, 0x1c, 0x27, 0x35, 0xae])))
-        
-        XCTAssertEqual(try sut.parse("<>"), .data(Data()))
+    @Test(arguments: [
+        ("<0123456789abcdef>", Data([0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef])),
+        ("<0fbd777f 1c2735ae>", Data([0x0f, 0xbd, 0x77, 0x7f, 0x1c, 0x27, 0x35, 0xae])),
+        ("<>", Data()),
+    ] as [(String, Data)])
+    func data(input: String, expected: Data) throws {
+        try #expect(sut.parse(input) == .data(expected))
     }
     
-    func test_data_countIsOdd_throwError() {
-        XCTAssertThrowsError(try sut.parse("<012>"))
+    @Test func data_countIsOdd_throwError() {
+        #expect(throws: RunError.self, performing: {
+            try sut.parse("<012>")
+        })
     }
     
-    func test_array() {
+    @Test func array() throws {
         let plistString = #"("San Francisco", "New York", "Seoul")"#
         
         let plist = ASCIIPlist.array([
             .string("San Francisco"), .string("New York"), .string("Seoul")
         ])
         
-        XCTAssertEqual(try sut.parse(plistString), plist)
+        try #expect(sut.parse(plistString) == plist)
     }
     
-    func test_array_endBySeparator() {
+    @Test func array_endBySeparator() throws {
         let plistString = #"("San Francisco", "New York", )"#
         
         let plist = ASCIIPlist.array([
             .string("San Francisco"), .string("New York")
         ])
         
-        XCTAssertEqual(try sut.parse(plistString), plist)
+        try #expect(sut.parse(plistString) == plist)
     }
     
-    func test_dictionary() {
+    @Test func dictionary() throws {
         let plistString = """
-        {
+            {
+                Animals = (pig, lamb, worm);
+                AnimalSmells = { pig = piggish; lamb = lambish; worm = wormy; };
+                AnimalColors = { pig = pink; lamb = black; worm = pink; };
+            }
+            """
+        
+        let plist = ASCIIPlist.dictionary([
+            DictionaryEntry(key: "Animals", value: .array([
+                .string("pig"), .string("lamb"), .string("worm")
+            ])),
+            DictionaryEntry(key: "AnimalSmells", value: .dictionary([
+                DictionaryEntry(key: "pig", value: .string("piggish")),
+                DictionaryEntry(key: "lamb", value: .string("lambish")),
+                DictionaryEntry(key: "worm", value: .string("wormy")),
+            ])),
+            DictionaryEntry(key: "AnimalColors", value: .dictionary([
+                DictionaryEntry(key: "pig", value: .string("pink")),
+                DictionaryEntry(key: "lamb", value: .string("black")),
+                DictionaryEntry(key: "worm", value: .string("pink")),
+            ])),
+        ])
+        
+        try #expect(sut.parse(plistString) == plist)
+    }
+    
+    @Test func dictionary_withoutCurlyBracesAtRoot() throws {
+        let plistString = """
             Animals = (pig, lamb, worm);
             AnimalSmells = { pig = piggish; lamb = lambish; worm = wormy; };
             AnimalColors = { pig = pink; lamb = black; worm = pink; };
-        }
-        """
+            """
         
         let plist = ASCIIPlist.dictionary([
             DictionaryEntry(key: "Animals", value: .array([
@@ -83,256 +114,232 @@ final class ASCIIPlistParserTests: XCTestCase {
             ])),
         ])
         
-        XCTAssertEqual(try sut.parse(plistString), plist)
+        try #expect(sut.parse(plistString) == plist)
     }
     
-    func test_dictionary_withoutCurlyBracesAtRoot() {
+    @Test func parse_comment_beforeString_ignore() throws {
         let plistString = """
-        Animals = (pig, lamb, worm);
-        AnimalSmells = { pig = piggish; lamb = lambish; worm = wormy; };
-        AnimalColors = { pig = pink; lamb = black; worm = pink; };
-        """
+            /* comment */
+            "hello"
+            """
         
-        let plist = ASCIIPlist.dictionary([
-            DictionaryEntry(key: "Animals", value: .array([
-                .string("pig"), .string("lamb"), .string("worm")
-            ])),
-            DictionaryEntry(key: "AnimalSmells", value: .dictionary([
-                DictionaryEntry(key: "pig", value: .string("piggish")),
-                DictionaryEntry(key: "lamb", value: .string("lambish")),
-                DictionaryEntry(key: "worm", value: .string("wormy")),
-            ])),
-            DictionaryEntry(key: "AnimalColors", value: .dictionary([
-                DictionaryEntry(key: "pig", value: .string("pink")),
-                DictionaryEntry(key: "lamb", value: .string("black")),
-                DictionaryEntry(key: "worm", value: .string("pink")),
-            ])),
-        ])
-        
-        XCTAssertEqual(try sut.parse(plistString), plist)
+        try #expect(sut.parse(plistString) == .string("hello"))
     }
     
-    func test_parse_comment_beforeString_ignore() {
+    @Test func parse_manyComment_beforeString_ignore() throws {
         let plistString = """
-        /* comment */
-        "hello"
-        """
+            /* comment */
+            /* comment */
+            "hello"
+            """
         
-        XCTAssertEqual(try sut.parse(plistString), .string("hello"))
+        try #expect(sut.parse(plistString) == .string("hello"))
     }
     
-    func test_parse_manyComment_beforeString_ignore() {
+    @Test func parse_comment_afterString_ignore() throws {
         let plistString = """
-        /* comment */
-        /* comment */
-        "hello"
-        """
+            "hello"
+            /* comment */
+            """
         
-        XCTAssertEqual(try sut.parse(plistString), .string("hello"))
+        try #expect(sut.parse(plistString) == .string("hello"))
     }
     
-    func test_parse_comment_afterString_ignore() {
+    @Test func parse_manyComment_afterString_ignore() throws {
         let plistString = """
-        "hello"
-        /* comment */
-        """
+            "hello"
+            /* comment */
+            /* comment */
+            """
         
-        XCTAssertEqual(try sut.parse(plistString), .string("hello"))
+        try #expect(sut.parse(plistString) == .string("hello"))
     }
     
-    func test_parse_manyComment_afterString_ignore() {
+    @Test func parse_comment_beforeData_ignore() throws {
         let plistString = """
-        "hello"
-        /* comment */
-        /* comment */
-        """
+            /* comment */
+            <0f>
+            """
         
-        XCTAssertEqual(try sut.parse(plistString), .string("hello"))
+        try #expect(sut.parse(plistString) == .data(Data([0x0f])))
     }
     
-    func test_parse_comment_beforeData_ignore() {
+    @Test func parse_comment_afterData_ignore() throws {
         let plistString = """
-        /* comment */
-        <0f>
-        """
+            <0f>
+            /* comment */
+            """
         
-        XCTAssertEqual(try sut.parse(plistString), .data(Data([0x0f])))
+        try #expect(sut.parse(plistString) == .data(Data([0x0f])))
     }
     
-    func test_parse_comment_afterData_ignore() {
+    @Test func parse_comment_beforeArray_ignore() throws {
         let plistString = """
-        <0f>
-        /* comment */
-        """
+            /* comment */
+            ("Seoul")
+            """
         
-        XCTAssertEqual(try sut.parse(plistString), .data(Data([0x0f])))
+        try #expect(sut.parse(plistString) == .array([.string("Seoul")]))
     }
     
-    func test_parse_comment_beforeArray_ignore() {
+    @Test func parse_comment_afterArray_ignore() throws {
         let plistString = """
-        /* comment */
-        ("Seoul")
-        """
+            ("Seoul")
+            /* comment */
+            """
         
-        XCTAssertEqual(try sut.parse(plistString), .array([.string("Seoul")]))
+        try #expect(sut.parse(plistString) == .array([.string("Seoul")]))
     }
     
-    func test_parse_comment_afterArray_ignore() {
+    @Test func parse_comment_insideArray_ignore() throws {
         let plistString = """
-        ("Seoul")
-        /* comment */
-        """
-        
-        XCTAssertEqual(try sut.parse(plistString), .array([.string("Seoul")]))
-    }
-    
-    func test_parse_comment_insideArray_ignore() {
-        let plistString = """
-        (
-            /* comment */ "San Francisco" /* comment */,
-            /* comment */ "New York" /* comment */,
-            /* comment */ /* comment */ "Seoul" /* comment */ /* comment */
-        )
-        """
+            (
+                /* comment */ "San Francisco" /* comment */,
+                /* comment */ "New York" /* comment */,
+                /* comment */ /* comment */ "Seoul" /* comment */ /* comment */
+            )
+            """
         
         let plist = ASCIIPlist.array([
             .string("San Francisco"), .string("New York"), .string("Seoul")
         ])
         
-        XCTAssertEqual(try sut.parse(plistString), plist)
+        try #expect(sut.parse(plistString) == plist)
     }
     
-    func test_parse_comment_beforeDictionary_ignore() {
+    @Test func parse_comment_beforeDictionary_ignore() throws {
         let plistString = """
-        /* comment */
-        {
-            Animal = "pig";
-        }
-        """
+            /* comment */
+            {
+                Animal = "pig";
+            }
+            """
         
-        XCTAssertEqual(try sut.parse(plistString), .dictionary([
+        try #expect(sut.parse(plistString) == .dictionary([
             DictionaryEntry(comment: nil, key: "Animal", value: .string("pig"))
         ]))
     }
     
-    func test_parse_comment_afterDictionary_ignore() {
+    @Test func parse_comment_afterDictionary_ignore() throws {
         let plistString = """
-        {
-            Animal = "pig";
-        }
-        /* comment */
-        """
+            {
+                Animal = "pig";
+            }
+            /* comment */
+            """
         
-        XCTAssertEqual(try sut.parse(plistString), .dictionary([
+        try #expect(sut.parse(plistString) == .dictionary([
             DictionaryEntry(comment: nil, key: "Animal", value: .string("pig"))
         ]))
     }
     
-    func test_parse_comment_beforeDictionaryKey_take() {
+    @Test func parse_comment_beforeDictionaryKey_take() throws {
         let plistString = """
-        {
+            {
+                /* comment */
+                Animal = "pig";
+            }
+            """
+        
+        try #expect(sut.parse(plistString) == .dictionary([
+            DictionaryEntry(comment: "comment", key: "Animal", value: .string("pig"))
+        ]))
+    }
+    
+    @Test func parse_slashComment_beforeDictionaryKey_take() throws {
+        let plistString = """
+            {
+                // comment
+                Animal = "pig";
+            }
+            """
+        
+        try #expect(sut.parse(plistString) == .dictionary([
+            DictionaryEntry(comment: "comment", key: "Animal", value: .string("pig"))
+        ]))
+    }
+    
+    @Test func parse_comment_withoutCurlyBracesAtRoot_beforeDictionaryKey_take() throws {
+        let plistString = """
             /* comment */
             Animal = "pig";
-        }
-        """
+            """
         
-        XCTAssertEqual(try sut.parse(plistString), .dictionary([
+        try #expect(sut.parse(plistString) == .dictionary([
             DictionaryEntry(comment: "comment", key: "Animal", value: .string("pig"))
         ]))
     }
     
-    func test_parse_slashComment_beforeDictionaryKey_take() {
+    @Test func parse_manyComment_beforeDictionaryKey_takeLastOne() throws {
         let plistString = """
-        {
-            // comment
-            Animal = "pig";
-        }
-        """
+            {
+                /* comment1 */
+                /* comment2 */
+                Animal = "pig";
+                
+                /* comment3 */
+                /* comment4 */
+                City = "Seoul";
+            }
+            """
         
-        XCTAssertEqual(try sut.parse(plistString), .dictionary([
-            DictionaryEntry(comment: "comment", key: "Animal", value: .string("pig"))
-        ]))
-    }
-    
-    func test_parse_comment_withoutCurlyBracesAtRoot_beforeDictionaryKey_take() {
-        let plistString = """
-        /* comment */
-        Animal = "pig";
-        """
-        
-        XCTAssertEqual(try sut.parse(plistString), .dictionary([
-            DictionaryEntry(comment: "comment", key: "Animal", value: .string("pig"))
-        ]))
-    }
-    
-    func test_parse_manyComment_beforeDictionaryKey_takeLastOne() {
-        let plistString = """
-        {
-            /* comment1 */
-            /* comment2 */
-            Animal = "pig";
-            
-            /* comment3 */
-            /* comment4 */
-            City = "Seoul";
-        }
-        """
-        
-        XCTAssertEqual(try sut.parse(plistString), .dictionary([
+        try #expect(sut.parse(plistString) == .dictionary([
             DictionaryEntry(comment: "comment2", key: "Animal", value: .string("pig")),
             DictionaryEntry(comment: "comment4", key: "City", value: .string("Seoul"))
         ]))
     }
     
-    func test_parse_comment_withoutFollowingPair_ignore() {
+    @Test func parse_comment_withoutFollowingPair_ignore() throws {
         let plistString = """
-        {
+            {
+                Animal = "pig";
+                /* comment */
+            }
+            """
+        
+        try #expect(sut.parse(plistString) == .dictionary([
+            DictionaryEntry(comment: nil, key: "Animal", value: .string("pig"))
+        ]))
+    }
+    
+    @Test func parse_comment_withoutCurlyBracesAtRoot_withoutFollowingPair_ignore() throws {
+        let plistString = """
             Animal = "pig";
             /* comment */
-        }
-        """
+            """
         
-        XCTAssertEqual(try sut.parse(plistString), .dictionary([
+        try #expect(sut.parse(plistString) == .dictionary([
             DictionaryEntry(comment: nil, key: "Animal", value: .string("pig"))
         ]))
     }
     
-    func test_parse_comment_withoutCurlyBracesAtRoot_withoutFollowingPair_ignore() {
+    @Test func parse_comment_insideDictionaryEntry_ignore() throws {
         let plistString = """
-        Animal = "pig";
-        /* comment */
-        """
+            {
+                Animal /* comment */ = /* comment */ "pig" /* comment */ ;
+            }
+            """
         
-        XCTAssertEqual(try sut.parse(plistString), .dictionary([
+        try #expect(sut.parse(plistString) == .dictionary([
             DictionaryEntry(comment: nil, key: "Animal", value: .string("pig"))
         ]))
     }
     
-    func test_parse_comment_insideDictionaryEntry_ignore() {
-        let plistString = """
-        {
-            Animal /* comment */ = /* comment */ "pig" /* comment */ ;
-        }
-        """
-        
-        XCTAssertEqual(try sut.parse(plistString), .dictionary([
-            DictionaryEntry(comment: nil, key: "Animal", value: .string("pig"))
-        ]))
+    @Test func parse_comment_only() throws {
+        try #expect(sut.parse("( /* comment */ )") == .array([]))
+        try #expect(sut.parse("{ /* comment */ }") == .dictionary([]))
+        try #expect(sut.parse("/* comment */") == .dictionary([]))
+        try #expect(sut.parse("// comment") == .dictionary([]))
     }
     
-    func test_parse_comment_only() {
-        XCTAssertEqual(try sut.parse("( /* comment */ )"), .array([]))
-        XCTAssertEqual(try sut.parse("{ /* comment */ }"), .dictionary([]))
-        XCTAssertEqual(try sut.parse("/* comment */"), .dictionary([]))
-        XCTAssertEqual(try sut.parse("// comment"), .dictionary([]))
+    @Test func parse_comment_notCompleted_throwError() throws {
+        #expect(throws: RunError.self, performing: {
+            try sut.parse("/* comment ")
+        })
     }
     
-    func test_parse_comment_notCompleted_throwError() {
-        XCTAssertThrowsError(try sut.parse("/* comment "))
-    }
-    
-    func test_parse_empty() {
-        XCTAssertEqual(try sut.parse(" "), .dictionary([]))
-        XCTAssertEqual(try sut.parse(""), .dictionary([]))
+    @Test func parse_empty() throws {
+        try #expect(sut.parse(" ") == .dictionary([]))
+        try #expect(sut.parse("") == .dictionary([]))
     }
 }

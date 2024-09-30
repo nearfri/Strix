@@ -1,4 +1,4 @@
-import XCTest
+import Testing
 @testable import Strix
 
 private struct StreamSnapshot {
@@ -20,22 +20,10 @@ private struct FakeErrorOutputStream: ErrorOutputStream {
 
 private typealias ErrorMessageWriter = Strix.ErrorMessageWriter<FakeErrorOutputStream>
 
-class BaseErrorMessageWriterTests: XCTestCase {
-    fileprivate var errorStream = FakeErrorOutputStream()
+@Suite struct ErrorMessageWriterTests {
+    private var errorStream = FakeErrorOutputStream()
     
-    override func setUpWithError() throws {
-        try super.setUpWithError()
-        
-        errorStream = FakeErrorOutputStream()
-    }
-    
-    func test() {}
-}
-
-// MARK: - ErrorMessageWriter
-
-final class ErrorMessageWriterTests: BaseErrorMessageWriterTests {
-    func test_write() {
+    @Test mutating func write() {
         // Given
         let input = "\"abc def"
         let errors: [ParseError] = [
@@ -49,191 +37,190 @@ final class ErrorMessageWriterTests: BaseErrorMessageWriterTests {
         sut.write(to: &errorStream)
         
         // Then
-        XCTAssertEqual(errorStream.text, """
-        Error at line 1, column 1
-        "abc def
-        ^
-        Expecting: string literal in double quotes
+        #expect(errorStream.text == """
+            Error at line 1, column 1
+            "abc def
+            ^
+            Expecting: string literal in double quotes
+            
+            string literal in double quotes could not be parsed because:
+            Error at line 1, column 9
+            "abc def
+                    ^
+            Note: The error occurred at the end of the input stream.
+            Expecting: '"'
+            
+            """)
         
-        string literal in double quotes could not be parsed because:
-        Error at line 1, column 9
-        "abc def
-                ^
-        Note: The error occurred at the end of the input stream.
-        Expecting: '"'
-        
-        """)
-        
-        XCTAssert(errorStream.snapshots.contains(where: { snapshot in
-            return snapshot.indent.level == 0
-                && snapshot.text.contains("Expecting: string literal in double quotes")
-                && snapshot.text.hasSuffix("could not be parsed because:\n")
+        #expect(errorStream.snapshots.contains(where: { snapshot in
+            snapshot.indent.level == 0
+            && snapshot.text.contains("Expecting: string literal in double quotes")
+            && snapshot.text.hasSuffix("could not be parsed because:\n")
         }))
         
-        XCTAssert(errorStream.snapshots.contains(where: { snapshot in
+        #expect(errorStream.snapshots.contains(where: { snapshot in
             return snapshot.indent.level == 1
-                && snapshot.text.contains("Error at line 1, column 9")
-                && snapshot.text.contains("Expecting: '\"'")
+            && snapshot.text.contains("Error at line 1, column 9")
+            && snapshot.text.contains("Expecting: '\"'")
         }))
         
-        XCTAssertEqual(errorStream.indent.level, 0)
+        #expect(errorStream.indent.level == 0)
     }
-}
-
-// MARK: - Position
-
-final class ErrorMessageWriterPositionTests: BaseErrorMessageWriterTests {
-    enum Seed {
+    
+    // MARK: - Position
+    
+    private enum PositionFixture {
         static let input = """
-        12345
-        abcde
-        a\tde
-        ABCDE
-        """
+            12345
+            abcde
+            a\tde
+            ABCDE
+            """
     }
     
-    func test_write_lineAndColumn() throws {
+    @Test mutating func write_lineAndColumn() throws {
         // Given
-        let position = try XCTUnwrap(Seed.input.firstIndex(of: "c"))
-        let sut = ErrorMessageWriter(input: Seed.input, position: position, errors: [])
+        let position = try #require(PositionFixture.input.firstIndex(of: "c"))
+        let sut = ErrorMessageWriter(input: PositionFixture.input, position: position, errors: [])
         
         // When
         sut.write(to: &errorStream)
         
         // Then
-        XCTAssert(errorStream.text.contains("Error at line 2, column 3"))
+        #expect(errorStream.text.contains("Error at line 2, column 3"))
     }
     
-    func test_write_substringAtPosition() throws {
+    @Test mutating func write_substringAtPosition() throws {
         // Given
-        let position = try XCTUnwrap(Seed.input.firstIndex(of: "c"))
-        let sut = ErrorMessageWriter(input: Seed.input, position: position, errors: [])
+        let position = try #require(PositionFixture.input.firstIndex(of: "c"))
+        let sut = ErrorMessageWriter(input: PositionFixture.input, position: position, errors: [])
         
         // When
         sut.write(to: &errorStream)
         
         // Then
-        XCTAssert(errorStream.text.contains("abcde"))
-        XCTAssertFalse(errorStream.text.contains("12345"))
-        XCTAssertFalse(errorStream.text.contains("ABCDE"))
+        #expect(errorStream.text.contains("abcde"))
+        #expect(!errorStream.text.contains("12345"))
+        #expect(!errorStream.text.contains("ABCDE"))
     }
     
-    func test_write_columnMarker() throws {
+    @Test mutating func write_columnMarker() throws {
         // Given
-        let position = try XCTUnwrap(Seed.input.firstIndex(of: "c"))
-        let sut = ErrorMessageWriter(input: Seed.input, position: position, errors: [])
+        let position = try #require(PositionFixture.input.firstIndex(of: "c"))
+        let sut = ErrorMessageWriter(input: PositionFixture.input, position: position, errors: [])
         
         // When
         sut.write(to: &errorStream)
         
         // Then
-        //                                     abcde
-        XCTAssert(errorStream.text.contains("\n  ^"))
+        //                                   abcde
+        #expect(errorStream.text.contains("\n  ^"))
     }
     
-    func test_write_columnMarkerAtEndOfLine() throws {
+    @Test mutating func write_columnMarkerAtEndOfLine() throws {
         // Given
-        let position = Seed.input.index(after: try XCTUnwrap(Seed.input.firstIndex(of: "e")))
-        let sut = ErrorMessageWriter(input: Seed.input, position: position, errors: [])
-        
-        // When
-        sut.write(to: &errorStream)
-        
-        // Then
-        //                                     abcde
-        XCTAssert(errorStream.text.contains("\n     ^"))
-    }
-    
-    func test_write_columnMarkerAtEndOfInput() throws {
-        // Given
-        let position = Seed.input.endIndex
-        let sut = ErrorMessageWriter(input: Seed.input, position: position, errors: [])
-        
-        // When
-        sut.write(to: &errorStream)
-        
-        // Then
-        //                                     ABCDE
-        XCTAssert(errorStream.text.contains("\n     ^"))
-    }
-    
-    func test_write_columnMarkerAfterTab() throws {
-        // Given
-        let position = Seed.input.index(after: try XCTUnwrap(Seed.input.firstIndex(of: "\t")))
-        XCTAssertEqual(Seed.input[position], "d")
-        let sut = ErrorMessageWriter(input: Seed.input, position: position, errors: [])
-        
-        // When
-        sut.write(to: &errorStream)
-        
-        // Then
-        //                                     a\tde
-        XCTAssert(errorStream.text.contains("\n \t^"))
-    }
-    
-    func test_write_noteAtEndOfInput() {
-        // Given
-        let position = Seed.input.endIndex
-        let sut = ErrorMessageWriter(input: Seed.input, position: position, errors: [])
-        
-        // When
-        sut.write(to: &errorStream)
-        
-        // Then
-        XCTAssert(errorStream.text.contains("The error occurred at the end of the input stream."))
-    }
-    
-    func test_write_noteAtEndOfLine() throws {
-        // Given
-        let position = Seed.input.index(after: try XCTUnwrap(Seed.input.firstIndex(of: "e")))
-        let sut = ErrorMessageWriter(input: Seed.input, position: position, errors: [])
-        
-        // When
-        sut.write(to: &errorStream)
-        
-        // Then
-        XCTAssert(errorStream.text.contains("The error occurred at the end of the line."))
-    }
-    
-    func test_write_noteAtEmptyLine() throws {
-        // Given
-        let input = """
-        abc
-        
-        def
-        """
-        let position = input.index(before: try XCTUnwrap(input.firstIndex(of: "d")))
+        let input = PositionFixture.input
+        let position = PositionFixture.input.index(after: try #require(input.firstIndex(of: "e")))
         let sut = ErrorMessageWriter(input: input, position: position, errors: [])
         
         // When
         sut.write(to: &errorStream)
         
         // Then
-        XCTAssert(errorStream.text.contains("The error occurred on an empty line."))
+        //                                   abcde
+        #expect(errorStream.text.contains("\n     ^"))
     }
     
-    func test_write_multiline() throws {
+    @Test mutating func write_columnMarkerAtEndOfInput() throws {
         // Given
-        let position = try XCTUnwrap(Seed.input.firstIndex(of: "c"))
-        let sut = ErrorMessageWriter(input: Seed.input, position: position, errors: [])
+        let position = PositionFixture.input.endIndex
+        let sut = ErrorMessageWriter(input: PositionFixture.input, position: position, errors: [])
         
         // When
         sut.write(to: &errorStream)
         
         // Then
-        XCTAssert(errorStream.text.contains("""
-        Error at line 2, column 3
-        abcde
-          ^
-        
-        """))
+        //                                   ABCDE
+        #expect(errorStream.text.contains("\n     ^"))
     }
-}
-
-// MARK: - Without position
-
-final class ErrorMessageWriterWithoutPositionTests: BaseErrorMessageWriterTests {
-    func test_writeWithoutPosition() {
+    
+    @Test mutating func write_columnMarkerAfterTab() throws {
+        // Given
+        let input = PositionFixture.input
+        let position = PositionFixture.input.index(after: try #require(input.firstIndex(of: "\t")))
+        #expect(PositionFixture.input[position] == "d")
+        let sut = ErrorMessageWriter(input: input, position: position, errors: [])
+        
+        // When
+        sut.write(to: &errorStream)
+        
+        // Then
+        //                                   a\tde
+        #expect(errorStream.text.contains("\n \t^"))
+    }
+    
+    @Test mutating func write_noteAtEndOfInput() {
+        // Given
+        let position = PositionFixture.input.endIndex
+        let sut = ErrorMessageWriter(input: PositionFixture.input, position: position, errors: [])
+        
+        // When
+        sut.write(to: &errorStream)
+        
+        // Then
+        #expect(errorStream.text.contains("The error occurred at the end of the input stream."))
+    }
+    
+    @Test mutating func write_noteAtEndOfLine() throws {
+        // Given
+        let input = PositionFixture.input
+        let position = PositionFixture.input.index(after: try #require(input.firstIndex(of: "e")))
+        let sut = ErrorMessageWriter(input: input, position: position, errors: [])
+        
+        // When
+        sut.write(to: &errorStream)
+        
+        // Then
+        #expect(errorStream.text.contains("The error occurred at the end of the line."))
+    }
+    
+    @Test mutating func write_noteAtEmptyLine() throws {
+        // Given
+        let input = """
+            abc
+            
+            def
+            """
+        let position = input.index(before: try #require(input.firstIndex(of: "d")))
+        let sut = ErrorMessageWriter(input: input, position: position, errors: [])
+        
+        // When
+        sut.write(to: &errorStream)
+        
+        // Then
+        #expect(errorStream.text.contains("The error occurred on an empty line."))
+    }
+    
+    @Test mutating func write_multiline() throws {
+        // Given
+        let position = try #require(PositionFixture.input.firstIndex(of: "c"))
+        let sut = ErrorMessageWriter(input: PositionFixture.input, position: position, errors: [])
+        
+        // When
+        sut.write(to: &errorStream)
+        
+        // Then
+        #expect(errorStream.text.contains("""
+            Error at line 2, column 3
+            abcde
+              ^
+            
+            """))
+    }
+    
+    // MARK: - Without position
+    
+    @Test mutating func writeWithoutPosition() {
         // Given
         let errors: [ParseError] = [
             .expected(label: "number"),
@@ -244,14 +231,12 @@ final class ErrorMessageWriterWithoutPositionTests: BaseErrorMessageWriterTests 
         sut.write(to: &errorStream)
         
         // Then
-        XCTAssertEqual(errorStream.text, "Expecting: number\n")
+        #expect(errorStream.text == "Expecting: number\n")
     }
-}
-
-// MARK: - Expected error
-
-final class ErrorMessageWriterExpectedTests: BaseErrorMessageWriterTests {
-    func test_write_expectedErrors_1() {
+    
+    // MARK: - Expected error
+    
+    @Test mutating func write_expectedErrors_1() {
         // Given
         let input = "hello"
         let errors: [ParseError] = [
@@ -263,10 +248,10 @@ final class ErrorMessageWriterExpectedTests: BaseErrorMessageWriterTests {
         sut.write(to: &errorStream)
         
         // Then
-        XCTAssert(errorStream.text.contains("Expecting: number"))
+        #expect(errorStream.text.contains("Expecting: number"))
     }
     
-    func test_write_expectedErrors_2() {
+    @Test mutating func write_expectedErrors_2() {
         // Given
         let input = "hello"
         let errors: [ParseError] = [
@@ -279,10 +264,10 @@ final class ErrorMessageWriterExpectedTests: BaseErrorMessageWriterTests {
         sut.write(to: &errorStream)
         
         // Then
-        XCTAssert(errorStream.text.contains("Expecting: number or boolean"))
+        #expect(errorStream.text.contains("Expecting: number or boolean"))
     }
     
-    func test_write_expectedErrors_3() {
+    @Test mutating func write_expectedErrors_3() {
         // Given
         let input = ""
         let errors: [ParseError] = [
@@ -296,10 +281,10 @@ final class ErrorMessageWriterExpectedTests: BaseErrorMessageWriterTests {
         sut.write(to: &errorStream)
         
         // Then
-        XCTAssert(errorStream.text.contains("Expecting: number, boolean, or string"))
+        #expect(errorStream.text.contains("Expecting: number, boolean, or string"))
     }
     
-    func test_write_expectedStringErrors() {
+    @Test mutating func write_expectedStringErrors() {
         // Given
         let input = "wow"
         let errors: [ParseError] = [
@@ -312,10 +297,10 @@ final class ErrorMessageWriterExpectedTests: BaseErrorMessageWriterTests {
         sut.write(to: &errorStream)
         
         // Then
-        XCTAssert(errorStream.text.contains("Expecting: 'HELLO' (case-insensitive) or 'WORLD'"))
+        #expect(errorStream.text.contains("Expecting: 'HELLO' (case-insensitive) or 'WORLD'"))
     }
     
-    func test_write_compoundErrors() {
+    @Test mutating func write_compoundExpectedErrors() {
         // Given
         let input = "\"abcd"
         let errors: [ParseError] = [
@@ -329,14 +314,12 @@ final class ErrorMessageWriterExpectedTests: BaseErrorMessageWriterTests {
         sut.write(to: &errorStream)
         
         // Then
-        XCTAssert(errorStream.text.contains("Expecting: string literal in double quotes"))
+        #expect(errorStream.text.contains("Expecting: string literal in double quotes"))
     }
-}
-
-// MARK: - Unexpected error
-
-final class ErrorMessageWriterUnexpectedTests: BaseErrorMessageWriterTests {
-    func test_write_unexpectedErrors() {
+    
+    // MARK: - Unexpected error
+    
+    @Test mutating func write_unexpectedErrors() {
         // Given
         let input = "false"
         let errors: [ParseError] = [
@@ -349,10 +332,10 @@ final class ErrorMessageWriterUnexpectedTests: BaseErrorMessageWriterTests {
         sut.write(to: &errorStream)
         
         // Then
-        XCTAssert(errorStream.text.contains("Unexpected: boolean and string"))
+        #expect(errorStream.text.contains("Unexpected: boolean and string"))
     }
     
-    func test_write_unexpectedStringErrors() {
+    @Test mutating func write_unexpectedStringErrors() {
         // Given
         let input = "hello"
         let errors: [ParseError] = [
@@ -365,14 +348,12 @@ final class ErrorMessageWriterUnexpectedTests: BaseErrorMessageWriterTests {
         sut.write(to: &errorStream)
         
         // Then
-        XCTAssert(errorStream.text.contains("Unexpected: 'HELLO' (case-insensitive) and 'WORLD'"))
+        #expect(errorStream.text.contains("Unexpected: 'HELLO' (case-insensitive) and 'WORLD'"))
     }
-}
-
-// MARK: - Generic error
-
-final class ErrorMessageWriterGenericTests: BaseErrorMessageWriterTests {
-    func test_write_onlyGenericErrors() {
+    
+    // MARK: - Generic error
+    
+    @Test mutating func write_onlyGenericErrors() {
         // Given
         let input = "foo bar"
         let errors: [ParseError] = [
@@ -384,13 +365,13 @@ final class ErrorMessageWriterGenericTests: BaseErrorMessageWriterTests {
         sut.write(to: &errorStream)
         
         // Then
-        XCTAssert(errorStream.snapshots.contains(where: { snapshot in
+        #expect(errorStream.snapshots.contains(where: { snapshot in
             return snapshot.indent.level == 0
-                && snapshot.text.contains("integer overflow")
+            && snapshot.text.contains("integer overflow")
         }))
     }
     
-    func test_write_genericErrorsWithExpectedErrors() {
+    @Test mutating func write_genericErrorsWithExpectedErrors() {
         // Given
         let input = "1) Write open source library 2) ??? 3) lot's of unpaid work"
         let errors: [ParseError] = [
@@ -404,25 +385,23 @@ final class ErrorMessageWriterGenericTests: BaseErrorMessageWriterTests {
         sut.write(to: &errorStream)
         
         // Then
-        XCTAssert(errorStream.text.contains("""
-        Expecting: 'profit'
-        Other error messages:
-        So much about that theory ...
-        """))
+        #expect(errorStream.text.contains("""
+            Expecting: 'profit'
+            Other error messages:
+            So much about that theory ...
+            """))
         
-        XCTAssert(errorStream.snapshots.contains(where: { snapshot in
+        #expect(errorStream.snapshots.contains(where: { snapshot in
             return snapshot.indent.level == 1
-                && snapshot.text.contains("So much about that theory ...")
+            && snapshot.text.contains("So much about that theory ...")
         }))
         
-        XCTAssertEqual(errorStream.indent.level, 0)
+        #expect(errorStream.indent.level == 0)
     }
-}
-
-// MARK: - Compound, nested error
-
-final class ErrorMessageWriterCompoundTests: BaseErrorMessageWriterTests {
-    func test_write_compoundErrors() {
+    
+    // MARK: - Compound, nested error
+    
+    @Test mutating func write_compoundErrors() {
         // Given
         let input = "\"abc def"
         let errors: [ParseError] = [
@@ -436,33 +415,33 @@ final class ErrorMessageWriterCompoundTests: BaseErrorMessageWriterTests {
         sut.write(to: &errorStream)
         
         // Then
-        XCTAssert(errorStream.text.contains("""
-        Expecting: string literal in double quotes
+        #expect(errorStream.text.contains("""
+            Expecting: string literal in double quotes
+            
+            string literal in double quotes could not be parsed because:
+            Error at line 1, column 9
+            "abc def
+                    ^
+            Note: The error occurred at the end of the input stream.
+            Expecting: '"'
+            """))
         
-        string literal in double quotes could not be parsed because:
-        Error at line 1, column 9
-        "abc def
-                ^
-        Note: The error occurred at the end of the input stream.
-        Expecting: '"'
-        """))
-        
-        XCTAssert(errorStream.snapshots.contains(where: { snapshot in
+        #expect(errorStream.snapshots.contains(where: { snapshot in
             return snapshot.indent.level == 0
-                && snapshot.text.contains("Expecting: string literal in double quotes")
-                && snapshot.text.hasSuffix("could not be parsed because:\n")
+            && snapshot.text.contains("Expecting: string literal in double quotes")
+            && snapshot.text.hasSuffix("could not be parsed because:\n")
         }))
         
-        XCTAssert(errorStream.snapshots.contains(where: { snapshot in
+        #expect(errorStream.snapshots.contains(where: { snapshot in
             return snapshot.indent.level == 1
-                && snapshot.text.contains("Error at line 1, column 9")
-                && snapshot.text.contains("Expecting: '\"'")
+            && snapshot.text.contains("Error at line 1, column 9")
+            && snapshot.text.contains("Expecting: '\"'")
         }))
         
-        XCTAssertEqual(errorStream.indent.level, 0)
+        #expect(errorStream.indent.level == 0)
     }
     
-    func test_write_nestedErrors() {
+    @Test mutating func write_nestedErrors() {
         // Given
         let input = "ac"
         let errors: [ParseError] = [
@@ -475,20 +454,20 @@ final class ErrorMessageWriterCompoundTests: BaseErrorMessageWriterTests {
         sut.write(to: &errorStream)
         
         // Then
-        XCTAssert(errorStream.text.contains("""
-        The parser backtracked after:
-        Error at line 1, column 2
-        ac
-         ^
-        Expecting: 'b'
-        """))
+        #expect(errorStream.text.contains("""
+            The parser backtracked after:
+            Error at line 1, column 2
+            ac
+             ^
+            Expecting: 'b'
+            """))
         
-        XCTAssert(errorStream.snapshots.contains(where: { snapshot in
+        #expect(errorStream.snapshots.contains(where: { snapshot in
             return snapshot.indent.level == 1
-                && snapshot.text.contains("Error at line 1, column 2")
-                && snapshot.text.contains("Expecting: 'b'")
+            && snapshot.text.contains("Error at line 1, column 2")
+            && snapshot.text.contains("Expecting: 'b'")
         }))
         
-        XCTAssertEqual(errorStream.indent.level, 0)
+        #expect(errorStream.indent.level == 0)
     }
 }

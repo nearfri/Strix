@@ -1,8 +1,8 @@
-import XCTest
+import Testing
 @testable import Strix
 
-final class ParserResultTests: XCTestCase {
-    func test_value() {
+@Suite struct ParserResultTests {
+    @Test func value() {
         // Given
         let value = 3
         let result = ParserResult.success(value, [])
@@ -11,10 +11,10 @@ final class ParserResultTests: XCTestCase {
         let resultValue = result.value
         
         // Then
-        XCTAssertEqual(resultValue, value)
+        #expect(resultValue == value)
     }
     
-    func test_errors_setAndGetWhenSuccess() {
+    @Test func errors_setAndGetWhenSuccess() {
         // Given
         let errors: [ParseError] = [.expected(label: "number")]
         var result = ParserResult.success(3, [])
@@ -24,10 +24,10 @@ final class ParserResultTests: XCTestCase {
         let resultErrors = result.errors
         
         // Then
-        XCTAssertEqual(resultErrors, errors)
+        #expect(resultErrors == errors)
     }
     
-    func test_errors_setAndGetWhenFailure() {
+    @Test func errors_setAndGetWhenFailure() {
         // Given
         let errors: [ParseError] = [.expected(label: "number")]
         var result = ParserResult<Int>.failure([])
@@ -37,10 +37,10 @@ final class ParserResultTests: XCTestCase {
         let resultErrors = result.errors
         
         // Then
-        XCTAssertEqual(resultErrors, errors)
+        #expect(resultErrors == errors)
     }
     
-    func test_map_successAndSuccess_returnSuccess() {
+    @Test func map_successAndSuccess_returnSuccess() {
         // Given
         let sut = ParserResult.success("hello", [])
         
@@ -48,22 +48,24 @@ final class ParserResultTests: XCTestCase {
         let mapped = sut.map({ _ in 123 })
         
         // Then
-        XCTAssertEqual(mapped.value, 123)
+        #expect(mapped.value == 123)
     }
     
-    func test_map_successAndThrow_returnFailure() {
+    @Test func map_successAndThrow_returnFailure() {
         // Given
         let sut = ParserResult.success("hello", [])
         
         // When
-        let mapped: ParserResult<Int> = sut.map({ _ in throw ParseError.expected(label: "Hello") })
+        let mapped: ParserResult<Int> = sut.map({ _ throws(ParseError) in
+            throw ParseError.expected(label: "Hello")
+        })
         
         // Then
-        XCTAssertNil(mapped.value)
-        XCTAssertEqual(mapped.errors, [.expected(label: "Hello")])
+        #expect(mapped.value == nil)
+        #expect(mapped.errors == [.expected(label: "Hello")])
     }
     
-    func test_map_failure_returnFailure() {
+    @Test func map_failure_returnFailure() {
         // Given
         let sut = ParserResult<String>.failure([])
         
@@ -71,6 +73,6 @@ final class ParserResultTests: XCTestCase {
         let mapped = sut.map({ _ in 123 })
         
         // Then
-        XCTAssertNil(mapped.value)
+        #expect(mapped.value == nil)
     }
 }

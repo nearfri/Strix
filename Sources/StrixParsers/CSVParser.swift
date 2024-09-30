@@ -11,11 +11,11 @@ public struct CSVParser {
         parser = ws *> Parser.csv <* ws <* .endOfStream
     }
     
-    public func parse(_ csvString: String) throws -> CSV {
+    public func parse(_ csvString: String) throws(RunError) -> CSV {
         return try parser.run(csvString)
     }
     
-    public func callAsFunction(_ csvString: String) throws -> CSV {
+    public func callAsFunction(_ csvString: String) throws(RunError) -> CSV {
         return try parse(csvString)
     }
 }

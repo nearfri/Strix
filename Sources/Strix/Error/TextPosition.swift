@@ -1,6 +1,6 @@
 import Foundation
 
-public struct TextPosition {
+public struct TextPosition: Sendable {
     public var line: Int
     public var column: Int
     

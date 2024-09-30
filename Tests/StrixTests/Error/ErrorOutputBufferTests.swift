@@ -1,17 +1,14 @@
-import XCTest
+import Testing
 @testable import Strix
 
-final class ErrorOutputBufferTests: XCTestCase {
-    var sut: ErrorOutputBuffer = .init()
+@Suite struct ErrorOutputBufferTests {
+    private var sut: ErrorOutputBuffer = .init()
     
-    override func setUpWithError() throws {
-        try super.setUpWithError()
-        
-        sut = .init()
+    init() {
         sut.indent.width = 4
     }
     
-    func test_write_singleLine() {
+    @Test mutating func write_singleLine() {
         // Given
         let input = "hello world"
         
@@ -19,10 +16,10 @@ final class ErrorOutputBufferTests: XCTestCase {
         print(input, terminator: "", to: &sut)
         
         // Then
-        XCTAssertEqual(sut.text, input)
+        #expect(sut.text == input)
     }
     
-    func test_write_multipleLine() {
+    @Test mutating func write_multipleLine() {
         // Given
         let input = """
         hello
@@ -34,10 +31,10 @@ final class ErrorOutputBufferTests: XCTestCase {
         print(input, terminator: "", to: &sut)
         
         // Then
-        XCTAssertEqual(sut.text, input)
+        #expect(sut.text == input)
     }
     
-    func test_write_repeat() {
+    @Test mutating func write_repeat() {
         // Given
         let lines: [String] = [
             "hello",
@@ -51,20 +48,20 @@ final class ErrorOutputBufferTests: XCTestCase {
         }
         
         // Then
-        XCTAssertEqual(sut.text, "hello\n" + "    swift\n" + "world\n")
+        #expect(sut.text == "hello\n" + "    swift\n" + "world\n")
     }
     
-    func test_write_withoutTerminator() {
+    @Test mutating func write_withoutTerminator() {
         // When
         print("hello ", terminator: "", to: &sut)
         print("swift", terminator: "", to: &sut)
         print(" world", terminator: "", to: &sut)
         
         // Then
-        XCTAssertEqual(sut.text, "hello swift world")
+        #expect(sut.text == "hello swift world")
     }
     
-    func test_write_indent_singleLine() {
+    @Test mutating func write_indent_singleLine() {
         // Given
         let input = "hello world"
         
@@ -78,21 +75,21 @@ final class ErrorOutputBufferTests: XCTestCase {
         print("end", to: &sut)
         
         // Then
-        XCTAssertEqual(sut.text, """
-        start
-            hello world
-        end
-        
-        """)
+        #expect(sut.text == """
+            start
+                hello world
+            end
+            
+            """)
     }
     
-    func test_write_indent_multipleLine() {
+    @Test mutating func write_indent_multipleLine() {
         // Given
         let input = """
-        hello
-            swift
-        world
-        """
+            hello
+                swift
+            world
+            """
         
         // When
         print("start", to: &sut)
@@ -104,17 +101,17 @@ final class ErrorOutputBufferTests: XCTestCase {
         print("end", to: &sut)
         
         // Then
-        XCTAssertEqual(sut.text, """
-        start
-            hello
-                swift
-            world
-        end
-        
-        """)
+        #expect(sut.text == """
+            start
+                hello
+                    swift
+                world
+            end
+            
+            """)
     }
     
-    func test_write_indent_repeat() {
+    @Test mutating func write_indent_repeat() {
         // Given
         let lines: [String] = [
             "hello",
@@ -134,22 +131,22 @@ final class ErrorOutputBufferTests: XCTestCase {
         print("end", to: &sut)
         
         // Then
-        XCTAssertEqual(sut.text, """
-        start
-            hello
-                swift
-            world
-        end
-        
-        """)
+        #expect(sut.text == """
+            start
+                hello
+                    swift
+                world
+            end
+            
+            """)
     }
     
-    func test_write_indent_startsWithIndent() {
+    @Test mutating func write_indent_startsWithIndent() {
         // When
         sut.indent.level += 1
         print("hello", to: &sut)
         
         // Then
-        XCTAssertEqual(sut.text, "    hello\n")
+        #expect(sut.text == "    hello\n")
     }
 }

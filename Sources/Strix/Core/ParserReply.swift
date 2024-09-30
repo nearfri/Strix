@@ -27,7 +27,7 @@ public struct ParserReply<T> {
         return .init(result: .failure(errors), state: state)
     }
     
-    public func map<U>(_ transform: (T) throws -> U) -> ParserReply<U> {
+    public func map<U>(_ transform: (T) throws(ParseError) -> U) -> ParserReply<U> {
         return .init(result: result.map(transform), state: state)
     }
     

@@ -1,123 +1,121 @@
-import XCTest
+import Testing
 import Strix
 @testable import StrixParsers
 
-final class FormatSpecifierParserTests: XCTestCase {
-    let sut = Parser.formatSpecifier
+@Suite struct FormatSpecifierParserTests {
+    private let sut = Parser.formatSpecifier
     
-    func test_parse_nonFormat_throwError() {
-        XCTAssertThrowsError(try sut.run("d"))
+    @Test func parse_nonFormat_throwError() {
+        #expect(throws: RunError.self, performing: {
+            try sut.run("d")
+        })
     }
     
-    func test_parse_invalidFormat_throwError() {
-        XCTAssertThrowsError(try sut.run("%m"))
+    @Test func parse_invalidFormat_throwError() {
+        #expect(throws: RunError.self, performing: {
+            try sut.run("%m")
+        })
     }
     
-    func test_parse_percent() throws {
-        XCTAssertEqual(try sut.run("%%"), .percentSign)
+    @Test func parse_percent() throws {
+        try #expect(sut.run("%%") == .percentSign)
     }
     
-    func test_parse_int() throws {
-        XCTAssertEqual(try sut.run("%d"), .placeholder(.init(conversion: .decimal)))
-        XCTAssertEqual(try sut.run("%D"), .placeholder(.init(conversion: .DECIMAL)))
+    @Test func parse_int() throws {
+        try #expect(sut.run("%d") == .placeholder(.init(conversion: .decimal)))
+        try #expect(sut.run("%D") == .placeholder(.init(conversion: .DECIMAL)))
     }
     
-    func test_parse_hex() throws {
-        XCTAssertEqual(try sut.run("%x"), .placeholder(.init(conversion: .hex)))
-        XCTAssertEqual(try sut.run("%X"), .placeholder(.init(conversion: .HEX)))
+    @Test func parse_hex() throws {
+        try #expect(sut.run("%x") == .placeholder(.init(conversion: .hex)))
+        try #expect(sut.run("%X") == .placeholder(.init(conversion: .HEX)))
     }
     
-    func test_parse_object() throws {
-        XCTAssertEqual(try sut.run("%@"), .placeholder(.init(conversion: .object)))
+    @Test func parse_object() throws {
+        try #expect(sut.run("%@") == .placeholder(.init(conversion: .object)))
     }
     
-    func test_parse_index() {
-        XCTAssertEqual(try sut.run("%1$d"), .placeholder(
-                        .init(index: 1, conversion: .decimal)))
+    @Test func parse_index() throws {
+        try #expect(sut.run("%1$d") == .placeholder(.init(index: 1, conversion: .decimal)))
     }
     
-    func test_parse_index_zero_throwError() {
-        XCTAssertThrowsError(try sut.run("%0$d"))
+    @Test func parse_index_zero_throwError() {
+        #expect(throws: RunError.self, performing: {
+            try sut.run("%0$d")
+        })
     }
     
-    func test_parse_flags_minus() {
-        XCTAssertEqual(try sut.run("%-d"), .placeholder(
-                        .init(flags: [.minus], conversion: .decimal)))
+    @Test(arguments: [
+        ("minus", "%-d", .init(flags: [.minus], conversion: .decimal)),
+        ("hash", "%#d", .init(flags: [.hash], conversion: .decimal)),
+        ("minus and zero", "%-0d", .init(flags: [.minus, .zero], conversion: .decimal)),
+    ] as [(Comment, String, FormatPlaceholder)])
+    func parse_flags(comment: Comment, input: String, expected: FormatPlaceholder) throws {
+        try #expect(sut.run(input) == .placeholder(expected), comment)
     }
     
-    func test_parse_flags_hash() {
-        XCTAssertEqual(try sut.run("%#d"), .placeholder(
-                        .init(flags: [.hash], conversion: .decimal)))
+    @Test(arguments: [
+        ("static", "%5d", .init(width: .static(5), conversion: .decimal)),
+        ("dynamic", "%*d", .init(width: .dynamic(nil), conversion: .decimal)),
+        ("dynamic with index", "%*2$d", .init(width: .dynamic(2), conversion: .decimal)),
+    ] as [(Comment, String, FormatPlaceholder)])
+    func parse_width(comment: Comment, input: String, expected: FormatPlaceholder) throws {
+        try #expect(sut.run(input) == .placeholder(expected), comment)
     }
     
-    func test_parse_flags_minusAndZero() {
-        XCTAssertEqual(try sut.run("%-0d"), .placeholder(
-                        .init(flags: [.minus, .zero], conversion: .decimal)))
+    @Test(arguments: [
+        ("static", "%.5d", .init(precision: .static(5), conversion: .decimal)),
+        ("dynamic", "%.*d", .init(precision: .dynamic(nil), conversion: .decimal)),
+        ("dynamic with index", "%.*2$d", .init(precision: .dynamic(2), conversion: .decimal)),
+    ] as [(Comment, String, FormatPlaceholder)])
+    func parse_precision(comment: Comment, input: String, expected: FormatPlaceholder) throws {
+        try #expect(sut.run(input) == .placeholder(expected), comment)
     }
     
-    func test_parse_width_static() {
-        XCTAssertEqual(try sut.run("%5d"), .placeholder(
-                        .init(width: .static(5), conversion: .decimal)))
+    @Test(arguments: [
+        ("char", "%hhd", .init(length: .char, conversion: .decimal)),
+        ("short", "%hd", .init(length: .short, conversion: .decimal)),
+        ("long", "%ld", .init(length: .long, conversion: .decimal)),
+    ] as [(Comment, String, FormatPlaceholder)])
+    func parse_length(comment: Comment, input: String, expected: FormatPlaceholder) throws {
+        try #expect(sut.run(input) == .placeholder(expected), comment)
     }
     
-    func test_parse_width_dynamic() {
-        XCTAssertEqual(try sut.run("%*d"), .placeholder(
-                        .init(width: .dynamic(nil), conversion: .decimal)))
+    @Test func parse_variableName_goodName() throws {
+        let expected = FormatPlaceholder(
+            flags: [.hash],
+            conversion: .object,
+            variableName: "v1_minutes")
+        
+        try #expect(sut.run("%#@v1_minutes@") == .placeholder(expected))
     }
     
-    func test_parse_width_dynamicWithIndex() {
-        XCTAssertEqual(try sut.run("%*2$d"), .placeholder(
-                        .init(width: .dynamic(2), conversion: .decimal)))
+    @Test(arguments: [
+        "%#@v1_min&utes@",
+        "%#@v1_min utes@",
+        "%#@v1_min+utes@",
+    ])
+    func parse_variableName_invalidCharacter_throwError(input: String) {
+        #expect(throws: RunError.self, performing: {
+            try sut.run(input)
+        })
     }
     
-    func test_parse_precision_static() {
-        XCTAssertEqual(try sut.run("%.5d"), .placeholder(
-                        .init(precision: .static(5), conversion: .decimal)))
+    @Test func parse_variableName_notEndWithCommercialAt_throwError() {
+        #expect(throws: RunError.self, performing: {
+            try sut.run("%#@v1_minutes")
+        })
     }
     
-    func test_parse_precision_dynamic() {
-        XCTAssertEqual(try sut.run("%.*d"), .placeholder(
-                        .init(precision: .dynamic(nil), conversion: .decimal)))
-    }
-    
-    func test_parse_precision_dynamicWithIndex() {
-        XCTAssertEqual(try sut.run("%.*2$d"), .placeholder(
-                        .init(precision: .dynamic(2), conversion: .decimal)))
-    }
-    
-    func test_parse_length_char() {
-        XCTAssertEqual(try sut.run("%hhd"), .placeholder(
-                        .init(length: .char, conversion: .decimal)))
-    }
-    
-    func test_parse_length_short() {
-        XCTAssertEqual(try sut.run("%hd"), .placeholder(
-                        .init(length: .short, conversion: .decimal)))
-    }
-    
-    func test_parse_length_long() {
-        XCTAssertEqual(try sut.run("%ld"), .placeholder(
-                        .init(length: .long, conversion: .decimal)))
-    }
-    
-    func test_parse_variableName_goodName() {
-        XCTAssertEqual(try sut.run("%#@v1_minutes@"), .placeholder(
-                        .init(flags: [.hash], conversion: .object, variableName: "v1_minutes")))
-    }
-    
-    func test_parse_variableName_invalidCharacter_throwError() {
-        XCTAssertThrowsError(try sut.run("%#@v1_min&utes@"))
-        XCTAssertThrowsError(try sut.run("%#@v1_min utes@"))
-        XCTAssertThrowsError(try sut.run("%#@v1_min+utes@"))
-    }
-    
-    func test_parse_variableName_notEndWithCommercialAt_throwError() {
-        XCTAssertThrowsError(try sut.run("%#@v1_minutes"))
-    }
-    
-    func test_parse_complex_placeholder() {
-        XCTAssertEqual(try sut.run("%2$05.*3$ld"), .placeholder(
-                        .init(index: 2, flags: [.zero], width: .static(5), precision: .dynamic(3),
-                              length: .long, conversion: .decimal)))
+    @Test func parse_complex_placeholder() throws {
+        let expected = FormatPlaceholder(
+            index: 2,
+            flags: [.zero],
+            width: .static(5),
+            precision: .dynamic(3),
+            length: .long,
+            conversion: .decimal)
+        
+        try #expect(sut.run("%2$05.*3$ld") == .placeholder(expected))
     }
 }

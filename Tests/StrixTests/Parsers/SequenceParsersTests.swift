@@ -1,8 +1,8 @@
-import XCTest
+import Testing
 @testable import Strix
 
-final class SequenceParsersTests: XCTestCase {
-    func test_repeat_enoughSuccess_succeed() {
+@Suite struct SequenceParsersTests {
+    @Test func repeat_enoughSuccess_succeed() {
         // Given
         var count = 0
         let p1: Parser<Int> = Parser { state in
@@ -15,10 +15,10 @@ final class SequenceParsersTests: XCTestCase {
         let reply = p.parse(ParserState(stream: "Input"))
         
         // Then
-        XCTAssertEqual(reply.result.value, [1, 2, 3])
+        #expect(reply.result.value == [1, 2, 3])
     }
     
-    func test_repeat_notEnoughSuccess_fail() {
+    @Test func repeat_notEnoughSuccess_fail() {
         // Given
         var count = 0
         let p1: Parser<Int> = Parser { state in
@@ -34,10 +34,10 @@ final class SequenceParsersTests: XCTestCase {
         let reply = p.parse(ParserState(stream: "Input"))
         
         // Then
-        XCTAssert(reply.result.isFailure)
+        #expect(reply.result.isFailure)
     }
     
-    func test_many_enoughSuccess_succeed() {
+    @Test func many_enoughSuccess_succeed() {
         // Given
         let p1: Parser<Int> = .just(1)
         
@@ -55,10 +55,10 @@ final class SequenceParsersTests: XCTestCase {
         let reply = p.parse(ParserState(stream: "Input..........."))
         
         // Then
-        XCTAssertEqual(reply.result.value, [1, 2, 3, 4, 5])
+        #expect(reply.result.value == [1, 2, 3, 4, 5])
     }
     
-    func test_many_notEnoughSuccess_fail() {
+    @Test func many_notEnoughSuccess_fail() {
         // Given
         let p1: Parser<Int> = .just(1)
         
@@ -76,10 +76,10 @@ final class SequenceParsersTests: XCTestCase {
         let reply = p.parse(ParserState(stream: "Input..........."))
         
         // Then
-        XCTAssert(reply.result.isFailure)
+        #expect(reply.result.isFailure)
     }
     
-    func test_manySeparated_failAtSeparator_succeed() {
+    @Test func manySeparated_failAtSeparator_succeed() {
         // Given
         var count = 0
         let p1: Parser<Int> = Parser { state in
@@ -101,10 +101,10 @@ final class SequenceParsersTests: XCTestCase {
         let reply = p.parse(ParserState(stream: "Input..........."))
         
         // Then
-        XCTAssertEqual(reply.result.value, [1, 2, 3])
+        #expect(reply.result.value == [1, 2, 3])
     }
     
-    func test_manySeparated_failAtParser_fail() {
+    @Test func manySeparated_failAtParser_fail() {
         // Given
         var count = 0
         let p1: Parser<Int> = Parser { state in
@@ -126,10 +126,10 @@ final class SequenceParsersTests: XCTestCase {
         let reply = p.parse(ParserState(stream: "Input..........."))
         
         // Then
-        XCTAssert(reply.result.isFailure)
+        #expect(reply.result.isFailure)
     }
     
-    func test_manySeparatedWithAllowEndBySeparator_failAtParser_succeed() {
+    @Test func manySeparatedWithAllowEndBySeparator_failAtParser_succeed() {
         // Given
         var count = 0
         let p1: Parser<Int> = Parser { state in
@@ -151,7 +151,6 @@ final class SequenceParsersTests: XCTestCase {
         let reply = p.parse(ParserState(stream: "Input..........."))
         
         // Then
-        XCTAssertEqual(reply.result.value, [1, 2])
+        #expect(reply.result.value == [1, 2])
     }
 }
-

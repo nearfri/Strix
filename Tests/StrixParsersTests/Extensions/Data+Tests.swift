@@ -1,8 +1,9 @@
-import XCTest
+import Testing
+import Foundation
 @testable import StrixParsers
 
-final class Data_Tests: XCTestCase {
-    func test_hexStringRepresentation_lowercase() {
+@Suite struct DataTests {
+    @Test func hexStringRepresentation_lowercase() {
         // Given
         let data = Data([
             0xab, 0xcd, 0xef, 0x01, 0x23, 0x45, 0x67, 0x89
@@ -12,10 +13,10 @@ final class Data_Tests: XCTestCase {
         let hexString = data.hexStringRepresentation(uppercase: false)
         
         // Then
-        XCTAssertEqual(hexString, "abcdef0123456789")
+        #expect(hexString == "abcdef0123456789")
     }
     
-    func test_hexStringRepresentation_uppercase() {
+    @Test func hexStringRepresentation_uppercase() {
         // Given
         let data = Data([
             0xab, 0xcd, 0xef, 0x01, 0x23, 0x45, 0x67, 0x89
@@ -25,6 +26,6 @@ final class Data_Tests: XCTestCase {
         let hexString = data.hexStringRepresentation(uppercase: true)
         
         // Then
-        XCTAssertEqual(hexString, "ABCDEF0123456789")
+        #expect(hexString == "ABCDEF0123456789")
     }
 }

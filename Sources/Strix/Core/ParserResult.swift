@@ -39,13 +39,12 @@ public enum ParserResult<T> {
         }
     }
     
-    public func map<U>(_ transform: (T) throws -> U) -> ParserResult<U> {
+    public func map<U>(_ transform: (T) throws(ParseError) -> U) -> ParserResult<U> {
         switch self {
         case let .success(value, errors):
             do {
                 return .success(try transform(value), errors)
-            } catch let e {
-                let error = (e as? ParseError) ?? .generic(message: e.localizedDescription)
+            } catch {
                 return .failure(errors + [error])
             }
         case let .failure(errors):

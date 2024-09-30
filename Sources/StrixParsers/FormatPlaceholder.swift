@@ -6,7 +6,7 @@ import Foundation
 // https://pubs.opengroup.org/onlinepubs/9699919799/functions/printf.html
 // http://man.openbsd.org/printf.3
 
-public struct FormatPlaceholder: Equatable {
+public struct FormatPlaceholder: Equatable, Sendable {
     public var index: Index?
     public var flags: [Flag] = []
     public var width: Width?
@@ -37,10 +37,35 @@ public struct FormatPlaceholder: Equatable {
     }
 }
 
+extension FormatPlaceholder: CustomStringConvertible {
+    public var description: String {
+        let components: [String?] = [
+            index.map({ "index: \($0)" }),
+            
+            {
+                let flagDescs = flags.map({ "\($0)" })
+                return flagDescs.isEmpty ? nil : "flags: \(flagDescs)"
+            }(),
+            
+            width.map({ "width: \($0)" }),
+            
+            precision.map({ "precision: \($0) "}),
+            
+            length.map({ "length: \($0)" }),
+            
+            "conversion: \(conversion)",
+            
+            variableName.map({ "variableName: \($0)" }),
+        ]
+        
+        return "FormatPlaceholder(\(components.compactMap({ $0 }).joined(separator: ", ")))"
+    }
+}
+
 extension FormatPlaceholder {
     public typealias Index = Int
     
-    public enum Flag: Character, CaseIterable {
+    public enum Flag: Character, CaseIterable, Sendable {
         case minus = "-"
         case plus = "+"
         case space = " "
@@ -49,14 +74,14 @@ extension FormatPlaceholder {
         case hash = "#"
     }
     
-    public enum Width: Equatable {
+    public enum Width: Equatable, Sendable {
         case `static`(Int)
         case dynamic(Index?)
     }
     
     public typealias Precision = Width
     
-    public enum Length: String, CaseIterable {
+    public enum Length: String, CaseIterable, Sendable {
         case char = "hh" // char or unsigned char
         case short = "h" // short or unsigned short
         case long = "l" // long or unsigned long
@@ -70,7 +95,7 @@ extension FormatPlaceholder {
         case quadword = "q" // quad_t
     }
     
-    public enum Conversion: Character, CaseIterable {
+    public enum Conversion: Character, CaseIterable, Sendable {
         case decimal = "d" // int
         case int = "i" // int
         case unsigned = "u" // unsigned int

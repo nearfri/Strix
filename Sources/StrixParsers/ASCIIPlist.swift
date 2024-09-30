@@ -6,7 +6,7 @@ import Foundation
 // 본래 ASCII property list에서 주석은 어디에도 있을 수 있지만, 여기선 dictionary key 앞에 있는 것만 저장하도록 한다.
 // Localizable.strings 파일을 다루는데는 이 정도면 충분하다.
 
-public enum ASCIIPlist: Equatable {
+public enum ASCIIPlist: Hashable, Sendable {
     case string(String)
     case data(Data)
     case array([ASCIIPlist])
@@ -14,7 +14,7 @@ public enum ASCIIPlist: Equatable {
 }
 
 extension ASCIIPlist {
-    public struct DictionaryEntry: Equatable {
+    public struct DictionaryEntry: Hashable, Sendable {
         public var comment: String?
         public var key: String
         public var value: ASCIIPlist

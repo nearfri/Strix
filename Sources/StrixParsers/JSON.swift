@@ -2,7 +2,7 @@ import Foundation
 import CoreFoundation
 
 @dynamicMemberLookup
-public enum JSON: Equatable {
+public enum JSON: Hashable, Sendable {
     case dictionary([String: JSON])
     case array([JSON])
     case string(String)
@@ -122,13 +122,13 @@ extension JSON {
         case let dictionary as [String: Any]:
             self = .dictionary(try dictionary.mapValues { try JSON(jsonObject: $0) })
         default:
-            throw InvalidTypeError(type: type(of: jsonObject), value: jsonObject)
+            throw InvalidTypeError(type: type(of: jsonObject), valueDescription: "\(jsonObject)")
         }
     }
     
     public struct InvalidTypeError: Error {
         let type: Any.Type
-        let value: Any
+        let valueDescription: String
     }
 }
 

@@ -1,61 +1,61 @@
-import XCTest
+import Testing
 @testable import Strix
 
-private enum Seed {
+private enum Fixture {
     static let input = """
-    12345
-    abcde
-    ABCDE
-    """
+        12345
+        abcde
+        ABCDE
+        """
 }
 
-final class TextPositionTests: XCTestCase {
-    func test_init_lineAtStartIndex() {
+@Suite struct TextPositionTests {
+    @Test func init_lineAtStartIndex() {
         // Given
-        let startIndex = Seed.input.startIndex
+        let startIndex = Fixture.input.startIndex
         
         // When
-        let position = TextPosition(string: Seed.input, index: startIndex)
+        let position = TextPosition(string: Fixture.input, index: startIndex)
         
         // Then
-        XCTAssertEqual(position.line, 1)
+        #expect(position.line == 1)
     }
     
-    func test_init_lineAtEndIndex() {
+    @Test func init_lineAtEndIndex() {
         // Given
-        let endIndex = Seed.input.endIndex
+        let endIndex = Fixture.input.endIndex
         
         // When
-        let position = TextPosition(string: Seed.input, index: endIndex)
+        let position = TextPosition(string: Fixture.input, index: endIndex)
         
         // Then
-        XCTAssertEqual(position.line, 3)
+        #expect(position.line == 3)
     }
     
-    func test_init_lineAtStartOfLine() throws {
+    @Test func init_lineAtStartOfLine() throws {
         // Given
-        let indexA = try XCTUnwrap(Seed.input.firstIndex(of: "a"))
+        let indexA = try #require(Fixture.input.firstIndex(of: "a"))
         
         // When
-        let position = TextPosition(string: Seed.input, index: indexA)
+        let position = TextPosition(string: Fixture.input, index: indexA)
         
         // Then
-        XCTAssertEqual(position.line, 2)
+        #expect(position.line == 2)
     }
     
-    func test_init_lineAtEndOfLine() throws {
+    @Test func init_lineAtEndOfLine() throws {
         // Given
-        let indexE = try XCTUnwrap(Seed.input.firstIndex(of: "e"))
-        let indexAfterE = Seed.input.index(after: indexE)
+        let indexE = try #require(Fixture.input.firstIndex(of: "e"))
+        let indexAfterE = Fixture.input.index(after: indexE)
         
         // When
-        let position = TextPosition(string: Seed.input, index: indexAfterE)
+        let position = TextPosition(string: Fixture.input, index: indexAfterE)
         
         // Then
-        XCTAssertEqual(position.line, 2)
+        #expect(position.line == 2)
     }
     
-    func test_init_lineAtEmptyString_startIndex() {
+    @Test func init_lineAtEmptyString_startIndex() {
         // Given
         let input = ""
         let index = input.startIndex
@@ -64,10 +64,10 @@ final class TextPositionTests: XCTestCase {
         let position = TextPosition(string: input, index: index)
         
         // Then
-        XCTAssertEqual(position.line, 1)
+        #expect(position.line == 1)
     }
     
-    func test_init_lineAtEmptyString_endIndex() {
+    @Test func init_lineAtEmptyString_endIndex() {
         // Given
         let input = ""
         let index = input.endIndex
@@ -76,10 +76,10 @@ final class TextPositionTests: XCTestCase {
         let position = TextPosition(string: input, index: index)
         
         // Then
-        XCTAssertEqual(position.line, 1)
+        #expect(position.line == 1)
     }
     
-    func test_init_lineAtSingleLineString() {
+    @Test func init_lineAtSingleLineString() {
         // Given
         let input = "hello world\n"
         let index = input.endIndex
@@ -88,55 +88,55 @@ final class TextPositionTests: XCTestCase {
         let position = TextPosition(string: input, index: index)
         
         // Then
-        XCTAssertEqual(position.line, 1)
+        #expect(position.line == 1)
     }
     
-    func test_init_columnAtFirstIndex() {
+    @Test func init_columnAtFirstIndex() {
         // Given
-        let startIndex = Seed.input.startIndex
+        let startIndex = Fixture.input.startIndex
         
         // When
-        let position = TextPosition(string: Seed.input, index: startIndex)
+        let position = TextPosition(string: Fixture.input, index: startIndex)
         
         // Then
-        XCTAssertEqual(position.column, 1)
+        #expect(position.column == 1)
     }
     
-    func test_init_columnAtEndIndex() {
+    @Test func init_columnAtEndIndex() {
         // Given
-        let endIndex = Seed.input.endIndex
+        let endIndex = Fixture.input.endIndex
         
         // When
-        let position = TextPosition(string: Seed.input, index: endIndex)
+        let position = TextPosition(string: Fixture.input, index: endIndex)
         
         // Then
-        XCTAssertEqual(position.column, 6)
+        #expect(position.column == 6)
     }
     
-    func test_init_columnAtStartOfLine() throws {
+    @Test func init_columnAtStartOfLine() throws {
         // Given
-        let indexA = try XCTUnwrap(Seed.input.firstIndex(of: "a"))
+        let indexA = try #require(Fixture.input.firstIndex(of: "a"))
         
         // When
-        let position = TextPosition(string: Seed.input, index: indexA)
+        let position = TextPosition(string: Fixture.input, index: indexA)
         
         // Then
-        XCTAssertEqual(position.column, 1)
+        #expect(position.column == 1)
     }
     
-    func test_init_columnAtEndOfLine() throws {
+    @Test func init_columnAtEndOfLine() throws {
         // Given
-        let indexE = try XCTUnwrap(Seed.input.firstIndex(of: "e"))
-        let indexAfterE = Seed.input.index(after: indexE)
+        let indexE = try #require(Fixture.input.firstIndex(of: "e"))
+        let indexAfterE = Fixture.input.index(after: indexE)
         
         // When
-        let position = TextPosition(string: Seed.input, index: indexAfterE)
+        let position = TextPosition(string: Fixture.input, index: indexAfterE)
         
         // Then
-        XCTAssertEqual(position.column, 6)
+        #expect(position.column == 6)
     }
     
-    func test_init_columnAtEmptyString() throws {
+    @Test func init_columnAtEmptyString() throws {
         // Given
         let input = ""
         let index = input.startIndex
@@ -145,6 +145,6 @@ final class TextPositionTests: XCTestCase {
         let position = TextPosition(string: input, index: index)
         
         // Then
-        XCTAssertEqual(position.column, 1)
+        #expect(position.column == 1)
     }
 }
