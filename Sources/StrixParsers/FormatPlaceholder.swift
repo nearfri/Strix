@@ -6,7 +6,7 @@ import Foundation
 // https://pubs.opengroup.org/onlinepubs/9699919799/functions/printf.html
 // http://man.openbsd.org/printf.3
 
-public struct FormatPlaceholder: Equatable {
+public struct FormatPlaceholder: Equatable, Sendable {
     public var index: Index?
     public var flags: [Flag] = []
     public var width: Width?
@@ -40,7 +40,7 @@ public struct FormatPlaceholder: Equatable {
 extension FormatPlaceholder {
     public typealias Index = Int
     
-    public enum Flag: Character, CaseIterable {
+    public enum Flag: Character, CaseIterable, Sendable {
         case minus = "-"
         case plus = "+"
         case space = " "
@@ -49,14 +49,14 @@ extension FormatPlaceholder {
         case hash = "#"
     }
     
-    public enum Width: Equatable {
+    public enum Width: Equatable, Sendable {
         case `static`(Int)
         case dynamic(Index?)
     }
     
     public typealias Precision = Width
     
-    public enum Length: String, CaseIterable {
+    public enum Length: String, CaseIterable, Sendable {
         case char = "hh" // char or unsigned char
         case short = "h" // short or unsigned short
         case long = "l" // long or unsigned long
@@ -70,7 +70,7 @@ extension FormatPlaceholder {
         case quadword = "q" // quad_t
     }
     
-    public enum Conversion: Character, CaseIterable {
+    public enum Conversion: Character, CaseIterable, Sendable {
         case decimal = "d" // int
         case int = "i" // int
         case unsigned = "u" // unsigned int

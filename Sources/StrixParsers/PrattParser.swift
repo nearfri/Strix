@@ -1,7 +1,7 @@
 import Foundation
 import Strix
 
-public enum TokenType: Int {
+public enum TokenType: Int, Sendable {
     case end
     case number
     case string
@@ -10,7 +10,7 @@ public enum TokenType: Int {
     case comment
 }
 
-public struct Token: Hashable {
+public struct Token: Hashable, Sendable {
     public var type: TokenType
     public var value: String
     

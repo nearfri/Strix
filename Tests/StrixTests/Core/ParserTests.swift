@@ -2,17 +2,19 @@ import XCTest
 @testable import Strix
 
 private enum Seed {
-    static let state1: ParserState = .init(stream: "123456")
-    static let state2: ParserState = state1.advanced()
+    static var state1: ParserState { .init(stream: "123456") }
+    static var state2: ParserState { state1.advanced() }
     
     static let intErrors: [ParseError] = [.expected(label: "integer")]
     static let strErrors: [ParseError] = [.expected(label: "string")]
     
-    static let intSuccessParser: Parser<Int> = .init({ _ in .success(1, intErrors, state2) })
-    static let intFailureParser: Parser<Int> = .init({ _ in .failure(intErrors, state2) })
+    static var intSuccessParser: Parser<Int> { .init({ _ in .success(1, intErrors, state2) }) }
+    static var intFailureParser: Parser<Int> { .init({ _ in .failure(intErrors, state2) }) }
     
-    static let strSuccessParser: Parser<String> = .init({ _ in .success("wow", strErrors, state2) })
-    static let strFailureParser: Parser<String> = .init({ _ in .failure(strErrors, state2) })
+    static var strSuccessParser: Parser<String> {
+        .init({ _ in .success("wow", strErrors, state2) })
+    }
+    static var strFailureParser: Parser<String> { .init({ _ in .failure(strErrors, state2) }) }
 }
 
 private class TextOutput: TextOutputStream {

@@ -2,9 +2,9 @@ import XCTest
 @testable import Strix
 
 private enum Seed {
-    static let state: ParserState = .init(stream: "stream")
-    static let state1: ParserState = .init(stream: "stream1")
-    static let state2: ParserState = .init(stream: "stream2")
+    static var state: ParserState { .init(stream: "stream") }
+    static var state1: ParserState { .init(stream: "stream1") }
+    static var state2: ParserState { .init(stream: "stream2") }
     
     static let errors1: [ParseError] = [.expected(label: "Hello")]
     static let errors2: [ParseError] = [.expected(label: "World")]

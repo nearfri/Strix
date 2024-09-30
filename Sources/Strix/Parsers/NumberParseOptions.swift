@@ -1,6 +1,6 @@
 import Foundation
 
-public struct NumberParseOptions: OptionSet {
+public struct NumberParseOptions: OptionSet, Sendable {
     public let rawValue: Int
     
     public init(rawValue: Int) {

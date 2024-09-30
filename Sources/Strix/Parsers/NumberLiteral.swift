@@ -1,19 +1,19 @@
 import Foundation
 
 extension NumberLiteral {
-    public enum Sign {
+    public enum Sign: Sendable {
         case none
         case minus
         case plus
     }
     
-    public enum Classification {
+    public enum Classification: Sendable {
         case finite
         case nan
         case infinity
     }
     
-    public enum Notation: Int {
+    public enum Notation: Int, Sendable {
         case decimal = 10       // no prefix
         case hexadecimal = 16   // 0x prefix
         case octal = 8          // 0o prefix
@@ -21,7 +21,7 @@ extension NumberLiteral {
     }
 }
 
-public struct NumberLiteral: Equatable {
+public struct NumberLiteral: Equatable, Sendable {
     public var string: String = ""
     public var sign: Sign = .none
     public var classification: Classification = .finite

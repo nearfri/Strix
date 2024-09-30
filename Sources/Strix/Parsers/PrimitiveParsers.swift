@@ -356,15 +356,10 @@ public class RecursiveParserGenerator<T> {
     }
     
     private let subjectParser: ParserObject
-    private let placeholderParser: ParserObject
     
     public init() {
         subjectParser = ParserObject { _ in
             preconditionFailure("a recursive parser was not initialized")
-        }
-        
-        placeholderParser = ParserObject { [unowned subjectParser] in
-            return subjectParser.parse($0)
         }
     }
     
@@ -379,8 +374,8 @@ public class RecursiveParserGenerator<T> {
     }
     
     public var placeholder: Parser<T> {
-        return Parser { [placeholderParser] in
-            return placeholderParser.parse($0)
+        return Parser { [unowned subjectParser] in
+            return subjectParser.parse($0)
         }
     }
     

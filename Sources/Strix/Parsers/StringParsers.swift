@@ -42,11 +42,11 @@ extension Parser where T == Substring {
     /// `substring(str, caseSensitive: flag)` parses the string `str` and returns the parsed string.
     /// It is an atomic parser: either it succeeds or it fails without consuming any input.
     public static func substring(_ str: String, caseSensitive: Bool = true) -> Parser<Substring> {
-        let equal: (Character, Character) -> Bool = {
-            return caseSensitive
-                ? { lhs, rhs in lhs == rhs }
-                : { lhs, rhs in lhs.lowercased() == rhs.lowercased() }
-        }()
+        let equal: (Character, Character) -> Bool = if caseSensitive {
+            { lhs, rhs in lhs == rhs }
+        } else {
+            { lhs, rhs in lhs.lowercased() == rhs.lowercased() }
+        }
         
         return Parser { state in
             let stream = state.stream
