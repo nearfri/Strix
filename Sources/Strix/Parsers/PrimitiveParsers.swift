@@ -140,6 +140,7 @@ extension Parser {
         }
     }
     
+    /// Use the ``one(of:)`` instead.
     @available(*, deprecated, renamed: "one(of:)")
     public static func any<S: Sequence>(of parsers: S) -> Parser<T> where S.Element == Parser<T> {
         return one(of: parsers)
@@ -329,6 +330,7 @@ extension Parser where T == Void {
         }
     }
     
+    /// Use the ``satisfyUserInfo(_:_:)`` instead.
     @available(*, deprecated, renamed: "satisfyUserInfo(_:_:)")
     public static func satisfyUserInfo(
         _ predicate: @escaping (UserInfo) -> Bool,

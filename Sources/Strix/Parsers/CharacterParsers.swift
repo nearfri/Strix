@@ -15,6 +15,7 @@ extension Parser where T == Character {
         }
     }
     
+    /// Use the ``satisfy(_:_:)`` instead.
     @available(*, deprecated, renamed: "satisfy(_:_:)")
     public static func satisfy(
         _ predicate: @escaping (Character) -> Bool,
