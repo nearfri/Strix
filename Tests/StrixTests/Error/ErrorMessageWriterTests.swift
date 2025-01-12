@@ -53,15 +53,15 @@ private typealias ErrorMessageWriter = Strix.ErrorMessageWriter<FakeErrorOutputS
             """)
         
         #expect(errorStream.snapshots.contains(where: { snapshot in
-            snapshot.indent.level == 0
-            && snapshot.text.contains("Expecting: string literal in double quotes")
-            && snapshot.text.hasSuffix("could not be parsed because:\n")
+            snapshot.indent.level == 0 &&
+            snapshot.text.contains("Expecting: string literal in double quotes") &&
+            snapshot.text.hasSuffix("could not be parsed because:\n")
         }))
         
         #expect(errorStream.snapshots.contains(where: { snapshot in
-            return snapshot.indent.level == 1
-            && snapshot.text.contains("Error at line 1, column 9")
-            && snapshot.text.contains("Expecting: '\"'")
+            return snapshot.indent.level == 1 &&
+            snapshot.text.contains("Error at line 1, column 9") &&
+            snapshot.text.contains("Expecting: '\"'")
         }))
         
         #expect(errorStream.indent.level == 0)
@@ -392,8 +392,8 @@ private typealias ErrorMessageWriter = Strix.ErrorMessageWriter<FakeErrorOutputS
             """))
         
         #expect(errorStream.snapshots.contains(where: { snapshot in
-            return snapshot.indent.level == 1
-            && snapshot.text.contains("So much about that theory ...")
+            return snapshot.indent.level == 1 &&
+            snapshot.text.contains("So much about that theory ...")
         }))
         
         #expect(errorStream.indent.level == 0)
@@ -427,15 +427,15 @@ private typealias ErrorMessageWriter = Strix.ErrorMessageWriter<FakeErrorOutputS
             """))
         
         #expect(errorStream.snapshots.contains(where: { snapshot in
-            return snapshot.indent.level == 0
-            && snapshot.text.contains("Expecting: string literal in double quotes")
-            && snapshot.text.hasSuffix("could not be parsed because:\n")
+            return snapshot.indent.level == 0 &&
+            snapshot.text.contains("Expecting: string literal in double quotes") &&
+            snapshot.text.hasSuffix("could not be parsed because:\n")
         }))
         
         #expect(errorStream.snapshots.contains(where: { snapshot in
-            return snapshot.indent.level == 1
-            && snapshot.text.contains("Error at line 1, column 9")
-            && snapshot.text.contains("Expecting: '\"'")
+            return snapshot.indent.level == 1 &&
+            snapshot.text.contains("Error at line 1, column 9") &&
+            snapshot.text.contains("Expecting: '\"'")
         }))
         
         #expect(errorStream.indent.level == 0)
@@ -463,9 +463,9 @@ private typealias ErrorMessageWriter = Strix.ErrorMessageWriter<FakeErrorOutputS
             """))
         
         #expect(errorStream.snapshots.contains(where: { snapshot in
-            return snapshot.indent.level == 1
-            && snapshot.text.contains("Error at line 1, column 2")
-            && snapshot.text.contains("Expecting: 'b'")
+            return snapshot.indent.level == 1 &&
+            snapshot.text.contains("Error at line 1, column 2") &&
+            snapshot.text.contains("Expecting: 'b'")
         }))
         
         #expect(errorStream.indent.level == 0)
