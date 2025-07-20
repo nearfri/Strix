@@ -3,11 +3,19 @@ import Strix
 
 extension Parser where T == FormatSpecifier {
     public static var formatSpecifier: Parser<FormatSpecifier> {
-        return FormatSpecifierParserGenerator().formatSpecifier
+        return FormatSpecifierParserGenerator().formatSpecifier(supportsName: false)
     }
     
     public static var formatSpecifierContent: Parser<FormatSpecifier> {
-        return FormatSpecifierParserGenerator().formatSpecifierContent
+        return FormatSpecifierParserGenerator().formatSpecifierContent(supportsName: false)
+    }
+    
+    public static var namedFormatSpecifier: Parser<FormatSpecifier> {
+        return FormatSpecifierParserGenerator().formatSpecifier(supportsName: true)
+    }
+    
+    public static var namedFormatSpecifierContent: Parser<FormatSpecifier> {
+        return FormatSpecifierParserGenerator().formatSpecifierContent(supportsName: true)
     }
 }
 
@@ -19,20 +27,20 @@ private struct FormatSpecifierParserGenerator {
     private typealias Length = FormatPlaceholder.Length
     private typealias Conversion = FormatPlaceholder.Conversion
     
-    var formatSpecifier: Parser<FormatSpecifier> {
-        return .character("%") *> formatSpecifierContent
+    func formatSpecifier(supportsName: Bool) -> Parser<FormatSpecifier> {
+        return .character("%") *> formatSpecifierContent(supportsName: supportsName)
     }
     
-    var formatSpecifierContent: Parser<FormatSpecifier> {
-        return percentSign <|> placeholder
+    func formatSpecifierContent(supportsName: Bool) -> Parser<FormatSpecifier> {
+        return percentSign <|> placeholder(supportsName: supportsName)
     }
     
     private let percentSign: Parser<FormatSpecifier> = .character("%") *> .just(.percentSign)
     
-    private var placeholder: Parser<FormatSpecifier> {
+    private func placeholder(supportsName: Bool) -> Parser<FormatSpecifier> {
         let fields = Parser.tuple(
             Parser.optional(index),
-            Parser.optional(name),
+            supportsName ? Parser.optional(name) : Parser.just(nil),
             Parser.many(flag),
             Parser.optional(width),
             Parser.optional(precision),
