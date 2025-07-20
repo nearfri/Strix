@@ -32,6 +32,7 @@ private struct FormatSpecifierParserGenerator {
     private var placeholder: Parser<FormatSpecifier> {
         let fields = Parser.tuple(
             Parser.optional(index),
+            Parser.optional(name),
             Parser.many(flag),
             Parser.optional(width),
             Parser.optional(precision),
@@ -63,6 +64,16 @@ private struct FormatSpecifierParserGenerator {
         }
     }()
     
+    private var name: Parser<String> {
+        return .character("(") *> identifier <* .character(")")
+    }
+    
+    private let identifier: Parser<String> = {
+        let first = Parser.asciiLetter <|> .character("_")
+        let repeating = Parser.asciiLetter <|> .decimalDigit <|> .character("_")
+        return .skipped(by: .many(first: first, repeating: repeating, minCount: 1))
+    }()
+    
     private let flag: Parser<Flag> = {
         let allFlagChars = Flag.allCases.map(\.rawValue)
         return Parser.any(of: allFlagChars).map({ Flag(rawValue: $0)! })
@@ -90,10 +101,9 @@ private struct FormatSpecifierParserGenerator {
         return Parser.any(of: allConversionChars).map({ Conversion(rawValue: $0)! })
     }()
     
-    private let variableName: Parser<String> = {
-        let variableCharacters = Parser.one(of: [.asciiLetter, .decimalDigit, .character("_")])
-        return .skipped(by: .many(variableCharacters, minCount: 1)) <* .character("@")
-    }()
+    private var variableName: Parser<String> {
+        return identifier <* .character("@")
+    }
 }
 
 private extension FormatPlaceholder {

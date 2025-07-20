@@ -39,6 +39,12 @@ import Strix
         try #expect(sut.run("%1$d") == .placeholder(.init(index: 1, conversion: .decimal)))
     }
     
+    @Test func parse_name() throws {
+        try #expect(sut.run("%1$(count)3d") == .placeholder(
+            .init(index: 1, name: "count", width: .static(3), conversion: .decimal)
+        ))
+    }
+    
     @Test func parse_index_zero_throwError() {
         #expect(throws: RunError.self, performing: {
             try sut.run("%0$d")

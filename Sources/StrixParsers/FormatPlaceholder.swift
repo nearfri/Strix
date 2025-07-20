@@ -8,6 +8,7 @@ import Foundation
 
 public struct FormatPlaceholder: Equatable, Sendable {
     public var index: Index?
+    public var name: String? // for named format specifiers, like %(landmarkCount)lld
     public var flags: [Flag] = []
     public var width: Width?
     public var precision: Precision?
@@ -16,6 +17,7 @@ public struct FormatPlaceholder: Equatable, Sendable {
     public var variableName: String? // variable in stringsdict
     
     public init(index: FormatPlaceholder.Index? = nil,
+                name: String? = nil,
                 flags: [FormatPlaceholder.Flag] = [],
                 width: FormatPlaceholder.Width? = nil,
                 precision: FormatPlaceholder.Precision? = nil,
@@ -24,6 +26,7 @@ public struct FormatPlaceholder: Equatable, Sendable {
                 variableName: String? = nil
     ) {
         self.index = index
+        self.name = name
         self.flags = flags
         self.width = width
         self.precision = precision
@@ -41,6 +44,8 @@ extension FormatPlaceholder: CustomStringConvertible {
     public var description: String {
         let components: [String?] = [
             index.map({ "index: \($0)" }),
+            
+            name.map({ "name: \($0)" }),
             
             {
                 let flagDescs = flags.map({ "\($0)" })
