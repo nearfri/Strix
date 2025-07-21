@@ -35,6 +35,10 @@ public struct FormatPlaceholder: Equatable, Sendable {
         self.variableName = variableName
     }
     
+    public var resolvedName: String? {
+        return name ?? variableName
+    }
+    
     public var isPluralVariable: Bool {
         return flags.contains(.hash) && variableName != nil
     }
